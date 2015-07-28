@@ -58,6 +58,7 @@
      <Compile Include="Assets\_Scripts\MouseClick.cs" />
      <Compile Include="Assets\_Scripts\PlayerMovement.cs" />
      <Compile Include="Assets\_Scripts\ProjectileCollision.cs" />
+     <Compile Include="Assets\_Scripts\TurnButton.cs" />
      <Compile Include="Assets\_Scripts\TweenBy.cs" />
      <None Include="Assets\Plugins\Pixelplacement\iTween\ReadMe!\ReadMe!.txt" />
  <Reference Include="UnityEngine.UI">

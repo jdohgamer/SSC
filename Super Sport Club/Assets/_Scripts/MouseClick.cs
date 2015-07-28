@@ -5,6 +5,7 @@ public class MouseClick : MonoBehaviour {
 
 	Message message;
 	public Vector3 p;
+	public static bool BSelection;
 	void Start () 
 	{
 		message = new Message ();

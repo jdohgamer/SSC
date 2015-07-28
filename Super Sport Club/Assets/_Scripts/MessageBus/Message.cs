@@ -6,6 +6,7 @@ public enum MessageType
 	NONE,
 	MouseClick,
 	PlayerPosition,
+	EndTurn,
 	Hit
 }
 

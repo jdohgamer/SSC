@@ -3,17 +3,28 @@ using System.Collections;
 
 public class ClickMoveHandler : MessageHandler
 {
-	public float deltaSpeed;
+	//public float deltaSpeed;
 	[SerializeField] protected iTween.EaseType ease;
 	protected string easeType;
-	//[SerializeField] protected int ;
+	Vector3 target;
 	[SerializeField] protected float speed;
 	public override void HandleMessage(Message message)
 	{
-		Vector3 target = new Vector3 (message.Vector3Value.x, 0f, message.Vector3Value.z);
-		Debug.Log("God damn nigga "+ message.Vector3Value.ToString());
-		StopCoroutine ("MoveTo");
-		StartCoroutine ("MoveTo",target);
+		switch (message.Type) 
+		{
+			case MessageType.MouseClick:
+			{
+				target = new Vector3 (message.Vector3Value.x, 0f, message.Vector3Value.z);
+				Debug.Log("God damn nigga "+ message.Vector3Value.ToString());
+				break;
+			}
+			case MessageType.EndTurn:
+			{
+				StopCoroutine ("MoveTo");
+				StartCoroutine ("MoveTo",target);
+				break;
+			}
+		}
 	}
 	IEnumerator MoveTo(Vector3 target)
 	{
