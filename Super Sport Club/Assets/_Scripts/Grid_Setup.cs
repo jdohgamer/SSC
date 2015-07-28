@@ -6,6 +6,11 @@ public class Grid_Setup : MonoBehaviour
 {
 	public int length, width;
 	public GameObject[] boardCell;
+	/* Dirt = 0
+	 * Corner Lines = 1
+	 * Lines = 2
+	 * Grass = 3
+	 */
 
 	private Transform boardHolder;
 	private List <Vector3> gridPositions = new List <Vector3> ();
@@ -29,39 +34,44 @@ public class Grid_Setup : MonoBehaviour
 
 	void Generate () 
 	{
-		Quaternion turnRotation = Quaternion.LookRotation(new Vector3(0,0,-90));
-
 		GameObject cell;
+		int cellType = 0;
 
-		for (int x = -1; x<width+1; x++)
+		for (int x = -1; x<=width+1; x++)
 		{
-			for (int z = -1; z<length+1; z++)
+			for (int z = -1; z<=length+1; z++)
 			{
-				if(x ==-1||x ==width||z ==-1|| z == length)
+				if(x ==-1||x ==width+1||z ==-1|| z == length+1)
 				{
-					cell = Instantiate(boardCell[0],new Vector3(x,0,z), Quaternion.identity) as GameObject;
-				}else if(x ==0||x == width-1||z ==0|| z == length-1){
-					if(z ==0|| z == length-1)
+					CreateCell(0,x,z,0f);
+				}else if(x==0||x==width||z==0||z==length)
+				{
+					if(x==0) //left side
 					{
-						if(x ==0&&z ==0)
-						{
-							cell = Instantiate(boardCell[2],new Vector3(x,0,z), Quaternion.identity)as GameObject;
-							cell.transform.rotation = Quaternion.AngleAxis(-90, Vector3.up);
-						}else
-						{
-							cell = Instantiate(boardCell[2],new Vector3(x,0,z), Quaternion.identity)as GameObject;
-						}
-					}else if(x ==0||x == width-1){
-						cell = Instantiate(boardCell[1],new Vector3(x,0,z), Quaternion.identity)as GameObject;
-						cell.transform.rotation = Quaternion.AngleAxis(90, Vector3.up);
+						if(z==0){CreateCell(1,x,z,-90);} //bottom left
+						else if(z==length){CreateCell(1,x,z,0f);} //top left
+						else{CreateCell(2,x,z,90);} //if(z>0&&z<length)
 					}
-
-				}else {
-					cell = Instantiate(boardCell[3],new Vector3(x,0,z), Quaternion.identity)as GameObject;
+					else if(x==width)//right side
+					{
+						if(z==0){CreateCell(1,x,z,180f);} //bottom right
+						else if(z==length){CreateCell(1,x,z,90);} //top right
+						else {CreateCell(2,x,z,90);} //if(z>0&&z<length)
+					}else{ //if(x>0&&x<width&&z==0||z==length)
+						CreateCell(2,x,z,0f);
+					}
+				}else { //inner field
+					CreateCell(3,x,z,0f);
 				}
 
 			}
 		}
+	}
+	void CreateCell(int type,int x, int z, float rotation)
+	{
+		GameObject cell;
+		cell = Instantiate(boardCell[type],new Vector3(x,0,z), Quaternion.identity)as GameObject;
+		cell.transform.rotation = Quaternion.AngleAxis(rotation, Vector3.up);
 	}
 	
 	void Start()
