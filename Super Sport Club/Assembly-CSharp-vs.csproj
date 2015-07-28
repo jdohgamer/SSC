@@ -46,7 +46,20 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\_Scripts\CameraFollow.cs" />
+     <Compile Include="Assets\_Scripts\ClickMoveHandler.cs" />
      <Compile Include="Assets\_Scripts\Grid_Setup.cs" />
+     <Compile Include="Assets\_Scripts\HitHandler.cs" />
+     <Compile Include="Assets\_Scripts\MessageBus\Message.cs" />
+     <Compile Include="Assets\_Scripts\MessageBus\MessageBus.cs" />
+     <Compile Include="Assets\_Scripts\MessageBus\MessageHandler.cs" />
+     <Compile Include="Assets\_Scripts\MessageBus\MessageSubscriber.cs" />
+     <Compile Include="Assets\_Scripts\MessageBus\MessageSubscriberController.cs" />
+     <Compile Include="Assets\_Scripts\MouseClick.cs" />
+     <Compile Include="Assets\_Scripts\PlayerMovement.cs" />
+     <Compile Include="Assets\_Scripts\ProjectileCollision.cs" />
+     <Compile Include="Assets\_Scripts\TweenBy.cs" />
+     <None Include="Assets\Plugins\Pixelplacement\iTween\ReadMe!\ReadMe!.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
@@ -59,6 +72,10 @@
  <Reference Include="UnityEditor.iOS.Extensions.Xcode">
  <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
  </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Assembly-CSharp-firstpass-vs.csproj">
+      <Project>{F1A87E70-1BC2-C068-91A3-2EB23381E594}</Project>      <Name>Assembly-CSharp-firstpass-vs</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

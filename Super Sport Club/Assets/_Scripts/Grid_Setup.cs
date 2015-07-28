@@ -6,7 +6,9 @@ public class Grid_Setup : MonoBehaviour
 {
 	public int length, width;
 	public GameObject[] boardCell;
-	public GameObject ball, field;
+	public GameObject ball;
+	public Vector3 size;
+	GameObject field;
 	Transform fieldTran;
 	/* Dirt = 0
 	 * Corner Lines = 1
@@ -74,6 +76,7 @@ public class Grid_Setup : MonoBehaviour
 		cell = Instantiate(boardCell[type],new Vector3(x,0,z), Quaternion.identity)as GameObject;
 		cell.transform.rotation = Quaternion.AngleAxis(rotation, Vector3.up);
 		cell.transform.SetParent (fieldTran);
+		size = cell.GetComponent<Collider> ().bounds.size;
 	}
 	
 	void Start()
