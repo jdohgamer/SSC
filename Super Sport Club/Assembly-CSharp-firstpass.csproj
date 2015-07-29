@@ -50,7 +50,16 @@
      <Compile Include="Assets\Plugins\Pixelplacement\iTween\Sample\RotateSample.cs" />
      <Compile Include="Assets\Plugins\Pixelplacement\iTween\Sample\SampleInfo.cs" />
      <Compile Include="Assets\Plugins\Pixelplacement\iTween\iTween.cs" />
+     <None Include="Assets\RAIN\Editor\Shaders\AspectSphereShader.shader" />
+     <None Include="Assets\RAIN\Editor\Shaders\VisualSensorLineShader.shader" />
+     <None Include="Assets\RAIN\Editor\Shaders\NavMeshContourShader.shader" />
+     <None Include="Assets\RAIN\Editor\Shaders\WaypointShader.shader" />
+     <None Include="Assets\RAIN\Editor\ScriptTemplates\BehaviorTreeTemplate.xml" />
      <None Include="Assets\Plugins\Pixelplacement\iTween\ReadMe!\ReadMe!.txt" />
+     <None Include="Assets\RAIN\Editor\Shaders\VisualSensorRingShader.shader" />
+     <None Include="Assets\RAIN\ReleaseNotes.txt" />
+     <None Include="Assets\RAIN\Editor\Shaders\AspectRingShader.shader" />
+     <None Include="Assets\RAIN\Editor\Shaders\NavMeshColliderShader.shader" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
@@ -59,6 +68,12 @@
  </Reference>
  <Reference Include="UnityEngine.Analytics">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
+ </Reference>
+ <Reference Include="RAINMetaform">
+ <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/RAIN/RAINMetaform.dll</HintPath>
+ </Reference>
+ <Reference Include="RAIN">
+ <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/RAIN/RAIN.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.iOS.Extensions.Xcode">
  <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>

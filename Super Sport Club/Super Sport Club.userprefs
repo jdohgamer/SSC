@@ -1,13 +1,13 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\_Scripts\ClickMoveHandler.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\_Scripts\MouseClick.cs">
     <Files>
-      <File FileName="Assets\_Scripts\ClickMoveHandler.cs" Line="19" Column="5" />
+      <File FileName="Assets\_Scripts\ClickMoveHandler.cs" Line="1" Column="1" />
       <File FileName="Assets\_Scripts\Grid_Setup.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\MessageBus\MessageBus.cs" Line="1" Column="1" />
       <File FileName="Assets\_Scripts\TweenBy.cs" Line="1" Column="1" />
       <File FileName="Assets\_Scripts\HitHandler.cs" Line="1" Column="1" />
       <File FileName="Assets\_Scripts\MessageBus\Message.cs" Line="21" Column="2" />
+      <File FileName="Assets\_Scripts\MouseClick.cs" Line="22" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

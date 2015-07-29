@@ -6,7 +6,7 @@ public class ClickMoveHandler : MessageHandler
 	//public float deltaSpeed;
 	[SerializeField] protected iTween.EaseType ease;
 	protected string easeType;
-	Vector3 target;
+	public Vector3 target;
 	[SerializeField] protected float speed;
 	public override void HandleMessage(Message message)
 	{
