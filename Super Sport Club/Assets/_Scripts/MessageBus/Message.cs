@@ -5,7 +5,7 @@ public enum MessageType
 {
 	NONE,
 	MouseClick,
-	PlayerPosition,
+	BallPosition,
 	EndTurn,
 	Hit
 }
@@ -18,4 +18,13 @@ public struct Message
 	public float FloatValue;
 	public Vector3 Vector3Value;
 	public GameObject GameObjectValue;
+
+	public void Clear()
+	{
+		this.StringValue = "";
+		this.IntValue = 0;
+		this.FloatValue = 0f;
+		this.Vector3Value = Vector3.zero;
+		this.GameObjectValue = null;
+	}
 }

@@ -46,8 +46,17 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\AI\Actions\ChooseChargePoint.cs" />
+     <Compile Include="Assets\AI\Actions\ChooseFleePosition.cs" />
+     <Compile Include="Assets\AI\Actions\ChooseWanderPosition.cs" />
+     <Compile Include="Assets\AI\Actions\GetStandOnPoint.cs" />
+     <Compile Include="Assets\AI\Actions\StickToPlayer.cs" />
+     <Compile Include="Assets\ControllerHandler.cs" />
+     <Compile Include="Assets\GameController.cs" />
      <Compile Include="Assets\_Scripts\CameraFollow.cs" />
      <Compile Include="Assets\_Scripts\ClickMoveHandler.cs" />
+     <Compile Include="Assets\_Scripts\FSM_BASE.cs" />
+     <Compile Include="Assets\_Scripts\FSM_Character.cs" />
      <Compile Include="Assets\_Scripts\Grid_Setup.cs" />
      <Compile Include="Assets\_Scripts\HitHandler.cs" />
      <Compile Include="Assets\_Scripts\MessageBus\Message.cs" />
@@ -56,12 +65,20 @@
      <Compile Include="Assets\_Scripts\MessageBus\MessageSubscriber.cs" />
      <Compile Include="Assets\_Scripts\MessageBus\MessageSubscriberController.cs" />
      <Compile Include="Assets\_Scripts\MouseClick.cs" />
+     <Compile Include="Assets\_Scripts\NPC_FSM.cs" />
      <Compile Include="Assets\_Scripts\PlayerMovement.cs" />
      <Compile Include="Assets\_Scripts\ProjectileCollision.cs" />
      <Compile Include="Assets\_Scripts\TurnButton.cs" />
      <Compile Include="Assets\_Scripts\TweenBy.cs" />
+     <None Include="Assets\Plugins\RAIN\Editor\Shaders\VisualSensorRingShader.shader" />
+     <None Include="Assets\Plugins\RAIN\Editor\Shaders\AspectSphereShader.shader" />
+     <None Include="Assets\Plugins\RAIN\Editor\ScriptTemplates\BehaviorTreeTemplate.xml" />
+     <None Include="Assets\Plugins\RAIN\Editor\Shaders\NavMeshColliderShader.shader" />
+     <None Include="Assets\Plugins\RAIN\Editor\Shaders\VisualSensorLineShader.shader" />
      <None Include="Assets\RAIN\Editor\Shaders\AspectSphereShader.shader" />
+     <None Include="Assets\Plugins\RAIN\ReleaseNotes.txt" />
      <None Include="Assets\RAIN\Editor\Shaders\VisualSensorLineShader.shader" />
+     <None Include="Assets\Plugins\RAIN\Editor\Shaders\NavMeshContourShader.shader" />
      <None Include="Assets\RAIN\Editor\Shaders\NavMeshContourShader.shader" />
      <None Include="Assets\RAIN\Editor\Shaders\WaypointShader.shader" />
      <None Include="Assets\RAIN\Editor\ScriptTemplates\BehaviorTreeTemplate.xml" />
@@ -69,7 +86,9 @@
      <None Include="Assets\RAIN\Editor\Shaders\VisualSensorRingShader.shader" />
      <None Include="Assets\RAIN\ReleaseNotes.txt" />
      <None Include="Assets\RAIN\Editor\Shaders\AspectRingShader.shader" />
+     <None Include="Assets\Plugins\RAIN\Editor\Shaders\AspectRingShader.shader" />
      <None Include="Assets\RAIN\Editor\Shaders\NavMeshColliderShader.shader" />
+     <None Include="Assets\Plugins\RAIN\Editor\Shaders\WaypointShader.shader" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
@@ -79,11 +98,17 @@
  <Reference Include="UnityEngine.Analytics">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>
+ <Reference Include="RAIN">
+ <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/Plugins/RAIN/RAIN.dll</HintPath>
+ </Reference>
  <Reference Include="RAINMetaform">
- <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/RAIN/RAINMetaform.dll</HintPath>
+ <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/Plugins/RAIN/RAINMetaform.dll</HintPath>
  </Reference>
  <Reference Include="RAIN">
  <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/RAIN/RAIN.dll</HintPath>
+ </Reference>
+ <Reference Include="RAINMetaform">
+ <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/RAIN/RAINMetaform.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.iOS.Extensions.Xcode">
  <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
@@ -92,6 +117,10 @@
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
       <Project>{F1A87E70-1BC2-C068-91A3-2EB23381E594}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
+    <ProjectReference Include="Assembly-Boo-firstpass.booproj">
+      <Project>{35552552-D2B6-41AA-227E-075D9B90CFC3}</Project>      <Name>Assembly-Boo-firstpass</Name>    </ProjectReference>
+    <ProjectReference Include="Assembly-UnityScript-firstpass.unityproj">
+      <Project>{5C5F8F40-0605-9F30-5B85-66824307629A}</Project>      <Name>Assembly-UnityScript-firstpass</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
