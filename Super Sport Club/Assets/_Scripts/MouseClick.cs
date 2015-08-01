@@ -6,11 +6,24 @@ public class MouseClick : MonoBehaviour {
 	Message message;
 	public static bool bSelection;
 	public static GameObject CurrentSelectedObj;
+	public GameObject destPin;
+	GameObject newPin, oldPin;
+	MeshRenderer currentMesh;
 	[SerializeField] LayerMask mask;
 	void Start () 
 	{
 		CurrentSelectedObj = new GameObject ();
+		newPin = new GameObject ();
+		currentMesh = new MeshRenderer ();
 		message = new Message ();
+	}
+	public void EndTurn()
+	{
+		if(currentMesh !=null)
+			currentMesh.material.color = Color.white;
+		currentMesh = null;
+		CurrentSelectedObj = null;
+		bSelection = false;
 	}
 	public void FixedUpdate() 
 	{
@@ -26,9 +39,20 @@ public class MouseClick : MonoBehaviour {
 				{
 					case "Player":
 					{
-						bSelection = true;
-						CurrentSelectedObj = hit.transform.gameObject;
-						Debug.Log ("Dick");
+						if(CurrentSelectedObj != hit.transform.gameObject)
+						{
+							bSelection = true;
+							if(currentMesh !=null)
+							{
+								currentMesh.material.color = Color.white;
+							}
+							oldPin = newPin;
+							newPin = null;
+							CurrentSelectedObj = hit.transform.gameObject;
+							currentMesh = CurrentSelectedObj.GetComponent<MeshRenderer>();
+							currentMesh.material.color = Color.cyan;
+							Debug.Log ("Dick");
+						}
 						break;
 					}
 					case "Field":
@@ -40,6 +64,12 @@ public class MouseClick : MonoBehaviour {
 							Debug.Log ("Click");
 							message.Type = MessageType.MouseClick;
 							MessageBus.Instance.SendMessage (message);
+							if(newPin != null)
+							{
+								Destroy(newPin);
+							}
+							newPin = Instantiate(destPin,message.Vector3Value,Quaternion.identity) as GameObject;
+
 						}
 						break;
 					}

@@ -3,6 +3,11 @@ using System.Collections;
 
 public class ControllerHandler : MessageHandler 
 {
+	MouseClick mouse;
+	void Awake()
+	{
+		mouse = GetComponent<MouseClick> ();
+	}
 
 	public override void HandleMessage(Message message)
 	{
@@ -10,8 +15,7 @@ public class ControllerHandler : MessageHandler
 		{
 			case MessageType.EndTurn:
 			{
-				MouseClick.CurrentSelectedObj = null;
-				MouseClick.bSelection = false;
+				mouse.EndTurn();
 				break;
 			}
 		}
