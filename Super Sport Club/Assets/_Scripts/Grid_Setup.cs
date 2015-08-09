@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic; 
+using RAIN.Core;
+using RAIN.Navigation.Waypoints;
 
 public class Grid_Setup : MonoBehaviour 
 {
@@ -10,12 +12,29 @@ public class Grid_Setup : MonoBehaviour
 	public Vector3 size;
 	GameObject field;
 	Transform fieldTran;
+
 	/* Dirt = 0
 	 * Corner Lines = 1
 	 * Lines = 2
 	 * Grass = 3
 	 */
 	private List <Vector3> gridPositions = new List <Vector3> ();
+
+//	private WaypointRig wpRig = null;
+//	WaypointSet tWPSet;
+	
+	void Awake()
+	{
+//		wpRig = GetComponentInChildren<WaypointRig>();
+//		tWPSet = wpRig.WaypointSet;
+	}
+
+	void Start()
+	{
+		field = new GameObject("Field");
+		fieldTran = field.transform;
+		Generate();
+	}
 
 	void InitialiseList ()
 	{
@@ -77,16 +96,9 @@ public class Grid_Setup : MonoBehaviour
 		cell.transform.rotation = Quaternion.AngleAxis(rotation, Vector3.up);
 		cell.transform.SetParent (fieldTran);
 		size = cell.GetComponent<Collider> ().bounds.size;
+		//tWPSet.AddWaypoint(new Waypoint(cell.transform.position));
 	}
 	
-	void Start()
-	{
-		field = new GameObject("Field");
-		fieldTran = field.transform;
-		Generate();
-	}
-	void Update () 
-	{
-	
-	}
+
+
 }

@@ -29,7 +29,7 @@ public class FSM_Base : MonoBehaviour {
 
 	private Enum _currentState;
 	
-	public Enum currentState
+	public Enum CurrentState
 	{
 		get
 		{

@@ -1,16 +1,38 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\_Scripts\MouseClick.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\_Scripts\MemoryGame\Tile.cs">
     <Files>
-      <File FileName="Assets\_Scripts\ClickMoveHandler.cs" Line="14" Column="1" />
-      <File FileName="Assets\_Scripts\MessageBus\Message.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\MouseClick.cs" Line="30" Column="26" />
-      <File FileName="Assets\_Scripts\NPC_FSM.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\FSM_Character.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\TurnButton.cs" Line="1" Column="1" />
-      <File FileName="Assets\ControllerHandler.cs" Line="13" Column="5" />
-      <File FileName="Assets\_Scripts\MessageBus\MessageSubscriberController.cs" Line="9" Column="2" />
+      <File FileName="Assets\_Scripts\MemoryGame\MemoryGui.cs" Line="1" Column="1" />
+      <File FileName="Assets\_Scripts\MemoryGame\UtilityScripts\NamepickerGui.cs" Line="1" Column="1" />
+      <File FileName="Assets\_Scripts\MemoryGame\Tile.cs" Line="1" Column="1" />
+      <File FileName="Assets\_Scripts\MemoryGame\TileMono.cs" Line="228" Column="3" />
+      <File FileName="Assets\_Scripts\MemoryGame\TileMonoGroup.cs" Line="1" Column="1" />
+      <File FileName="Assets\_Scripts\MemoryGame\MemoryBoard.cs" Line="1" Column="1" />
+      <File FileName="Assets\_Scripts\MemoryGame\MemoryGameClient.cs" Line="353" Column="10" />
+      <File FileName="Assets\_Scripts\MemoryGame\UtilityScripts\WebRpcResponse.cs" Line="1" Column="1" />
+      <File FileName="Assets\Plugins\PhotonAssets\PhotonLoadbalancingApi\LoadBalancingClient.cs" Line="1809" Column="41" />
     </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="Assembly-CSharp" expanded="True">
+            <Node name="_Scripts" expanded="True">
+              <Node name="MemoryGame" expanded="True">
+                <Node name="UtilityScripts" expanded="True" />
+                <Node name="Tile.cs" selected="True" />
+              </Node>
+            </Node>
+          </Node>
+          <Node name="Assembly-CSharp-firstpass" expanded="True">
+            <Node name="Plugins" expanded="True">
+              <Node name="PhotonAssets" expanded="True">
+                <Node name="PhotonLoadbalancingApi" expanded="True" />
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

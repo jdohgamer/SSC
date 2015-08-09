@@ -15,6 +15,20 @@ public class FSM_Character : FSM_Base
 		set{moveTarget = value; hasTarget = true;}
 	}
 
+	public enum Stance
+	{
+		Neutral,
+		Sprint,
+		Pass,
+		Shoot,
+		Cover_Man,
+		Cover_Ball
+	};
+
+	public void Awake()
+	{
+		CurrentState = Stance.Neutral;
+	}
 	public IEnumerator MoveTo(Vector3 target)
 	{
 		easeType = ease.ToString();
@@ -25,10 +39,7 @@ public class FSM_Character : FSM_Base
 			yield return null;
 		}
 	}
-	void Update()
-	{
 
-	}
 	public void EndTurn()
 	{
 		if (hasTarget) 
@@ -36,6 +47,19 @@ public class FSM_Character : FSM_Base
 			hasTarget = false;
 			StopCoroutine ("MoveTo");
 			StartCoroutine ("MoveTo", moveTarget);
+		}
+	}
+
+	void OnTriggerEnter(Collider other)
+	{
+		switch(other.tag)
+		{
+			case "Ball":
+			{
+				other.transform.SetParent(transform);
+				other.attachedRigidbody.isKinematic = true;
+				break;
+			}
 		}
 	}
 

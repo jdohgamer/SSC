@@ -55,11 +55,13 @@
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\VisualSensorLineShader.shader" />
      <None Include="Assets\RAIN\Editor\Shaders\AspectSphereShader.shader" />
      <None Include="Assets\Plugins\RAIN\ReleaseNotes.txt" />
+     <None Include="Assets\Plugins\PhotonAssets\Plugins\Photon3Unity3D.xml" />
      <None Include="Assets\RAIN\Editor\Shaders\VisualSensorLineShader.shader" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\NavMeshContourShader.shader" />
      <None Include="Assets\RAIN\Editor\Shaders\NavMeshContourShader.shader" />
      <None Include="Assets\RAIN\Editor\Shaders\WaypointShader.shader" />
      <None Include="Assets\RAIN\Editor\ScriptTemplates\BehaviorTreeTemplate.xml" />
+     <None Include="Assets\_Assets\Graphics\game-icons\icons-readme.txt" />
      <None Include="Assets\Plugins\Pixelplacement\iTween\ReadMe!\ReadMe!.txt" />
      <None Include="Assets\RAIN\Editor\Shaders\VisualSensorRingShader.shader" />
      <None Include="Assets\RAIN\ReleaseNotes.txt" />
@@ -82,29 +84,41 @@
  <Reference Include="UnityEngine.Analytics">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>
+ <Reference Include="Photon3Unity3D">
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/Plugins/Photon3Unity3D.dll</HintPath>
+ </Reference>
+ <Reference Include="Photon3Unity3D">
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/Plugins/PhotonAssets/Plugins/Photon3Unity3D.dll</HintPath>
+ </Reference>
+ <Reference Include="Photon3Unity3D">
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/Plugins/PhotonAssets/Plugins/Metro/Photon3Unity3D.dll</HintPath>
+ </Reference>
+ <Reference Include="Photon3Unity3D">
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/Plugins/PhotonAssets/Plugins/WP8/Photon3Unity3D.dll</HintPath>
+ </Reference>
  <Reference Include="RAIN">
- <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/Plugins/RAIN/RAIN.dll</HintPath>
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/Plugins/RAIN/RAIN.dll</HintPath>
  </Reference>
  <Reference Include="RAINMetaform">
- <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/Plugins/RAIN/RAINMetaform.dll</HintPath>
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/Plugins/RAIN/RAINMetaform.dll</HintPath>
  </Reference>
  <Reference Include="RAINEditor">
- <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/Plugins/RAIN/Editor/RAINEditor.dll</HintPath>
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/Plugins/RAIN/Editor/RAINEditor.dll</HintPath>
  </Reference>
  <Reference Include="RAINMetaformEditor">
- <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/Plugins/RAIN/Editor/RAINMetaformEditor.dll</HintPath>
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/Plugins/RAIN/Editor/RAINMetaformEditor.dll</HintPath>
  </Reference>
  <Reference Include="RAIN">
- <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/RAIN/RAIN.dll</HintPath>
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/RAIN/RAIN.dll</HintPath>
  </Reference>
  <Reference Include="RAINMetaform">
- <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/RAIN/RAINMetaform.dll</HintPath>
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/RAIN/RAINMetaform.dll</HintPath>
  </Reference>
  <Reference Include="RAINEditor">
- <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/RAIN/Editor/RAINEditor.dll</HintPath>
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/RAIN/Editor/RAINEditor.dll</HintPath>
  </Reference>
  <Reference Include="RAINMetaformEditor">
- <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/RAIN/Editor/RAINMetaformEditor.dll</HintPath>
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/RAIN/Editor/RAINMetaformEditor.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.Graphs">
  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEditor.Graphs.dll</HintPath>

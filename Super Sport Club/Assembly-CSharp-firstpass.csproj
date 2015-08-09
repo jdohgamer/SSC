@@ -46,6 +46,23 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Plugins\PhotonAssets\PhotonChatApi\ChatChannel.cs" />
+     <Compile Include="Assets\Plugins\PhotonAssets\PhotonChatApi\ChatClient.cs" />
+     <Compile Include="Assets\Plugins\PhotonAssets\PhotonChatApi\ChatDisconnectCause.cs" />
+     <Compile Include="Assets\Plugins\PhotonAssets\PhotonChatApi\ChatEventCode.cs" />
+     <Compile Include="Assets\Plugins\PhotonAssets\PhotonChatApi\ChatOperationCode.cs" />
+     <Compile Include="Assets\Plugins\PhotonAssets\PhotonChatApi\ChatParameterCode.cs" />
+     <Compile Include="Assets\Plugins\PhotonAssets\PhotonChatApi\ChatPeer.cs" />
+     <Compile Include="Assets\Plugins\PhotonAssets\PhotonChatApi\ChatState.cs" />
+     <Compile Include="Assets\Plugins\PhotonAssets\PhotonChatApi\ChatUserStatus.cs" />
+     <Compile Include="Assets\Plugins\PhotonAssets\PhotonChatApi\IChatClientListener.cs" />
+     <Compile Include="Assets\Plugins\PhotonAssets\PhotonLoadbalancingApi\Extensions.cs" />
+     <Compile Include="Assets\Plugins\PhotonAssets\PhotonLoadbalancingApi\FriendInfo.cs" />
+     <Compile Include="Assets\Plugins\PhotonAssets\PhotonLoadbalancingApi\LoadBalancingClient.cs" />
+     <Compile Include="Assets\Plugins\PhotonAssets\PhotonLoadbalancingApi\LoadBalancingPeer.cs" />
+     <Compile Include="Assets\Plugins\PhotonAssets\PhotonLoadbalancingApi\Player.cs" />
+     <Compile Include="Assets\Plugins\PhotonAssets\PhotonLoadbalancingApi\Room.cs" />
+     <Compile Include="Assets\Plugins\PhotonAssets\PhotonLoadbalancingApi\RoomInfo.cs" />
      <Compile Include="Assets\Plugins\Pixelplacement\iTween\Sample\MoveSample.cs" />
      <Compile Include="Assets\Plugins\Pixelplacement\iTween\Sample\RotateSample.cs" />
      <Compile Include="Assets\Plugins\Pixelplacement\iTween\Sample\SampleInfo.cs" />
@@ -59,11 +76,13 @@
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\VisualSensorLineShader.shader" />
      <None Include="Assets\RAIN\Editor\Shaders\AspectSphereShader.shader" />
      <None Include="Assets\Plugins\RAIN\ReleaseNotes.txt" />
+     <None Include="Assets\Plugins\PhotonAssets\Plugins\Photon3Unity3D.xml" />
      <None Include="Assets\RAIN\Editor\Shaders\VisualSensorLineShader.shader" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\NavMeshContourShader.shader" />
      <None Include="Assets\RAIN\Editor\Shaders\NavMeshContourShader.shader" />
      <None Include="Assets\RAIN\Editor\Shaders\WaypointShader.shader" />
      <None Include="Assets\RAIN\Editor\ScriptTemplates\BehaviorTreeTemplate.xml" />
+     <None Include="Assets\_Assets\Graphics\game-icons\icons-readme.txt" />
      <None Include="Assets\Plugins\Pixelplacement\iTween\ReadMe!\ReadMe!.txt" />
      <None Include="Assets\RAIN\Editor\Shaders\VisualSensorRingShader.shader" />
      <None Include="Assets\RAIN\ReleaseNotes.txt" />
@@ -80,17 +99,29 @@
  <Reference Include="UnityEngine.Analytics">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>
+ <Reference Include="Photon3Unity3D">
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/Plugins/Photon3Unity3D.dll</HintPath>
+ </Reference>
+ <Reference Include="Photon3Unity3D">
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/Plugins/PhotonAssets/Plugins/Photon3Unity3D.dll</HintPath>
+ </Reference>
+ <Reference Include="Photon3Unity3D">
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/Plugins/PhotonAssets/Plugins/Metro/Photon3Unity3D.dll</HintPath>
+ </Reference>
+ <Reference Include="Photon3Unity3D">
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/Plugins/PhotonAssets/Plugins/WP8/Photon3Unity3D.dll</HintPath>
+ </Reference>
  <Reference Include="RAIN">
- <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/Plugins/RAIN/RAIN.dll</HintPath>
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/Plugins/RAIN/RAIN.dll</HintPath>
  </Reference>
  <Reference Include="RAINMetaform">
- <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/Plugins/RAIN/RAINMetaform.dll</HintPath>
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/Plugins/RAIN/RAINMetaform.dll</HintPath>
  </Reference>
  <Reference Include="RAIN">
- <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/RAIN/RAIN.dll</HintPath>
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/RAIN/RAIN.dll</HintPath>
  </Reference>
  <Reference Include="RAINMetaform">
- <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/RAIN/RAINMetaform.dll</HintPath>
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/RAIN/RAINMetaform.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.iOS.Extensions.Xcode">
  <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
