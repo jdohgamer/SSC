@@ -8,6 +8,7 @@ public class Grid_Setup : MonoBehaviour
 {
 	public int length, width;
 	public GameObject[] boardCell;
+	List<Cell> cells;
 	public GameObject ball;
 	public Vector3 size;
 	GameObject field;
@@ -33,6 +34,7 @@ public class Grid_Setup : MonoBehaviour
 	{
 		field = new GameObject("Field");
 		fieldTran = field.transform;
+		cells = new List<Cell>();
 		Generate();
 	}
 
@@ -95,6 +97,7 @@ public class Grid_Setup : MonoBehaviour
 		cell = Instantiate(boardCell[type],new Vector3(x,0,z), Quaternion.identity)as GameObject;
 		cell.transform.rotation = Quaternion.AngleAxis(rotation, Vector3.up);
 		cell.transform.SetParent (fieldTran);
+		cells.Add(cell.GetComponent<Cell>());
 		size = cell.GetComponent<Collider> ().bounds.size;
 		//tWPSet.AddWaypoint(new Waypoint(cell.transform.position));
 	}

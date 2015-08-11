@@ -55,9 +55,13 @@
      <Compile Include="Assets\GameController.cs" />
      <Compile Include="Assets\PushNotificationsAndroid.cs" />
      <Compile Include="Assets\_Scripts\CameraFollow.cs" />
+     <Compile Include="Assets\_Scripts\Cell.cs" />
+     <Compile Include="Assets\_Scripts\CellMono.cs" />
      <Compile Include="Assets\_Scripts\ClickMoveHandler.cs" />
+     <Compile Include="Assets\_Scripts\CustomGameClient.cs" />
      <Compile Include="Assets\_Scripts\FSM_BASE.cs" />
      <Compile Include="Assets\_Scripts\FSM_Character.cs" />
+     <Compile Include="Assets\_Scripts\GUIController.cs" />
      <Compile Include="Assets\_Scripts\Grid_Setup.cs" />
      <Compile Include="Assets\_Scripts\HitHandler.cs" />
      <Compile Include="Assets\_Scripts\MemoryGame\BgColorChanger.cs" />
