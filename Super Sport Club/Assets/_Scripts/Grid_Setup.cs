@@ -7,9 +7,13 @@ public class Grid_Setup : MonoBehaviour
 	public int length, width;
 	public GameObject[] boardCell;
 	public GameObject ball;
+	public GameObject PotMove;
 	public Vector3 size;
+	public Vector3 ballPosition;
 	GameObject field;
 	Transform fieldTran;
+	GameObject cell;
+
 	/* Dirt = 0
 	 * Corner Lines = 1
 	 * Lines = 2
@@ -64,6 +68,7 @@ public class Grid_Setup : MonoBehaviour
 					if(x==width/2&&z==length/2)
 					{
 						GameObject newBall = Instantiate(ball,new Vector3(x,0.2f,z), Quaternion.identity)as GameObject;
+
 					}
 				}
 
@@ -72,7 +77,7 @@ public class Grid_Setup : MonoBehaviour
 	}
 	void CreateCell(int type,int x, int z, float rotation)
 	{
-		GameObject cell;
+		//GameObject cell;
 		cell = Instantiate(boardCell[type],new Vector3(x,0,z), Quaternion.identity)as GameObject;
 		cell.transform.rotation = Quaternion.AngleAxis(rotation, Vector3.up);
 		cell.transform.SetParent (fieldTran);
@@ -84,9 +89,17 @@ public class Grid_Setup : MonoBehaviour
 		field = new GameObject("Field");
 		fieldTran = field.transform;
 		Generate();
+		ballPosition = ball.transform.position;
+
 	}
 	void Update () 
+	{
+
+
+	}
+	void OnMouseOver()
 	{
 	
 	}
 }
+	
