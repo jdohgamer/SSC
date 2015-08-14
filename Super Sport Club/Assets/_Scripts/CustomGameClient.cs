@@ -28,7 +28,12 @@ public class CustomGameClient : LoadBalancingClient
 {
 	public const string PropTurn = "turn";
 	public const string PropNames = "names";
+	public Grid_Setup board;
 
+	public void GetFucked()
+	{
+		OpRaiseEvent((byte)1, null, true, new RaiseEventOptions(){ CachingOption = EventCaching.AddToRoomCache });
+	}
 
 	public override void OnOperationResponse(OperationResponse operationResponse)
 	{
@@ -52,7 +57,7 @@ public class CustomGameClient : LoadBalancingClient
 			{
 				if (operationResponse.ReturnCode == 0)
 				{
-					//this.LoadBoardFromProperties(false);
+					this.LoadBoardFromProperties(false);
 				}
 			}
 			break;
@@ -103,6 +108,62 @@ public class CustomGameClient : LoadBalancingClient
 		}
 	}
 
+	public void LoadBoardFromProperties(bool calledByEvent)
+	{
+		//board.InitializeBoard();
+		
+		Hashtable roomProps = this.CurrentRoom.CustomProperties;
+		Debug.Log(string.Format("Board Properties: {0}", SupportClass.DictionaryToString(roomProps)));
+
+		if (roomProps.Count == 0)
+		{
+			// we are in a fresh room with no saved board.
+			board.Generate();
+			this.SaveBoardToProperties();
+			Debug.Log(string.Format("Board Properties: {0}", SupportClass.DictionaryToString(roomProps)));
+		}
+
+		
+		// we are in a game that has props (a board). read those (as update or as init, depending on calledByEvent)
+		bool success = board.SetBoardByCustomProperties(roomProps, calledByEvent);
+		if (!success)
+		{
+			Debug.LogError("Not loaded board from props?");
+		}
+		
+		/*
+		// we set properties "pt" (player turn) and "t#" (turn number). those props might have changed
+		// it's easier to use a variable in gui, so read the latter property now
+		if (this.CurrentRoom.CustomProperties.ContainsKey("t#"))
+		{
+			this.TurnNumber = (int) this.CurrentRoom.CustomProperties["t#"];
+		}
+		else
+		{
+			this.TurnNumber = 1;
+		}
+		
+		if (this.CurrentRoom.CustomProperties.ContainsKey("pt"))
+		{
+			this.PlayerIdToMakeThisTurn = (int) this.CurrentRoom.CustomProperties["pt"];
+			//Debug.Log("This turn was played by player.ID: " + this.PlayerIdToMakeThisTurn);
+		}
+		else
+		{
+			this.PlayerIdToMakeThisTurn = 0;
+		}
+		
+		// if the game didn't save a player's turn yet (it is 0): use master
+		if (this.PlayerIdToMakeThisTurn == 0)
+		{
+			this.PlayerIdToMakeThisTurn = this.CurrentRoom.MasterClientId;
+		}
+		
+		this.MyPoints = GetPlayerPointsFromProps(this.LocalPlayer);
+		this.OthersPoints = GetPlayerPointsFromProps(this.Opponent);
+		*/
+	}
+
 	public void CreateTurnbasedRoom()
 	{
 		string newRoomName = string.Format("{0}-{1}", this.NickName, Random.Range(0,1000).ToString("D4"));    // for int, Random.Range is max-exclusive!
@@ -118,4 +179,20 @@ public class CustomGameClient : LoadBalancingClient
 		this.OpCreateRoom(newRoomName, roomOptions, TypedLobby.Default);
 	}
 
+	public void SaveBoardToProperties()
+	{
+		Hashtable boardProps = board.GetBoardAsCustomProperties();
+		//boardProps.Add("pt", this.PlayerIdToMakeThisTurn);  // "pt" is for "player turn" and contains the ID/actorNumber of the player who's turn it is
+		//boardProps.Add("t#", this.TurnNumber);
+		boardProps.Add("tx#", board.width);
+		boardProps.Add("tz#", board.length);
+		//boardProps.Add(GetPlayerPointsPropKey(this.LocalPlayer.ID), this.MyPoints); // we always only save "our" points. this will not affect the opponent's score.
+		
+		
+		// our turn will be over if 2 tiles are clicked/flipped but not the same. in that case, we update the other player if inactive
+		bool webForwardToPush = false;
+
+		//Debug.Log(string.Format("saved board to room-props {0}", SupportClass.DictionaryToString(boardProps)));
+		this.OpSetCustomPropertiesOfRoom(boardProps, webForwardToPush);
+	}
 }

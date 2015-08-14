@@ -7,17 +7,19 @@ public class GUIController: MonoBehaviour
 	private CustomGameClient GameClientInstance;
 	public string AppId;            // set in inspector
 	// this is called when the client loaded and is ready to start
-
+	public Grid_Setup board;
 	EventData data;
 	void Awake()
 	{
+		GameClientInstance = new CustomGameClient();
+		GameClientInstance.AppId = AppId;  // edit this!
 		data = new EventData();
-		//data.Code = CustomEventCode.GetFucked;
+		data.Code = CustomEventCode.GetFucked;
+		GameClientInstance.board = board;
 	}
 	void Start()
 	{
-		GameClientInstance = new CustomGameClient();
-		GameClientInstance.AppId = AppId;  // edit this!
+
 		
 		// "eu" is the European region's token
 		bool connectInProcess = GameClientInstance.ConnectToRegionMaster("us");  // can return false for errors
@@ -32,10 +34,15 @@ public class GUIController: MonoBehaviour
 	{
 		GameClientInstance.Disconnect();
 	}
+	public void NewGameButton()
+	{
+		this.GameClientInstance.CreateTurnbasedRoom();
+		//this.GameClientInstance.OpJoinRandomRoom(null, 0);
+	}
 
 	public void GetFuckedButton()
 	{
-		GameClientInstance.OpRaiseEvent(1, data, false, RaiseEventOptions.Default);
+		GameClientInstance.GetFucked();
 	}
 
 	void MyCreateRoom(string roomName, byte maxPlayers)
