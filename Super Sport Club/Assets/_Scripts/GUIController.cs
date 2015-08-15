@@ -13,14 +13,13 @@ public class GUIController: MonoBehaviour
 	{
 		GameClientInstance = new CustomGameClient();
 		GameClientInstance.AppId = AppId;  // edit this!
-		data = new EventData();
-		data.Code = CustomEventCode.GetFucked;
 		GameClientInstance.board = board;
 	}
 	void Start()
 	{
 
-		
+		Application.runInBackground = true;
+		CustomTypes.Register();
 		// "eu" is the European region's token
 		bool connectInProcess = GameClientInstance.ConnectToRegionMaster("us");  // can return false for errors
 	}
@@ -42,7 +41,9 @@ public class GUIController: MonoBehaviour
 
 	public void GetFuckedButton()
 	{
-		GameClientInstance.GetFucked();
+		Debug.Log("Fuck you");
+		this.GameClientInstance.GetFucked();
+
 	}
 
 	void MyCreateRoom(string roomName, byte maxPlayers)

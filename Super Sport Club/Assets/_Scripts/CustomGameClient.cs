@@ -22,18 +22,27 @@ using Random = UnityEngine.Random;
 public class CustomEventCode: EventCode
 {
 	// <summary>(230) Initial list of RoomInfos (in lobby on Master)</summary>
-	public const byte GetFucked = 1;
+
 }
 public class CustomGameClient : LoadBalancingClient 
 {
+	Message message;
+	public const byte getFucked = 1;
+	public const byte EvTileClick = 1;
 	public const string PropTurn = "turn";
 	public const string PropNames = "names";
 	public Grid_Setup board;
 
 	public void GetFucked()
 	{
-		OpRaiseEvent((byte)1, null, true, new RaiseEventOptions(){ CachingOption = EventCaching.AddToRoomCache });
+
+		Debug.Log("Fuck you too");
+		Hashtable content = new Hashtable();
+		content[(byte)1] = 0;
+		content[(byte)2] = 1;
+		this.loadBalancingPeer.OpRaiseEvent(EvTileClick, content, true, new RaiseEventOptions() { Receivers = ReceiverGroup.All});
 	}
+
 
 	public override void OnOperationResponse(OperationResponse operationResponse)
 	{
@@ -77,19 +86,31 @@ public class CustomGameClient : LoadBalancingClient
 	{
 		base.OnEvent(photonEvent);
 		
-		switch (photonEvent.Code)
+		switch ((byte)photonEvent.Code)
 		{
-		case EventCode.PropertiesChanged:
-			//Debug.Log("Got Properties via Event. Update board by room props.");
-			//this.LoadBoardFromProperties(true);
-			//this.board.ShowFlippedTiles();
-			break;
-		case CustomEventCode.GetFucked:
+		case (byte)EvTileClick:
+		{
+			object content = photonEvent.Parameters[ParameterCode.CustomEventContent];
+			Hashtable turnClick = content as Hashtable;
+			if (turnClick != null)
+			{
+				Debug.Log(string.Format("{0},{1}", turnClick[0],turnClick[1]));
+			}
+			message = new Message();
+			message.Type = MessageType.EndTurn;
+				MessageBus.Instance.SendMessage(message);
 			Debug.Log("Go and get yourself a good fucking");
 			//Debug.Log("Got Properties via Event. Update board by room props.");
 			//this.LoadBoardFromProperties(true);
 			//this.board.ShowFlippedTiles();
 			break;
+		}
+		case EventCode.PropertiesChanged:
+			//Debug.Log("Got Properties via Event. Update board by room props.");
+			this.LoadBoardFromProperties(true);
+			//this.board.ShowFlippedTiles();
+			break;
+		
 		case EventCode.Join:
 			if (this.CurrentRoom.Players.Count == 2 && this.CurrentRoom.IsOpen)
 			{
@@ -106,6 +127,7 @@ public class CustomGameClient : LoadBalancingClient
 			}
 			break;
 		}
+		Debug.Log(photonEvent.Code.ToString());
 	}
 
 	public void LoadBoardFromProperties(bool calledByEvent)
