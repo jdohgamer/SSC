@@ -60,7 +60,7 @@ public class MouseClick : MonoBehaviour {
 						if(bSelection)
 						{
 							Transform objectHit = hit.transform;
-							message.Vector3Value = objectHit.position;
+							message.Vector3Value = objectHit.position + new Vector3(0.5f,0f,0.5f);
 							Debug.Log ("Click");
 							message.Type = MessageType.MouseClick;
 							MessageBus.Instance.SendMessage (message);
