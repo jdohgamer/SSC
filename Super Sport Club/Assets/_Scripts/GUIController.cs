@@ -7,26 +7,30 @@ public class GUIController: MonoBehaviour
 	private CustomGameClient GameClientInstance;
 	public string AppId;            // set in inspector
 	// this is called when the client loaded and is ready to start
-	public Grid_Setup board;
-	EventData data;
+
+	public float serviceInterval = 1;
+	public float timeSinceService;
+
 	void Awake()
 	{
-		GameClientInstance = new CustomGameClient();
-		GameClientInstance.AppId = AppId;  // edit this!
-		GameClientInstance.board = board;
+	
 	}
 	void Start()
 	{
-
-		Application.runInBackground = true;
-		CustomTypes.Register();
-		// "eu" is the European region's token
-		bool connectInProcess = GameClientInstance.ConnectToRegionMaster("us");  // can return false for errors
+		GameClientInstance = GameController.Instance.GameClientInstance;
+		GameClientInstance.AppId = AppId;  // edit this!
+	
 	}
+
 	
 	void Update()
 	{
-		GameClientInstance.Service();
+		timeSinceService += Time.deltaTime;
+		if (timeSinceService > serviceInterval)
+		{
+			this.GameClientInstance.Service();
+			timeSinceService = 0;
+		}
 	}
 	
 	void OnApplicationQuit()

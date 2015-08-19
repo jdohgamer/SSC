@@ -3,10 +3,10 @@ using System.Collections;
 
 public class ControllerHandler : MessageHandler 
 {
-	MouseClick mouse;
+	GameController gc;
 	void Awake()
 	{
-		mouse = GetComponent<MouseClick> ();
+		gc = GetComponent<GameController> ();
 	}
 
 	public override void HandleMessage(Message message)
@@ -15,7 +15,7 @@ public class ControllerHandler : MessageHandler
 		{
 			case MessageType.EndTurn:
 			{
-				mouse.EndTurn();
+				gc.EndTurn();
 				break;
 			}
 		}

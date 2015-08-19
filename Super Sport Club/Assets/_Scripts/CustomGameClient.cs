@@ -19,30 +19,73 @@ using Random = UnityEngine.Random;
 //		return string.Format("\"{0}\"[{1}] {2} ({3})", RoomName, MyPlayerId, MyTurn, SupportClass.DictionaryToString(AvailableProperties));
 //	}
 //}
-public class CustomEventCode: EventCode
-{
-	// <summary>(230) Initial list of RoomInfos (in lobby on Master)</summary>
 
+public class PlayerAction
+{
+	public FSM_Character iCh,tCh;
+	public Cell cFrom, cTo;
+	public enum Actions{Move, Pass, Shoot, Juke}
+	public Actions action; 
+
+	public PlayerAction()
+	{
+
+	}
+	public PlayerAction(Actions act, FSM_Character iCharacter)
+	{
+		this.action=act; iCh = iCharacter;
+	}
+	public PlayerAction(Actions act, FSM_Character iCharacter, FSM_Character tCharacter)
+	{
+		this.action=act; iCh = iCharacter; tCh = tCharacter;
+	}
+	public PlayerAction(Actions act, FSM_Character iCharacter, Cell tCell)
+	{
+		this.action=act; iCh = iCharacter; cTo = tCell;
+	}
+	public static PlayerAction MoveAction(FSM_Character iCharacter, Cell tCell)
+	{
+		return new PlayerAction(Actions.Move, iCharacter, tCell);
+	}
 }
+
+
 public class CustomGameClient : LoadBalancingClient 
 {
 	Message message;
-	public const byte getFucked = 1;
-	public const byte EvTileClick = 1;
+	byte actionCount = 0;
+	public bool bTurnDone;
+	public const byte EndTurn = 1;
+	public const byte setPA = 2;
 	public const string PropTurn = "turn";
 	public const string PropNames = "names";
 	public Grid_Setup board;
+	PlayerAction[] pActions;
+	GameController gc;
 
+	public CustomGameClient()
+	{
+		pActions = new PlayerAction[5];
+	}
 	public void GetFucked()
 	{
 
 		Debug.Log("Fuck you too");
-		Hashtable content = new Hashtable();
-		content[(byte)1] = 0;
-		content[(byte)2] = 1;
-		this.loadBalancingPeer.OpRaiseEvent(EvTileClick, content, true, new RaiseEventOptions() { Receivers = ReceiverGroup.All});
+
+		this.loadBalancingPeer.OpRaiseEvent(EndTurn, null, true, new RaiseEventOptions() { Receivers = ReceiverGroup.All});
 	}
 
+	public void SetPlayerAction(PlayerAction.Actions act, FSM_Character character, Cell loc)
+	{
+		if(actionCount<5)
+		{
+//			Hashtable content = new Hashtable();
+//			content[(byte)1] = 0;
+//			content[(byte)2] = 1;
+			pActions[actionCount] = new PlayerAction(act, character, loc);
+			actionCount += 1;
+		}
+	}
 
 	public override void OnOperationResponse(OperationResponse operationResponse)
 	{
@@ -88,14 +131,8 @@ public class CustomGameClient : LoadBalancingClient
 		
 		switch ((byte)photonEvent.Code)
 		{
-		case (byte)EvTileClick:
+		case (byte)EndTurn:
 		{
-			object content = photonEvent.Parameters[ParameterCode.CustomEventContent];
-			Hashtable turnClick = content as Hashtable;
-			if (turnClick != null)
-			{
-				Debug.Log(string.Format("{0},{1}", turnClick[0],turnClick[1]));
-			}
 			message = new Message();
 			message.Type = MessageType.EndTurn;
 				MessageBus.Instance.SendMessage(message);
@@ -140,7 +177,7 @@ public class CustomGameClient : LoadBalancingClient
 		if (roomProps.Count == 0)
 		{
 			// we are in a fresh room with no saved board.
-			board.Generate();
+			board.Generate(20,10);
 			this.SaveBoardToProperties();
 			Debug.Log(string.Format("Board Properties: {0}", SupportClass.DictionaryToString(roomProps)));
 		}

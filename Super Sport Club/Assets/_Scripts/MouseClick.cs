@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class MouseClick : MonoBehaviour {
@@ -6,9 +6,12 @@ public class MouseClick : MonoBehaviour {
 	Message message;
 	public static bool bSelection;
 	public static GameObject CurrentSelectedObj;
+	FSM_Character character;
 	public GameObject destPin;
 	GameObject newPin, oldPin;
 	MeshRenderer currentMesh;
+	Grid_Setup grid;
+	CustomGameClient GameClientInstance;
 	[SerializeField] LayerMask mask;
 	void Start () 
 	{
@@ -39,6 +42,7 @@ public class MouseClick : MonoBehaviour {
 				{
 					case "Player":
 					{
+						
 						if(CurrentSelectedObj != hit.transform.gameObject)
 						{
 							bSelection = true;
@@ -51,6 +55,8 @@ public class MouseClick : MonoBehaviour {
 							CurrentSelectedObj = hit.transform.gameObject;
 							currentMesh = CurrentSelectedObj.GetComponent<MeshRenderer>();
 							currentMesh.material.color = Color.cyan;
+							character = CurrentSelectedObj.GetComponent<FSM_Character>();
+							
 							Debug.Log ("Dick");
 						}
 						break;
@@ -59,8 +65,14 @@ public class MouseClick : MonoBehaviour {
 					{
 						if(bSelection)
 						{
+
 							Transform objectHit = hit.transform;
-							message.Vector3Value = objectHit.position + new Vector3(0.5f,0f,0.5f);
+							int index  = hit.transform.GetSiblingIndex();
+							Cell cell =  grid.cells[index];
+							
+							GameClientInstance.SetPlayerAction(PlayerAction.Actions.Move, character, cell);
+							
+							message.Vector3Value = objectHit.position ;
 							Debug.Log ("Click");
 							message.Type = MessageType.MouseClick;
 							MessageBus.Instance.SendMessage (message);

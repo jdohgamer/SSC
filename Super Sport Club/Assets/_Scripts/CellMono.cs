@@ -8,10 +8,15 @@ public class Cell
 	public GameObject boardObj;
 	public bool bHighlighted, hasBall, bOccupied;
 	public int x,z,id;
+	public Vector3 location;
 	public CellMono cm;
 	public CellType type;
 	public enum CellType{OutOfBounds, Corner, BoundLine, Field, InsideBox}
 
+	public Cell()
+	{
+		id=-1;
+	}
 	public Cell(int newID)
 	{
 		id = newID;
@@ -27,6 +32,10 @@ public class Cell
 		type = (CellType)newType;
 		x = X;
 		z = Z;
+	}
+	public Vector3 GetLocation()
+	{
+		return boardObj.transform.position;
 	}
 
 	public Hashtable SaveCell()
