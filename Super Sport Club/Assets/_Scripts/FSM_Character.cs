@@ -1,6 +1,35 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public class PlayerAction
+{
+	public FSM_Character iCh,tCh;
+	public Cell cFrom, cTo;
+	public enum Actions{Move, Pass, Shoot, Juke}
+	public Actions action; 
+	
+	public PlayerAction()
+	{
+		
+	}
+	public PlayerAction(Actions act, FSM_Character iCharacter)
+	{
+		this.action=act; iCh = iCharacter;
+	}
+	public PlayerAction(Actions act, FSM_Character iCharacter, FSM_Character tCharacter)
+	{
+		this.action=act; iCh = iCharacter; tCh = tCharacter;
+	}
+	public PlayerAction(Actions act, FSM_Character iCharacter, Cell tCell)
+	{
+		this.action=act; iCh = iCharacter; cTo = tCell;
+	}
+	public static PlayerAction MoveAction(FSM_Character iCharacter, Cell tCell)
+	{
+		return new PlayerAction(Actions.Move, iCharacter, tCell);
+	}
+}
+
 public class FSM_Character : FSM_Base 
 {
 	public int id;
@@ -45,6 +74,14 @@ public class FSM_Character : FSM_Base
 			actionCount += 1;
 		}
 	}
+	void ClearActions()
+	{
+		for(int c= 0;c<actions.Length;c++)
+		{
+			actions[c] = null;
+		}
+		actionCount = 0;
+	}
 	public IEnumerator ExecuteActions()
 	{
 		for (int i = 0;i<actions.Length;i++)
@@ -56,18 +93,24 @@ public class FSM_Character : FSM_Base
 					case PlayerAction.Actions.Move:
 					{
 						target = actions[i].cTo.GetLocation();
-						Move(target);
-						//actions[i].iCh.Move(actions[i].cTo.GetLocation());
+						//Move(target);
+						easeType = ease.ToString();
+						while (Vector3.Distance(transform.position,target)>.1f) 
+						{
+							iTween.MoveTo(gameObject, iTween.Hash("position", target, "easeType", easeType, "loopType", "none", "speed", moveSpeed));
+							yield return new WaitForSeconds(1f);
+						}
 						break;
 					}
 				}
-				yield return new WaitForSeconds(2f);
 			}else break;
 		}
+		ClearActions();	
 		yield return null;
-			
+
 
 	}
+
 	public void Highlight(bool set)
 	{
 		if(set)

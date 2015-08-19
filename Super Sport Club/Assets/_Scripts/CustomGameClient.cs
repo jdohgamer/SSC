@@ -20,35 +20,6 @@ using Random = UnityEngine.Random;
 //	}
 //}
 
-public class PlayerAction
-{
-	public FSM_Character iCh,tCh;
-	public Cell cFrom, cTo;
-	public enum Actions{Move, Pass, Shoot, Juke}
-	public Actions action; 
-
-	public PlayerAction()
-	{
-
-	}
-	public PlayerAction(Actions act, FSM_Character iCharacter)
-	{
-		this.action=act; iCh = iCharacter;
-	}
-	public PlayerAction(Actions act, FSM_Character iCharacter, FSM_Character tCharacter)
-	{
-		this.action=act; iCh = iCharacter; tCh = tCharacter;
-	}
-	public PlayerAction(Actions act, FSM_Character iCharacter, Cell tCell)
-	{
-		this.action=act; iCh = iCharacter; cTo = tCell;
-	}
-	public static PlayerAction MoveAction(FSM_Character iCharacter, Cell tCell)
-	{
-		return new PlayerAction(Actions.Move, iCharacter, tCell);
-	}
-}
-
 
 public class CustomGameClient : LoadBalancingClient 
 {
@@ -79,9 +50,6 @@ public class CustomGameClient : LoadBalancingClient
 	{
 		if(actionCount<5)
 		{
-//			Hashtable content = new Hashtable();
-//			content[(byte)1] = 0;
-//			content[(byte)2] = 1;
 			pActions[actionCount] = new PlayerAction(act, character, loc);
 			actionCount += 1;
 		}
@@ -168,9 +136,7 @@ public class CustomGameClient : LoadBalancingClient
 	}
 
 	public void LoadBoardFromProperties(bool calledByEvent)
-	{
-		//board.InitializeBoard();
-		
+	{	
 		Hashtable roomProps = this.CurrentRoom.CustomProperties;
 		Debug.Log(string.Format("Board Properties: {0}", SupportClass.DictionaryToString(roomProps)));
 
@@ -181,7 +147,6 @@ public class CustomGameClient : LoadBalancingClient
 			this.SaveBoardToProperties();
 			Debug.Log(string.Format("Board Properties: {0}", SupportClass.DictionaryToString(roomProps)));
 		}
-
 		
 		// we are in a game that has props (a board). read those (as update or as init, depending on calledByEvent)
 		bool success = board.SetBoardByCustomProperties(roomProps, calledByEvent);

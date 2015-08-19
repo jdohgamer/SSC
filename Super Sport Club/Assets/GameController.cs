@@ -77,8 +77,9 @@ public class GameController : MonoBehaviour
 		bSelection = false;
 		//Destroy(oldPin);
 		if(acts.Length>0)
-		//StartCoroutine("ExecuteMoves");
-		ExecuteMoves();
+		{
+			ExecuteMoves();
+		}
 	}
 
 	void Update()
@@ -91,6 +92,15 @@ public class GameController : MonoBehaviour
 	bool HaveBothPlayersSubmitted()
 	{
 		return true;
+	}
+
+	void ClearActions()
+	{
+		for(int c= 0;c<acts.Length;c++)
+		{
+			acts[c] = null;
+		}
+		actionCount = 0;
 	}
 
 	void ExecuteMoves()
@@ -106,21 +116,14 @@ public class GameController : MonoBehaviour
 				}
 
 				acts[h].iCh.SetPlayerAction(acts[h]);
-//				switch(acts[h].action)
-//				{
-//					case PlayerAction.Actions.Move:
-//					{
-//						acts[h].iCh.Move(acts[h].cTo.GetLocation());
-//						break;
-//					}
-//				}
-//				yield return new WaitForSeconds(2f);
+//				
 			}else break;
 		}
 		foreach(FSM_Character c in affectedChars)
 		{
 			c.StartCoroutine("ExecuteActions");
 		}
+		ClearActions();
 		//yield return null;
 
 		/*
