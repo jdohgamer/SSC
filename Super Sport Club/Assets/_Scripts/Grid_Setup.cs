@@ -6,6 +6,46 @@ using RAIN.Navigation.Waypoints;
 using ExitGames.Client.Photon.LoadBalancing;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
+
+struct AdjacentIndexes 
+{
+	//public int[] indexes;
+	public int[,] indexes2D;
+
+	public AdjacentIndexes(int index, int distance,  int boardLength)
+	{
+		/*
+		indexes = new int[8];
+		indexes[0] = (-boardLength +1) +index; //NW
+		indexes[6] = (-boardLength - 1) +index; //SW
+		indexes[7] = (-boardLength) +index; //W
+		indexes[1] = 1 +index; //N
+		indexes[2] = (boardLength+1) +index; //NE
+		indexes[3] = (boardLength) +index; //E
+		indexes[4] = (boardLength-1) +index; //SE
+		indexes[5] = -1 +index; //S
+		*/
+		int dist = distance*2+1;
+		int negDist = -distance;
+		indexes2D = new int[dist,dist];
+		int negDistColumn;
+		int negDistRow;
+		for(int x = 0; x<dist; x++)
+		{
+			negDistRow = negDist * boardLength;
+			negDistColumn = -distance;
+			for(int y = 0; y<dist; y++)
+			{
+				indexes2D[x,y] = negDistRow + negDistColumn + index;
+				negDistColumn++;
+			}
+			negDist++;
+
+		}
+
+	}
+} 
+
 public class Grid_Setup : MonoBehaviour 
 {
 	public int length, width, cellCount;
@@ -14,6 +54,7 @@ public class Grid_Setup : MonoBehaviour
 	public GameObject ball;
 	GameObject field;
 	public Transform fieldTran;
+	AdjacentIndexes adjacent;
 
 	/* Dirt = 0
 	 * Corner Lines = 1
@@ -99,6 +140,35 @@ public class Grid_Setup : MonoBehaviour
 
 	}
 
+	public void HighlightAdjacent(int index, int distance)
+	{
+		adjacent = new AdjacentIndexes(index, distance ,length+3);
+		int dist = distance*2+1;
+		for(int h =0; h<dist;h++)
+		{
+			for(int i =0; i<dist;i++)
+			{
+				if(adjacent.indexes2D[h,i]>=0 && adjacent.indexes2D[h,i]!= index)
+				{
+					cells[adjacent.indexes2D[h,i]].cm.Highlight(true);
+				}
+			}
+		}
+//		foreach(Cell c in cells)
+//		{
+//			for(int h =0; h<adjacent.indexes2D.GetLength(0);h++)
+//			{
+//				for(int i =0; i<adjacent.indexes2D.GetLength(1);i++)
+//				{
+//					if(adjacent.indexes2D[h,i]>0&&c.id == adjacent.indexes2D[h,i])
+//					{
+//						c.cm.Highlight(true);
+//					}
+//				}
+//			}
+//		}
+	}
+	
 	protected internal Hashtable GetBoardAsCustomProperties()
 	{
 		Hashtable customProps = new Hashtable();

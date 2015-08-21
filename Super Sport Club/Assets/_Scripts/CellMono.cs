@@ -47,18 +47,42 @@ public class Cell
 }
 public class CellMono: MonoBehaviour
 {
-	Material mat;
+	public Material mat;
 
 	void Awake()
 	{
-		mat = GetComponent<Renderer>().material;
+		mat = GetComponent<MeshRenderer>().material;
+
 	}
 
-	public void RotateMat(float degrees)
+	void OnMouseEnter()
 	{
-		if(mat.GetFloat("_RotationDegree")!= null)
+		//Highlight(true);
+		Debug.Log(transform.GetSiblingIndex());
+	}
+	void OnMouseExit()
+	{
+		//Highlight(false);
+		Debug.Log(transform.GetSiblingIndex());
+	}
+	public void Highlight(bool set)
+	{
+		if(set)
 		{
-			mat.SetFloat("_RotationDegree", degrees* Mathf.Deg2Rad);
+			mat.SetColor ("_Color",Color.cyan);
+			mat.SetFloat ("_Alpha",0.2f);
+		}
+		else{
+			mat.SetColor("_Color",Color.black);
+			mat.SetFloat ("_Alpha",1f);
 		}
 	}
+
+//	public void RotateMat(float degrees)
+//	{
+//		if(mat.GetFloat("_RotationDegree")!= null)
+//		{
+//			mat.SetFloat("_RotationDegree", degrees* Mathf.Deg2Rad);
+//		}
+//	}
 }

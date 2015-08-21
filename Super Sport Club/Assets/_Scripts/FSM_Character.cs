@@ -10,7 +10,6 @@ public class PlayerAction
 	
 	public PlayerAction()
 	{
-		
 	}
 	public PlayerAction(Actions act, FSM_Character iCharacter)
 	{
@@ -32,8 +31,9 @@ public class PlayerAction
 
 public class FSM_Character : FSM_Base 
 {
-	public int id;
+	public int id, actionCount, maxActions = 2;
 	public Cell OccupiedCell;
+	[SerializeField] LayerMask layer;
 	[SerializeField] protected iTween.EaseType ease;
 	protected string easeType;
 	public Vector3 target;
@@ -42,7 +42,6 @@ public class FSM_Character : FSM_Base
 	Vector3 moveTarget;
 	MeshRenderer currentMesh;
 	public PlayerAction[] actions;
-	int actionCount;
 	public Vector3 MoveTarget 
 	{ 
 		get{return moveTarget;}
@@ -64,11 +63,11 @@ public class FSM_Character : FSM_Base
 	{
 		CurrentState = Stance.Neutral;
 		currentMesh = GetComponent<MeshRenderer>();
-		actions = new PlayerAction[2];
+		actions = new PlayerAction[maxActions];
 	}
 	public void SetPlayerAction(PlayerAction act)
 	{
-		if(actionCount<2)
+		if(actionCount<maxActions)
 		{
 			actions[actionCount] = act;
 			actionCount += 1;
@@ -93,6 +92,7 @@ public class FSM_Character : FSM_Base
 					case PlayerAction.Actions.Move:
 					{
 						target = actions[i].cTo.GetLocation();
+						target += new Vector3(0,0.2f,0);
 						//Move(target);
 						easeType = ease.ToString();
 						while (Vector3.Distance(transform.position,target)>.1f) 
@@ -119,20 +119,28 @@ public class FSM_Character : FSM_Base
 			currentMesh.material.color = Color.white;
 	}
 
-	public void Move(Vector3 target)
+//	public void Move(Vector3 target)
+//	{
+//		StopCoroutine("MoveTo");
+//		StartCoroutine("MoveTo",target);
+//	}
+//	IEnumerator MoveTo(Vector3 target)
+//	{
+//		easeType = ease.ToString();
+//		while (Vector3.Distance(transform.position,target)>.1f) 
+//		{
+//			iTween.MoveTo(gameObject, iTween.Hash("position", target, "easeType", easeType, "loopType", "none", "speed", moveSpeed));
+//			//transform.position = Vector3.MoveTowards (transform.position, target, deltaSpeed);
+//			yield return null;
+//		}
+//	}
+
+	public int RaycastToGround()
 	{
-		StopCoroutine("MoveTo");
-		StartCoroutine("MoveTo",target);
-	}
-	IEnumerator MoveTo(Vector3 target)
-	{
-		easeType = ease.ToString();
-		while (Vector3.Distance(transform.position,target)>.1f) 
-		{
-			iTween.MoveTo(gameObject, iTween.Hash("position", target, "easeType", easeType, "loopType", "none", "speed", moveSpeed));
-			//transform.position = Vector3.MoveTowards (transform.position, target, deltaSpeed);
-			yield return null;
-		}
+		Ray ray = new Ray(transform.position,Vector3.down);
+		RaycastHit hit = new RaycastHit();;
+		Physics.Raycast(ray,out hit,5f,layer);
+		return hit.transform.GetSiblingIndex();
 	}
 
 	public void EndTurn()

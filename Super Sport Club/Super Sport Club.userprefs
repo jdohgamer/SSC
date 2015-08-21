@@ -1,33 +1,21 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\_Scripts\Grid_Setup.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\_Scripts\GameController.cs">
     <Files>
-      <File FileName="Assets\GameController.cs" Line="152" Column="13" />
-      <File FileName="Assets\_Scripts\CustomGameClient.cs" Line="93" Column="42" />
-      <File FileName="Assets\_Scripts\GUIController.cs" Line="31" Column="38" />
-      <File FileName="Assets\_Scripts\CellMono.cs" Line="11" Column="16" />
-      <File FileName="..\..\..\..\Downloads\Photon-Unity3D-Sdk_v4-0-0-10\demo-turnbased-sandbox\Assets\Demo\DemoGUI.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\FSM_Character.cs" Line="20" Column="17" />
-      <File FileName="..\..\Dealer\Dealer_5\Assets\_Scripts\Inventories\RightClickSell.cs" Line="1" Column="1" />
-      <File FileName="Assets\ControllerHandler.cs" Line="1" Column="1" />
-      <File FileName="..\..\..\..\Downloads\Photon-Unity3D-Sdk_v4-0-0-10\demo-turnbased-sandbox\Assets\Demo\DemoGame.cs" Line="13" Column="36" />
-      <File FileName="Assets\_Scripts\Grid_Setup.cs" Line="13" Column="22" />
+      <File FileName="Assets\_Scripts\GameController.cs" Line="175" Column="13" />
+      <File FileName="Assets\_Scripts\CellMono.cs" Line="10" Column="20" />
+      <File FileName="Assets\_Scripts\FSM_Character.cs" Line="143" Column="42" />
+      <File FileName="Assets\_Scripts\Grid_Setup.cs" Line="159" Column="2" />
+      <File FileName="..\..\Taicho\Assets\TaichoC#AfterConversion\gameparts\LevelOneLegalMovesClass.cs" Line="19" Column="33" />
+      <File FileName="..\..\Taicho\Assets\TaichoC#AfterConversion\gameparts\LevelThreeLegalMovesClass.cs" Line="62" Column="31" />
+      <File FileName="..\..\Taicho\Assets\TaichoC#AfterConversion\basecomponents\LegalMoves.cs" Line="4" Column="41" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Assembly-CSharp" expanded="True">
             <Node name="_Scripts" expanded="True">
-              <Node name="MemoryGame" expanded="True" />
-              <Node name="Grid_Setup.cs" selected="True" />
-            </Node>
-          </Node>
-          <Node name="Assembly-CSharp-firstpass" expanded="True">
-            <Node name="Plugins" expanded="True">
-              <Node name="PhotonAssets" expanded="True">
-                <Node name="PhotonChatApi" expanded="True" />
-                <Node name="PhotonLoadbalancingApi" expanded="True" />
-              </Node>
+              <Node name="GameController.cs" selected="True" />
             </Node>
           </Node>
         </State>
@@ -35,7 +23,9 @@
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="C:\Users\BoB\Documents\Projects\Sport Club\Super Sport Club\Assets\_Scripts\GameController.cs" line="171" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

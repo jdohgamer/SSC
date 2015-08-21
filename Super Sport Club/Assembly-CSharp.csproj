@@ -51,16 +51,15 @@
      <Compile Include="Assets\AI\Actions\ChooseWanderPosition.cs" />
      <Compile Include="Assets\AI\Actions\GetStandOnPoint.cs" />
      <Compile Include="Assets\AI\Actions\StickToPlayer.cs" />
-     <Compile Include="Assets\ControllerHandler.cs" />
-     <Compile Include="Assets\GameController.cs" />
-     <Compile Include="Assets\PushNotificationsAndroid.cs" />
      <Compile Include="Assets\_Scripts\CameraFollow.cs" />
      <Compile Include="Assets\_Scripts\CellMono.cs" />
      <Compile Include="Assets\_Scripts\ClickMoveHandler.cs" />
+     <Compile Include="Assets\_Scripts\ControllerHandler.cs" />
      <Compile Include="Assets\_Scripts\CustomGameClient.cs" />
      <Compile Include="Assets\_Scripts\FSM_BASE.cs" />
      <Compile Include="Assets\_Scripts\FSM_Character.cs" />
      <Compile Include="Assets\_Scripts\GUIController.cs" />
+     <Compile Include="Assets\_Scripts\GameController.cs" />
      <Compile Include="Assets\_Scripts\Grid_Setup.cs" />
      <Compile Include="Assets\_Scripts\HitHandler.cs" />
      <Compile Include="Assets\_Scripts\MemoryGame\BgColorChanger.cs" />
@@ -93,6 +92,7 @@
      <Compile Include="Assets\_Scripts\OpenPlayerSettings.cs" />
      <Compile Include="Assets\_Scripts\PlayerMovement.cs" />
      <Compile Include="Assets\_Scripts\ProjectileCollision.cs" />
+     <Compile Include="Assets\_Scripts\PushNotificationsAndroid.cs" />
      <Compile Include="Assets\_Scripts\TurnButton.cs" />
      <Compile Include="Assets\_Scripts\TweenBy.cs" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\VisualSensorRingShader.shader" />

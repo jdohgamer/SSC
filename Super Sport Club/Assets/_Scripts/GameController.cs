@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-
 public class GameController : MonoBehaviour 
 {
 	public static GameController Instance = null;
@@ -52,13 +51,6 @@ public class GameController : MonoBehaviour
 	void Start () 
 	{
 		acts = new PlayerAction[5];
-//		for(int h = 0; h<5;h++)
-//		{
-//			acts[h] = new PlayerAction();
-//		}
-		//CurrentSelectedObj = new GameObject ();
-		//newPin = new GameObject ();
-	
 		GameObject[] charObjs = GameObject.FindGameObjectsWithTag("Player");
 		characters = new FSM_Character[charObjs.Length];
 		for(int i = 0; i< charObjs.Length;i++)
@@ -141,11 +133,11 @@ public class GameController : MonoBehaviour
 		*/
 	}
 
-	public void SetPlayerAction(PlayerAction.Actions act, FSM_Character character, Cell loc)
+	public void SetPlayerAction(PlayerAction.Actions act, FSM_Character character, Cell targetCell)
 	{
 		if(actionCount<5)
 		{
-			acts[actionCount] = new PlayerAction(act, character, loc);
+			acts[actionCount] = new PlayerAction(act, character, targetCell);
 			actionCount += 1;
 		}
 	}
@@ -176,7 +168,10 @@ public class GameController : MonoBehaviour
 							CurrentSelectedChar.Highlight(true);
 							oldPin = newPin;
 							newPin = null;
+							CurrentSelectedChar.OccupiedCell = board.cells[CurrentSelectedChar.RaycastToGround()];//this should be done when placing characters
 						}
+						board.HighlightAdjacent(CurrentSelectedChar.OccupiedCell.id, CurrentSelectedChar.maxActions - CurrentSelectedChar.actionCount);
+							
 						break;
 					}
 					case "Field":
@@ -184,13 +179,10 @@ public class GameController : MonoBehaviour
 						if(bSelection)
 						{
 							int index  = hit.transform.GetSiblingIndex();
-							//CurrentSelectedChar.hasTarget = true;
-							//gameClientInstance.SetPlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, board.cells[index]);
-						SetPlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, board.cells[index]);
-//							message.Vector3Value = hit.transform.position ;
-//							//Debug.Log ("Click");
-//							message.Type = MessageType.MouseClick;
-//							MessageBus.Instance.SendMessage (message);
+							
+
+							SetPlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, board.cells[index]);
+
 							if(newPin != null)
 							{
 								Destroy(newPin);
