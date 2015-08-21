@@ -40,9 +40,7 @@ struct AdjacentIndexes
 				negDistColumn++;
 			}
 			negDist++;
-
 		}
-
 	}
 } 
 
@@ -69,12 +67,8 @@ public class Grid_Setup : MonoBehaviour
 	
 	void Awake()
 	{
-
 		field = new GameObject("Field");
 		fieldTran = field.transform;
-
-//		wpRig = GetComponentInChildren<WaypointRig>();
-//		tWPSet = wpRig.WaypointSet;
 	}
 
 	public void Generate (int w, int l) 
@@ -82,7 +76,7 @@ public class Grid_Setup : MonoBehaviour
 		width = w;
 		length = l;
 		int i = 0;
-		cellCount = 299;//(w+3)*(l+3);
+		cellCount = (w+3)*(l+3);
 		cells = new Cell[cellCount];
 		for (int x = -1; x<=w+1; x++)
 		{
@@ -100,15 +94,21 @@ public class Grid_Setup : MonoBehaviour
 					{
 						if(z==0)		{  type = 1; rot = 90f;} //bottom left
 						else if(z==l){type = 1; rot = 0f;;} //top left
-						else{			   type = 2; rot = 90f;} //if(z>0&&z<length)
+						else{			   type = 2; rot = -90f;} //if(z>0&&z<length)
 					}
 					else if(x==w)//right side
 					{
 						if(z==0){		   type = 1; rot = 180f;} //bottom right
 						else if(z==l){type = 1; rot = -90f;} //top right
 						else {			   type = 2; rot = 90f;} //if(z>0&&z<length)
-					}else{ //if(x>0&&x<width&&z==0||z==length)
-						type = 2; rot = 0f;;
+					}else{ //if(x>0&&x<width
+						if(z==0)
+						{
+							type = 2; rot = 0;
+						}else if (z==length)
+						{
+							type = 2; rot = 180f;
+						}
 					}
 				}else { //inner field
 					type = 3; rot = 0f;
@@ -126,7 +126,6 @@ public class Grid_Setup : MonoBehaviour
 	}
 	GameObject CreateCell(int type,int x, int z, float rotation)
 	{
-
 		GameObject cell = Instantiate(boardCell[type],new Vector3(x,0,z), Quaternion.identity)as GameObject;
 		//cell.GetComponent<Renderer>().material.shader = Shader.Find("Custon/RotateUVs");
 		//cell.transform.rotation = Quaternion.AngleAxis(rotation, Vector3.up);
@@ -136,8 +135,6 @@ public class Grid_Setup : MonoBehaviour
 			cell.GetComponent<Renderer>().material.SetFloat("_RotationDegree", rotation* Mathf.Deg2Rad);
 		}
 		return cell;
-		//tWPSet.AddWaypoint(new Waypoint(cell.transform.position));
-
 	}
 
 	public void HighlightAdjacent(int index, int distance)
@@ -150,23 +147,13 @@ public class Grid_Setup : MonoBehaviour
 			{
 				if(adjacent.indexes2D[h,i]>=0 && adjacent.indexes2D[h,i]!= index)
 				{
-					cells[adjacent.indexes2D[h,i]].cm.Highlight(true);
+					if(cells[adjacent.indexes2D[h,i]].type!= Cell.CellType.OutOfBounds)
+					{
+						cells[adjacent.indexes2D[h,i]].cm.Highlight(true);
+					}
 				}
 			}
 		}
-//		foreach(Cell c in cells)
-//		{
-//			for(int h =0; h<adjacent.indexes2D.GetLength(0);h++)
-//			{
-//				for(int i =0; i<adjacent.indexes2D.GetLength(1);i++)
-//				{
-//					if(adjacent.indexes2D[h,i]>0&&c.id == adjacent.indexes2D[h,i])
-//					{
-//						c.cm.Highlight(true);
-//					}
-//				}
-//			}
-//		}
 	}
 	
 	protected internal Hashtable GetBoardAsCustomProperties()
