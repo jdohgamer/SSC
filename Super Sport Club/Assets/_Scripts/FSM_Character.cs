@@ -38,7 +38,7 @@ public class FSM_Character : FSM_Base
 	protected string easeType;
 	public Vector3 target;
 	[SerializeField] protected float moveSpeed;
-	public bool hasTarget;
+	public bool hasTarget, hasBall;
 	Vector3 moveTarget;
 	MeshRenderer currentMesh;
 	public PlayerAction[] actions;
@@ -154,6 +154,7 @@ public class FSM_Character : FSM_Base
 		{
 			case "Ball":
 			{
+				hasBall = true;
 				other.transform.SetParent(transform);
 				other.attachedRigidbody.isKinematic = true;
 				break;

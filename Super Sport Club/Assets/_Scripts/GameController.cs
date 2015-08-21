@@ -3,6 +3,8 @@ using ExitGames.Client.Photon;
 using ExitGames.Client.Photon.LoadBalancing;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class GameController : MonoBehaviour 
@@ -20,6 +22,12 @@ public class GameController : MonoBehaviour
 	public enum Teams{TeamOne,TeamTwo}
 	byte actionCount = 0;
 	PlayerAction[] acts;
+
+	[SerializeField] Image panelFab;
+	[SerializeField] Button buttFab;
+	[SerializeField] Canvas can;
+	public float offsetX,offsetY;
+	public static GameObject panel;
 
 	Message message;
 	public static bool bSelection;
@@ -141,11 +149,14 @@ public class GameController : MonoBehaviour
 			actionCount += 1;
 		}
 	}
+	
+		
 	public void FixedUpdate() 
 	{
 		if (Input.GetMouseButtonUp (0)) 
 		{
 			message.Clear();
+
 			RaycastHit hit;
 			Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 			
@@ -179,15 +190,10 @@ public class GameController : MonoBehaviour
 						if(bSelection)
 						{
 							int index  = hit.transform.GetSiblingIndex();
+
+							//SetPlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, board.cells[index]);
+
 							
-
-							SetPlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, board.cells[index]);
-
-							if(newPin != null)
-							{
-								Destroy(newPin);
-							}
-							newPin = Instantiate(destPin,board.cells[index].GetLocation(),Quaternion.identity) as GameObject;
 							
 						}
 						break;
@@ -199,7 +205,59 @@ public class GameController : MonoBehaviour
 		}
 		if (Input.GetMouseButtonUp (1)) 
 		{
-			actionCount = 0;
+			RaycastHit hit;
+			Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+			
+			if (Physics.Raycast (ray, out hit, 100f, mask)) 
+			{
+				switch(hit.transform.tag)
+				{
+					case "Field":
+					{
+						if(bSelection)
+						{
+							int index  = hit.transform.GetSiblingIndex();
+							if (panel!=null)
+							{
+								Destroy(panel.gameObject);
+							}
+							Vector3 loc = Camera.main.WorldToScreenPoint(board.cells[index].GetLocation());
+							loc += new Vector3(offsetX,offsetY,0f);
+							panel = Instantiate(panelFab.gameObject, loc, Quaternion.identity)as GameObject;
+							panel.transform.SetParent(can.transform,false);
+							panel.transform.SetAsLastSibling();
+
+							Button moveButton = Instantiate(buttFab) as Button;
+							moveButton.transform.SetParent(panel.transform, false);
+							moveButton.GetComponentInChildren<Text>().text = "Move";
+							moveButton.onClick.AddListener(() => 
+							{ 
+								if(newPin != null)
+								{
+									Destroy(newPin);
+								}
+								newPin = Instantiate(destPin,board.cells[index].GetLocation(),Quaternion.identity) as GameObject;
+								SetPlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, board.cells[index]);
+								Destroy(panel.gameObject);
+							});
+
+							if(CurrentSelectedChar.hasBall)
+							{
+								Button passButton = Instantiate(buttFab) as Button;
+								passButton.transform.SetParent(panel.transform, false);
+								passButton.GetComponentInChildren<Text>().text = "Pass";
+								passButton.onClick.AddListener(() => 
+								{ 
+									SetPlayerAction(PlayerAction.Actions.Pass, CurrentSelectedChar, board.cells[index]);
+									Destroy(panel.gameObject);
+								});	
+							}
+						}
+					break;
+					}
+				}
+			}
+			//actionCount = 0; //make a button
 		}
 	}
 }

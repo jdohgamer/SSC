@@ -93,6 +93,7 @@
      <Compile Include="Assets\_Scripts\PlayerMovement.cs" />
      <Compile Include="Assets\_Scripts\ProjectileCollision.cs" />
      <Compile Include="Assets\_Scripts\PushNotificationsAndroid.cs" />
+     <Compile Include="Assets\_Scripts\RightClickSell.cs" />
      <Compile Include="Assets\_Scripts\TurnButton.cs" />
      <Compile Include="Assets\_Scripts\TweenBy.cs" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\VisualSensorRingShader.shader" />
