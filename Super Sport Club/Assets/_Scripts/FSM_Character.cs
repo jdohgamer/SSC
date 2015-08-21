@@ -41,6 +41,7 @@ public class FSM_Character : FSM_Base
 	public bool hasTarget, hasBall;
 	Vector3 moveTarget;
 	MeshRenderer currentMesh;
+	Animator anim;
 	public PlayerAction[] actions;
 	public Vector3 MoveTarget 
 	{ 
@@ -62,8 +63,9 @@ public class FSM_Character : FSM_Base
 	public void Awake()
 	{
 		CurrentState = Stance.Neutral;
-		currentMesh = GetComponent<MeshRenderer>();
+		currentMesh = GetComponentInChildren<MeshRenderer>();
 		actions = new PlayerAction[maxActions];
+		anim = GetComponentInChildren<Animator>();
 	}
 	public void SetPlayerAction(PlayerAction act)
 	{
@@ -97,9 +99,13 @@ public class FSM_Character : FSM_Base
 						easeType = ease.ToString();
 						while (Vector3.Distance(transform.position,target)>.1f) 
 						{
+							if (anim!=null)
+							anim.SetBool ("IsWalking",true);
 							iTween.MoveTo(gameObject, iTween.Hash("position", target, "easeType", easeType, "loopType", "none", "speed", moveSpeed));
 							yield return new WaitForSeconds(1f);
 						}
+						if (anim!=null)
+						anim.SetBool ("IsWalking",false);
 						break;
 					}
 				}

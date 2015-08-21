@@ -51,6 +51,7 @@
      <Compile Include="Assets\AI\Actions\ChooseWanderPosition.cs" />
      <Compile Include="Assets\AI\Actions\GetStandOnPoint.cs" />
      <Compile Include="Assets\AI\Actions\StickToPlayer.cs" />
+     <Compile Include="Assets\_Scripts\Behave.cs" />
      <Compile Include="Assets\_Scripts\CameraFollow.cs" />
      <Compile Include="Assets\_Scripts\CellMono.cs" />
      <Compile Include="Assets\_Scripts\ClickMoveHandler.cs" />
@@ -96,6 +97,7 @@
      <Compile Include="Assets\_Scripts\RightClickSell.cs" />
      <Compile Include="Assets\_Scripts\TurnButton.cs" />
      <Compile Include="Assets\_Scripts\TweenBy.cs" />
+     <Compile Include="Assets\_Scripts\playerMovementRotation.cs" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\VisualSensorRingShader.shader" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\AspectSphereShader.shader" />
      <None Include="Assets\Plugins\RAIN\Editor\ScriptTemplates\BehaviorTreeTemplate.xml" />
