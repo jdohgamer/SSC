@@ -21,7 +21,7 @@ public class ClickMoveHandler : MessageHandler
 				{
 					Vector3 target = new Vector3 (message.Vector3Value.x, 0.2f, message.Vector3Value.z);
 					Debug.Log("God damn nigga "+ message.Vector3Value.ToString());
-					player.MoveTarget = target;
+					//player.MoveTarget = target;
 				}
 //				else if (message.GameObjectValue == this.gameObject)
 //				{

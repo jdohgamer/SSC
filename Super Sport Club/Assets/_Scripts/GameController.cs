@@ -21,6 +21,7 @@ public class GameController : MonoBehaviour
 	FSM_Character[] characters;
 	public enum Teams{TeamOne,TeamTwo}
 	byte actionCount = 0;
+	public byte MaxActions = 5;
 	PlayerAction[] acts;
 
 	[SerializeField] Image panelFab;
@@ -36,8 +37,6 @@ public class GameController : MonoBehaviour
 	{
 		get{return characters[currentID];}
 	}
-	public GameObject destPin;
-	GameObject newPin, oldPin;
 
 	[SerializeField] LayerMask mask;
 
@@ -94,12 +93,25 @@ public class GameController : MonoBehaviour
 		return true;
 	}
 
-	void ClearActions()
+	public void ClearActions()
 	{
+		List<FSM_Character> affectedChars = new List<FSM_Character>();
 		for(int c= 0;c<acts.Length;c++)
 		{
-			acts[c] = null;
+			if(acts[c]!=null)
+			{
+				if(!affectedChars.Contains(acts[c].iCh))
+				{
+					affectedChars.Add(acts[c].iCh);
+				}
+				acts[c] = null;
+			}
 		}
+		foreach(FSM_Character c in affectedChars)
+		{
+			c.ClearActions();
+		}
+		board.TurnOffHiglighted ();
 		actionCount = 0;
 	}
 
@@ -143,13 +155,80 @@ public class GameController : MonoBehaviour
 
 	public void SetPlayerAction(PlayerAction.Actions act, FSM_Character character, Cell targetCell)
 	{
-		if(actionCount<5)
+		if(actionCount<MaxActions&&character.actionCount<character.maxActions)
 		{
 			acts[actionCount] = new PlayerAction(act, character, targetCell);
+			character.SetPlayerAction(acts[actionCount]);
 			actionCount += 1;
 		}
 	}
-	
+	void MovementClick(int index)
+	{
+		SetPlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, board.cells[index]);
+		if (CurrentSelectedChar.maxActions - CurrentSelectedChar.actionCount > 0) 
+		{
+			//board.HighlightAdjacent (false, CurrentSelectedChar.OccupiedCell.id, CurrentSelectedChar.maxActions);
+			board.HighlightAdjacent (true, index, CurrentSelectedChar.maxActions - CurrentSelectedChar.actionCount );
+		} else {
+			board.TurnOffHiglighted();
+		}
+
+	}
+	void CreateButtonPanel(int index)
+	{
+		if (panel!=null)
+		{
+			Destroy(panel.gameObject);
+		}
+		Vector3 loc = Camera.main.WorldToScreenPoint(board.cells[index].GetLocation());
+		loc += new Vector3(offsetX,offsetY,0f);
+		panel = Instantiate(panelFab.gameObject, loc, Quaternion.identity)as GameObject;
+		panel.transform.SetParent(can.transform,false);
+		panel.transform.SetAsLastSibling();
+
+		if ((CurrentSelectedChar.maxActions - CurrentSelectedChar.actionCount > 0)) 
+		{
+			if(CurrentSelectedChar.actionCount > 0) 
+			{
+				Button clearButton = Instantiate (buttFab) as Button;
+				clearButton.transform.SetParent (panel.transform, false);
+				clearButton.GetComponentInChildren<Text> ().text = "Clear";
+				clearButton.onClick.AddListener (() => 
+				{ 
+					CurrentSelectedChar.ClearActions();
+					board.TurnOffHiglighted();
+					Destroy (panel.gameObject);
+				});
+			}
+
+			Button moveButton = Instantiate (buttFab) as Button;
+			moveButton.transform.SetParent (panel.transform, false);
+			moveButton.GetComponentInChildren<Text> ().text = "Move";
+			moveButton.onClick.AddListener (() => 
+			{ 	
+				if(CurrentSelectedChar.targetCount>0)
+				{
+					board.HighlightAdjacent (true, CurrentSelectedChar.LastTargetCell.id, CurrentSelectedChar.maxActions - CurrentSelectedChar.actionCount);
+				}
+				else board.HighlightAdjacent (true, index, CurrentSelectedChar.maxActions - CurrentSelectedChar.actionCount);
+				
+				Destroy (panel.gameObject);
+			});
+		
+			if (CurrentSelectedChar.hasBall) {
+				Button passButton = Instantiate (buttFab) as Button;
+				passButton.transform.SetParent (panel.transform, false);
+				passButton.GetComponentInChildren<Text> ().text = "Pass";
+				passButton.onClick.AddListener (() => 
+				{ 
+					SetPlayerAction (PlayerAction.Actions.Pass, CurrentSelectedChar, board.cells [index]);
+					Destroy (panel.gameObject);
+				});	
+			}
+
+		} 
+			
+	}
 		
 	public void FixedUpdate() 
 	{
@@ -173,28 +252,28 @@ public class GameController : MonoBehaviour
 						if(id!= currentID)
 						{
 							if(currentID!=-1)
-							CurrentSelectedChar.Highlight(false);
+							{
+								CurrentSelectedChar.Highlight(false);
+								board.TurnOffHiglighted();
+							}
 
 							currentID = id;
 							CurrentSelectedChar.Highlight(true);
-							oldPin = newPin;
-							newPin = null;
 							CurrentSelectedChar.OccupiedCell = board.cells[CurrentSelectedChar.RaycastToGround()];//this should be done when placing characters
 						}
-						board.HighlightAdjacent(CurrentSelectedChar.OccupiedCell.id, CurrentSelectedChar.maxActions - CurrentSelectedChar.actionCount);
-							
+						CreateButtonPanel(CurrentSelectedChar.OccupiedCell.id);
 						break;
+
 					}
 					case "Field":
 					{
-						if(bSelection)
+						if(!EventSystem.current.IsPointerOverGameObject())
 						{
-							int index  = hit.transform.GetSiblingIndex();
-
-							//SetPlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, board.cells[index]);
-
-							
-							
+							if(bSelection)
+							{
+								int index  = hit.transform.GetSiblingIndex();
+								MovementClick( index);
+							}
 						}
 						break;
 					}
@@ -205,58 +284,6 @@ public class GameController : MonoBehaviour
 		}
 		if (Input.GetMouseButtonUp (1)) 
 		{
-			RaycastHit hit;
-			Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
-			
-			if (Physics.Raycast (ray, out hit, 100f, mask)) 
-			{
-				switch(hit.transform.tag)
-				{
-					case "Field":
-					{
-						if(bSelection)
-						{
-							int index  = hit.transform.GetSiblingIndex();
-							if (panel!=null)
-							{
-								Destroy(panel.gameObject);
-							}
-							Vector3 loc = Camera.main.WorldToScreenPoint(board.cells[index].GetLocation());
-							loc += new Vector3(offsetX,offsetY,0f);
-							panel = Instantiate(panelFab.gameObject, loc, Quaternion.identity)as GameObject;
-							panel.transform.SetParent(can.transform,false);
-							panel.transform.SetAsLastSibling();
-
-							Button moveButton = Instantiate(buttFab) as Button;
-							moveButton.transform.SetParent(panel.transform, false);
-							moveButton.GetComponentInChildren<Text>().text = "Move";
-							moveButton.onClick.AddListener(() => 
-							{ 
-								if(newPin != null)
-								{
-									Destroy(newPin);
-								}
-								newPin = Instantiate(destPin,board.cells[index].GetLocation(),Quaternion.identity) as GameObject;
-								SetPlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, board.cells[index]);
-								Destroy(panel.gameObject);
-							});
-
-							if(CurrentSelectedChar.hasBall)
-							{
-								Button passButton = Instantiate(buttFab) as Button;
-								passButton.transform.SetParent(panel.transform, false);
-								passButton.GetComponentInChildren<Text>().text = "Pass";
-								passButton.onClick.AddListener(() => 
-								{ 
-									SetPlayerAction(PlayerAction.Actions.Pass, CurrentSelectedChar, board.cells[index]);
-									Destroy(panel.gameObject);
-								});	
-							}
-						}
-					break;
-					}
-				}
-			}
 			//actionCount = 0; //make a button
 		}
 	}

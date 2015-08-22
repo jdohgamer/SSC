@@ -55,16 +55,16 @@ public class CellMono: MonoBehaviour
 
 	}
 
-	void OnMouseEnter()
-	{
-		//Highlight(true);
-		Debug.Log(transform.GetSiblingIndex());
-	}
-	void OnMouseExit()
-	{
-		//Highlight(false);
-		Debug.Log(transform.GetSiblingIndex());
-	}
+//	void OnMouseEnter()
+//	{
+//		//Highlight(true);
+//		Debug.Log(transform.GetSiblingIndex());
+//	}
+//	void OnMouseExit()
+//	{
+//		//Highlight(false);
+//		Debug.Log(transform.GetSiblingIndex());
+//	}
 	public void Highlight(bool set)
 	{
 		if(set)

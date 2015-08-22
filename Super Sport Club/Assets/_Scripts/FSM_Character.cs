@@ -31,25 +31,31 @@ public class PlayerAction
 
 public class FSM_Character : FSM_Base 
 {
-	public int id, actionCount, maxActions = 2;
+	public int id, actionCount, targetCount, maxActions = 2;
 	public Cell OccupiedCell;
 	[SerializeField] LayerMask layer;
 	[SerializeField] protected iTween.EaseType ease;
 	protected string easeType;
-	public Vector3 target;
+	GameObject[] targetPins;
+	Cell lastCell;
+	public Cell LastTargetCell
+	{
+		get{return lastCell;}
+	}
+	public GameObject destPin;
 	[SerializeField] protected float moveSpeed;
 	public bool hasTarget, hasBall;
-	Vector3 moveTarget;
+	//Vector3 moveTarget;
 	MeshRenderer currentMesh;
 	Animator anim;
 	public PlayerAction[] actions;
-	public Vector3 MoveTarget 
-	{ 
-		get{return moveTarget;}
-		set{moveTarget = value; hasTarget = true;}
-	}
+//	public Vector3 MoveTarget 
+//	{ 
+//		get{return moveTarget;}
+//		set{moveTarget = value; hasTarget = true;}
+//	}
 	GameController.Teams team;
-
+	
 	public enum Stance
 	{
 		Neutral,
@@ -66,22 +72,37 @@ public class FSM_Character : FSM_Base
 		currentMesh = GetComponentInChildren<MeshRenderer>();
 		actions = new PlayerAction[maxActions];
 		anim = GetComponentInChildren<Animator>();
+		targetPins = new GameObject[maxActions];
 	}
 	public void SetPlayerAction(PlayerAction act)
 	{
 		if(actionCount<maxActions)
 		{
+			if(act.action == PlayerAction.Actions.Move)
+			{
+
+				targetPins[targetCount] = Instantiate(destPin,act.cTo.GetLocation(),Quaternion.identity) as GameObject;
+				targetCount++;
+
+			}
 			actions[actionCount] = act;
 			actionCount += 1;
+			lastCell = act.cTo;
 		}
 	}
-	void ClearActions()
+	public void ClearActions()
 	{
 		for(int c= 0;c<actions.Length;c++)
 		{
 			actions[c] = null;
 		}
 		actionCount = 0;
+		for(int t= 0;t<targetPins.Length;t++)
+		{
+			if(targetPins[t]!=null)
+			Destroy(targetPins[t]);
+		}
+		targetCount = 0;
 	}
 	public IEnumerator ExecuteActions()
 	{
@@ -93,7 +114,7 @@ public class FSM_Character : FSM_Base
 				{
 					case PlayerAction.Actions.Move:
 					{
-						target = actions[i].cTo.GetLocation();
+						Vector3 target = actions[i].cTo.GetLocation();
 						target += new Vector3(0,0.2f,0);
 						//Move(target);
 						easeType = ease.ToString();
@@ -119,10 +140,24 @@ public class FSM_Character : FSM_Base
 
 	public void Highlight(bool set)
 	{
-		if(set)
+		if (set) 
+		{
 			currentMesh.material.color = Color.cyan;
-		else
+		} else 
+		{
 			currentMesh.material.color = Color.white;
+		}
+		ShowTargets(set);
+	}
+	void ShowTargets(bool set)
+	{
+		foreach (GameObject t in targetPins) 
+		{
+			if(t!=null)
+			{
+				t.GetComponent<Renderer>().enabled = set;
+			}
+		}
 	}
 
 //	public void Move(Vector3 target)

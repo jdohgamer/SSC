@@ -14,17 +14,6 @@ struct AdjacentIndexes
 
 	public AdjacentIndexes(int index, int distance,  int boardLength)
 	{
-		/*
-		indexes = new int[8];
-		indexes[0] = (-boardLength +1) +index; //NW
-		indexes[6] = (-boardLength - 1) +index; //SW
-		indexes[7] = (-boardLength) +index; //W
-		indexes[1] = 1 +index; //N
-		indexes[2] = (boardLength+1) +index; //NE
-		indexes[3] = (boardLength) +index; //E
-		indexes[4] = (boardLength-1) +index; //SE
-		indexes[5] = -1 +index; //S
-		*/
 		int dist = distance*2+1;
 		int negDist = -distance;
 		indexes2D = new int[dist,dist];
@@ -53,18 +42,14 @@ public class Grid_Setup : MonoBehaviour
 	GameObject field;
 	public Transform fieldTran;
 	AdjacentIndexes adjacent;
+	bool isHighlighted;
 
 	/* Dirt = 0
 	 * Corner Lines = 1
 	 * Lines = 2
 	 * Grass = 3
 	 */
-	private List <Vector3> gridPositions = new List <Vector3> ();
-
-//	private WaypointRig wpRig = null;
-//	WaypointSet tWPSet;
-
-	
+		
 	void Awake()
 	{
 		field = new GameObject("Field");
@@ -137,22 +122,37 @@ public class Grid_Setup : MonoBehaviour
 		return cell;
 	}
 
-	public void HighlightAdjacent(int index, int distance)
+	public void HighlightAdjacent(bool set, int index, int distance)
 	{
-		adjacent = new AdjacentIndexes(index, distance ,length+3);
-		int dist = distance*2+1;
-		for(int h =0; h<dist;h++)
-		{
-			for(int i =0; i<dist;i++)
+		if (isHighlighted||set==false)
+			TurnOffHiglighted ();
+	
+			adjacent = new AdjacentIndexes (index, distance, length + 3);
+			int dist = distance * 2 + 1;
+			for (int h =0; h<dist; h++) 
 			{
-				if(adjacent.indexes2D[h,i]>=0 && adjacent.indexes2D[h,i]!= index)
+				for (int i =0; i<dist; i++) 
 				{
-					if(cells[adjacent.indexes2D[h,i]].type!= Cell.CellType.OutOfBounds)
+					if (adjacent.indexes2D [h, i] >= 0 && adjacent.indexes2D [h, i] != index) 
 					{
-						cells[adjacent.indexes2D[h,i]].cm.Highlight(true);
+						if (cells [adjacent.indexes2D [h, i]].type != Cell.CellType.OutOfBounds) 
+						{
+							cells [adjacent.indexes2D [h, i]].cm.Highlight (set);
+						}
 					}
 				}
 			}
+			isHighlighted = true;
+
+	}
+	public void TurnOffHiglighted()
+	{
+		if (isHighlighted) 
+		{
+			foreach (int i in adjacent.indexes2D) {
+				cells [i].cm.Highlight (false);
+			}
+			isHighlighted = true;
 		}
 	}
 	
