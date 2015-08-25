@@ -35,22 +35,25 @@ public class Cell
 	}
 	public Vector3 GetLocation()
 	{
-		return boardObj.transform.position;
+		return boardObj.GetComponent<MeshRenderer>().bounds.center;
 	}
 
 	public Hashtable SaveCell()
 	{
 		Hashtable ht = new Hashtable();
-		ht["type"] = (int)type; 
+		ht["location"] = GetLocation(); 
+		ht["character"] = character.id; 
 		return ht;
 	}
 }
 public class CellMono: MonoBehaviour
 {
 	public Material mat;
+	Vector3 midpoint;
 
 	void Awake()
 	{
+
 		mat = GetComponent<MeshRenderer>().material;
 
 	}

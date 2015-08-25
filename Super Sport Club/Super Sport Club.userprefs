@@ -1,24 +1,39 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\_Scripts\PlayerMovement.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\_Scripts\GUIController.cs">
     <Files>
-      <File FileName="Assets\_Scripts\PlayerMovement.cs" Line="24" Column="3" />
-      <File FileName="Assets\_Scripts\playerMovementRotation.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\GameController.cs" Line="267" Column="1" />
-      <File FileName="Assets\_Scripts\CellMono.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\FSM_Character.cs" Line="1" Column="1" />
+      <File FileName="Assets\_Scripts\FSM_Character.cs" Line="86" Column="1" />
+      <File FileName="Assets\_Scripts\GUIController.cs" Line="70" Column="1" />
+      <File FileName="Assets\_Scripts\CustomGameClient.cs" Line="415" Column="5" />
+      <File FileName="Assets\Plugins\PhotonAssets\PhotonLoadbalancingApi\LoadBalancingClient.cs" Line="732" Column="1" />
       <File FileName="Assets\_Scripts\Grid_Setup.cs" Line="1" Column="1" />
+      <File FileName="Assets\_Scripts\CellMono.cs" Line="1" Column="1" />
+      <File FileName="Assets\_Scripts\MemoryGame\CustomTypes.cs" Line="1" Column="1" />
+      <File FileName="Assets\Plugins\PhotonAssets\PhotonLoadbalancingApi\LoadBalancingPeer.cs" Line="742" Column="18" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
-        <State expanded="True" selected="True">
-          <Node name="Assembly-CSharp" expanded="True" />
+        <State expanded="True">
+          <Node name="Assembly-CSharp" expanded="True">
+            <Node name="_Scripts" expanded="True">
+              <Node name="GUIController.cs" selected="True" />
+            </Node>
+          </Node>
+          <Node name="Assembly-CSharp-firstpass" expanded="True">
+            <Node name="Plugins" expanded="True">
+              <Node name="PhotonAssets" expanded="True">
+                <Node name="PhotonLoadbalancingApi" expanded="True" />
+              </Node>
+            </Node>
+          </Node>
         </State>
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="C:\Users\Tubocass\Projects\Sport Club\Super Sport Club\Assets\_Scripts\CustomGameClient.cs" line="410" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class PlayerAction
 {
@@ -27,6 +28,17 @@ public class PlayerAction
 	{
 		return new PlayerAction(Actions.Move, iCharacter, tCell);
 	}
+	public Hashtable GetActionProp()
+	{
+		Hashtable actionProp = new Hashtable ();
+
+		actionProp.Add("Act",(int)action);
+		actionProp.Add ("iCharacter",(int)iCh.id);
+		if(tCh!=null)actionProp.Add ("tCharacter",(int)tCh.id);
+		if(cTo!=null)actionProp.Add("tCell",(int)cTo.id);
+		if(cFrom!=null)actionProp.Add("fCell",(int)cFrom.id);
+		return actionProp;
+	}
 }
 
 public class FSM_Character : FSM_Base 
@@ -49,13 +61,8 @@ public class FSM_Character : FSM_Base
 	MeshRenderer currentMesh;
 	Animator anim;
 	public PlayerAction[] actions;
-//	public Vector3 MoveTarget 
-//	{ 
-//		get{return moveTarget;}
-//		set{moveTarget = value; hasTarget = true;}
-//	}
 	GameController.Teams team;
-	
+
 	public enum Stance
 	{
 		Neutral,
@@ -78,17 +85,24 @@ public class FSM_Character : FSM_Base
 	{
 		if(actionCount<maxActions)
 		{
-			if(act.action == PlayerAction.Actions.Move)
-			{
-
-				targetPins[targetCount] = Instantiate(destPin,act.cTo.GetLocation(),Quaternion.identity) as GameObject;
-				targetCount++;
-
-			}
 			actions[actionCount] = act;
 			actionCount += 1;
-			lastCell = act.cTo;
 		}
+	}
+	public Hashtable GetCharacterAsProp()
+	{
+		Hashtable props = new Hashtable ();
+		props["Stance"] = (int)(Stance)CurrentState;
+		props["Cell"] = (int)OccupiedCell.id;
+
+		return props;
+	}
+
+	public void SetTarget(Cell target)
+	{
+		targetPins[targetCount] = Instantiate(destPin,target.GetLocation(),Quaternion.identity) as GameObject;
+		targetCount++;
+		lastCell = target;
 	}
 	public void ClearActions()
 	{
@@ -103,6 +117,7 @@ public class FSM_Character : FSM_Base
 			Destroy(targetPins[t]);
 		}
 		targetCount = 0;
+		lastCell = null;
 	}
 	public IEnumerator ExecuteActions()
 	{
@@ -183,12 +198,7 @@ public class FSM_Character : FSM_Base
 		Physics.Raycast(ray,out hit,5f,layer);
 		return hit.transform.GetSiblingIndex();
 	}
-
-	public void EndTurn()
-	{
-
-	}
-
+	
 	void OnTriggerEnter(Collider other)
 	{
 		switch(other.tag)

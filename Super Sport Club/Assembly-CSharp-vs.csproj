@@ -51,19 +51,16 @@
      <Compile Include="Assets\AI\Actions\ChooseWanderPosition.cs" />
      <Compile Include="Assets\AI\Actions\GetStandOnPoint.cs" />
      <Compile Include="Assets\AI\Actions\StickToPlayer.cs" />
-     <Compile Include="Assets\LeftRight.cs" />
      <Compile Include="Assets\_Scripts\Behave.cs" />
      <Compile Include="Assets\_Scripts\CameraFollow.cs" />
      <Compile Include="Assets\_Scripts\CellMono.cs" />
-     <Compile Include="Assets\_Scripts\ClickMoveHandler.cs" />
-     <Compile Include="Assets\_Scripts\ControllerHandler.cs" />
      <Compile Include="Assets\_Scripts\CustomGameClient.cs" />
      <Compile Include="Assets\_Scripts\FSM_BASE.cs" />
      <Compile Include="Assets\_Scripts\FSM_Character.cs" />
      <Compile Include="Assets\_Scripts\GUIController.cs" />
      <Compile Include="Assets\_Scripts\GameController.cs" />
      <Compile Include="Assets\_Scripts\Grid_Setup.cs" />
-     <Compile Include="Assets\_Scripts\HitHandler.cs" />
+     <Compile Include="Assets\_Scripts\LeftRight.cs" />
      <Compile Include="Assets\_Scripts\MemoryGame\BgColorChanger.cs" />
      <Compile Include="Assets\_Scripts\MemoryGame\CustomAuthConnect.cs" />
      <Compile Include="Assets\_Scripts\MemoryGame\CustomTypes.cs" />
@@ -84,18 +81,19 @@
      <Compile Include="Assets\_Scripts\MemoryGame\UtilityScripts\PointedAtGameObjectInfo.cs" />
      <Compile Include="Assets\_Scripts\MemoryGame\UtilityScripts\QuitOnEscapeOrBack.cs" />
      <Compile Include="Assets\_Scripts\MemoryGame\UtilityScripts\WebRpcResponse.cs" />
+     <Compile Include="Assets\_Scripts\MessageBus\ControllerHandler.cs" />
+     <Compile Include="Assets\_Scripts\MessageBus\HitHandler.cs" />
      <Compile Include="Assets\_Scripts\MessageBus\Message.cs" />
      <Compile Include="Assets\_Scripts\MessageBus\MessageBus.cs" />
      <Compile Include="Assets\_Scripts\MessageBus\MessageHandler.cs" />
      <Compile Include="Assets\_Scripts\MessageBus\MessageSubscriber.cs" />
      <Compile Include="Assets\_Scripts\MessageBus\MessageSubscriberController.cs" />
-     <Compile Include="Assets\_Scripts\MouseClick.cs" />
+     <Compile Include="Assets\_Scripts\MessageBus\ProjectileCollision.cs" />
      <Compile Include="Assets\_Scripts\NPC_FSM.cs" />
-     <Compile Include="Assets\_Scripts\OpenPlayerSettings.cs" />
      <Compile Include="Assets\_Scripts\PlayerMovement.cs" />
-     <Compile Include="Assets\_Scripts\ProjectileCollision.cs" />
      <Compile Include="Assets\_Scripts\PushNotificationsAndroid.cs" />
      <Compile Include="Assets\_Scripts\RightClickSell.cs" />
+     <Compile Include="Assets\_Scripts\SSB_Player.cs" />
      <Compile Include="Assets\_Scripts\TurnButton.cs" />
      <Compile Include="Assets\_Scripts\TweenBy.cs" />
      <Compile Include="Assets\_Scripts\playerMovementRotation.cs" />
@@ -106,7 +104,6 @@
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\VisualSensorLineShader.shader" />
      <None Include="Assets\RotateUVs.shader" />
      <None Include="Assets\Plugins\RAIN\ReleaseNotes.txt" />
-     <None Include="Assets\Plugins\PhotonAssets\Plugins\Photon3Unity3D.xml" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\NavMeshContourShader.shader" />
      <None Include="Assets\_Assets\Graphics\game-icons\icons-readme.txt" />
      <None Include="Assets\Plugins\Pixelplacement\iTween\ReadMe!\ReadMe!.txt" />
@@ -129,15 +126,6 @@
  </Reference>
  <Reference Include="Photon3Unity3D">
  <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/Plugins/Photon3Unity3D.dll</HintPath>
- </Reference>
- <Reference Include="Photon3Unity3D">
- <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/Plugins/PhotonAssets/Plugins/Photon3Unity3D.dll</HintPath>
- </Reference>
- <Reference Include="Photon3Unity3D">
- <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/Plugins/PhotonAssets/Plugins/Metro/Photon3Unity3D.dll</HintPath>
- </Reference>
- <Reference Include="Photon3Unity3D">
- <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/Plugins/PhotonAssets/Plugins/WP8/Photon3Unity3D.dll</HintPath>
  </Reference>
  <Reference Include="RAIN">
  <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/Plugins/RAIN/RAIN.dll</HintPath>

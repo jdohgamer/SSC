@@ -35,12 +35,14 @@ struct AdjacentIndexes
 
 public class Grid_Setup : MonoBehaviour 
 {
-	public int length, width, cellCount;
-	public GameObject[] boardCell;
+	[SerializeField]  GameObject[] boardCell;
+	[SerializeField] GameObject ball;
+	public static GameObject Ball;
+	public FSM_Character[] characters;
 	public Cell[] cells;
-	public GameObject ball;
+	public int length, width, cellCount;
 	GameObject field;
-	public Transform fieldTran;
+	Transform fieldTran;
 	AdjacentIndexes adjacent;
 	bool isHighlighted;
 
@@ -56,14 +58,23 @@ public class Grid_Setup : MonoBehaviour
 		fieldTran = field.transform;
 	}
 
+	void DestroyBoard ()
+	{
+		for (int i=0; i<cellCount; i++) 
+		{
+			Destroy(cells[i].boardObj);
+		}
+		Destroy (Ball);
+	}
 	public void Generate (int w, int l) 
 	{
+		DestroyBoard ();
 		width = w;
 		length = l;
 		int i = 0;
-		cellCount = (w+3)*(l+3);
+		cellCount = (w+3)*(l+3);//
 		cells = new Cell[cellCount];
-		for (int x = -1; x<=w+1; x++)
+		for (int x = -1; x<=w+1; x++)//this is actually one unit too long, buy I don't feel like changinging it
 		{
 			for (int z = -1; z<=l+1; z++)
 			{
@@ -99,7 +110,7 @@ public class Grid_Setup : MonoBehaviour
 					type = 3; rot = 0f;
 					if(x==w/2&&z==l/2)
 					{
-						GameObject newBall = Instantiate(ball,new Vector3(x,0.2f,z), Quaternion.identity)as GameObject;
+						Ball = Instantiate(ball,new Vector3(x,0.2f,z), Quaternion.identity)as GameObject;
 					}
 				}
 				cells[i] = new Cell(i,type);
@@ -108,12 +119,15 @@ public class Grid_Setup : MonoBehaviour
 				i++;
 			}
 		}
+		for (int c = 0; c<characters.Length; c++) 
+		{
+			characters[c].OccupiedCell = cells[characters[c].RaycastToGround()];
+			characters[c].OccupiedCell.character = characters[c];
+		}
 	}
 	GameObject CreateCell(int type,int x, int z, float rotation)
 	{
 		GameObject cell = Instantiate(boardCell[type],new Vector3(x,0,z), Quaternion.identity)as GameObject;
-		//cell.GetComponent<Renderer>().material.shader = Shader.Find("Custon/RotateUVs");
-		//cell.transform.rotation = Quaternion.AngleAxis(rotation, Vector3.up);
 		cell.transform.SetParent (fieldTran);
 		if(cell.GetComponent<Renderer>().material.GetFloat("_RotationDegree")!= null)
 		{
@@ -179,7 +193,7 @@ public class Grid_Setup : MonoBehaviour
 				length = (int)customProps["tz#"];
 			}
 			
-			//this.Generate(width, length);
+			this.Generate(width, length);
 		}
 		
 		int readTiles = 0;
