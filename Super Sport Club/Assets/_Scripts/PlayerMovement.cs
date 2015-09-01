@@ -36,6 +36,7 @@ public class PlayerMovement : MonoBehaviour
 		
 		// Move the player to it's current position plus the movement.
 		playerRigidbody.MovePosition (transform.position + movement);
+		Animating ( h,  v);
 	}
 	
 	void Turning ()

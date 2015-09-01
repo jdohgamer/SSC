@@ -6,148 +6,172 @@ using RAIN.Navigation.Waypoints;
 using ExitGames.Client.Photon.LoadBalancing;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
+
+struct AdjacentIndexes 
+{
+	//public int[] indexes;
+	public int[,] indexes2D;
+
+	public AdjacentIndexes(int index, int distance,  int boardLength)
+	{
+		int dist = distance*2+1;
+		int negDist = -distance;
+		indexes2D = new int[dist,dist];
+		int negDistColumn;
+		int negDistRow;
+		for(int x = 0; x<dist; x++)
+		{
+			negDistRow = negDist * boardLength;
+			negDistColumn = -distance;
+			for(int y = 0; y<dist; y++)
+			{
+				indexes2D[x,y] = negDistRow + negDistColumn + index;
+				negDistColumn++;
+			}
+			negDist++;
+		}
+	}
+} 
+
 public class Grid_Setup : MonoBehaviour 
 {
+	[SerializeField]  GameObject[] boardCell;
+	[SerializeField] GameObject ball;
+	public static GameObject Ball;
+	public FSM_Character[] characters;
+	public Cell[] cells;
 	public int length, width, cellCount;
-	public GameObject[] boardCell;
-	Cell[] cells;
-	public GameObject ball;
-
-	public GameObject PotMove;
-	public Vector3 size;
-	public Vector3 ballPosition;
 	GameObject field;
 	Transform fieldTran;
-	GameObject cell;
-	//Transform fieldTran;
-
+	AdjacentIndexes adjacent;
+	bool isHighlighted;
 
 	/* Dirt = 0
 	 * Corner Lines = 1
 	 * Lines = 2
 	 * Grass = 3
 	 */
-	public List <Vector3> gridPositions = new List <Vector3> ();
-
-//	private WaypointRig wpRig = null;
-//	WaypointSet tWPSet;
-	
+		
 	void Awake()
 	{
-		cellCount = (width+3)*(length+3);
 		field = new GameObject("Field");
 		fieldTran = field.transform;
-		cells = new Cell[cellCount];
-//		wpRig = GetComponentInChildren<WaypointRig>();
-//		tWPSet = wpRig.WaypointSet;
 	}
 
-	void Start()
+	void DestroyBoard ()
 	{
-
-		//Generate();
-	}
-
-	void InitialiseList ()
-	{
-		//Clear our list gridPositions.
-		gridPositions.Clear ();
-		
-		//Loop through x axis (columns).
-		for(int x = 1; x < width-1; x++)
+		for (int i=0; i<cellCount; i++) 
 		{
-			//Within each column, loop through y axis (rows).
-			for(int z = 1; z < length-1; z++)
-			{
-				//At each index add a new Vector3 to our list with the x and y coordinates of that position.
-				gridPositions.Add (new Vector3(x, 0f, z));
-			}
+			Destroy(cells[i].boardObj);
 		}
+		Destroy (Ball);
 	}
-
-	public void Generate () 
+	public void Generate (int w, int l) 
 	{
+		DestroyBoard ();
+		width = w;
+		length = l;
 		int i = 0;
-		for (int x = -1; x<=width+1; x++)
+		cellCount = (w+3)*(l+3);//
+		cells = new Cell[cellCount];
+		for (int x = -1; x<=w+1; x++)//this is actually one unit too long, buy I don't feel like changinging it
 		{
-			for (int z = -1; z<=length+1; z++)
+			for (int z = -1; z<=l+1; z++)
 			{
 				int type = 0;
 				float rot = 0f;
 
-				if(x ==-1||x ==width+1||z ==-1|| z == length+1)//OutOfBounds
+				if(x ==-1||x ==w+1||z ==-1|| z == l+1)//OutOfBounds
 				{
 					type = 0; rot = 0f;
-				}else if(x==0||x==width||z==0||z==length)//Border
+				}else if(x==0||x==w||z==0||z==l)//Border
 				{
 					if(x==0) //left side
 					{
-						if(z==0)		{  type = 1; rot = -90f;} //bottom left
-						else if(z==length){type = 1; rot = 0f;;} //top left
-						else{			   type = 2; rot = 90f;} //if(z>0&&z<length)
+						if(z==0)		{  type = 1; rot = 90f;} //bottom left
+						else if(z==l){type = 1; rot = 0f;;} //top left
+						else{			   type = 2; rot = -90f;} //if(z>0&&z<length)
 					}
-					else if(x==width)//right side
+					else if(x==w)//right side
 					{
-						if(z==0){		   type = 1; rot = -180f;} //bottom right
-						else if(z==length){type = 1; rot = 90f;} //top right
+						if(z==0){		   type = 1; rot = 180f;} //bottom right
+						else if(z==l){type = 1; rot = -90f;} //top right
 						else {			   type = 2; rot = 90f;} //if(z>0&&z<length)
-					}else{ //if(x>0&&x<width&&z==0||z==length)
-						type = 2; rot = 0f;;
+					}else{ //if(x>0&&x<width
+						if(z==0)
+						{
+							type = 2; rot = 0;
+						}else if (z==length)
+						{
+							type = 2; rot = 180f;
+						}
 					}
 				}else { //inner field
 					type = 3; rot = 0f;
-					if(x==width/2&&z==length/2)
+					if(x==w/2&&z==l/2)
 					{
-						GameObject newBall = Instantiate(ball,new Vector3(x,0.2f,z), Quaternion.identity)as GameObject;
-
+						Ball = Instantiate(ball,new Vector3(x,0.2f,z), Quaternion.identity)as GameObject;
 					}
 				}
 				cells[i] = new Cell(i,type);
 				cells[i].boardObj = CreateCell(type,x,z,rot);
 				cells[i].cm = cells[i].boardObj.GetComponent<CellMono>();
-			//	i++;
+				i++;
 			}
+		}
+		for (int c = 0; c<characters.Length; c++) 
+		{
+			characters[c].OccupiedCell = cells[characters[c].RaycastToGround()];
+			characters[c].OccupiedCell.character = characters[c];
 		}
 	}
 	GameObject CreateCell(int type,int x, int z, float rotation)
 	{
-
-		GameObject cell;
-		cell = Instantiate(boardCell[type],new Vector3(x,0,z), Quaternion.identity)as GameObject;
-		cell.transform.rotation = Quaternion.AngleAxis(rotation, Vector3.up);
-
-
-		cell = Instantiate(boardCell[type],new Vector3(x,0,z), Quaternion.identity)as GameObject;
-		//cell.transform.rotation = Quaternion.AngleAxis(rotation, Vector3.up);
-
+		GameObject cell = Instantiate(boardCell[type],new Vector3(x,0,z), Quaternion.identity)as GameObject;
 		cell.transform.SetParent (fieldTran);
 		if(cell.GetComponent<Renderer>().material.GetFloat("_RotationDegree")!= null)
 		{
 			cell.GetComponent<Renderer>().material.SetFloat("_RotationDegree", rotation* Mathf.Deg2Rad);
 		}
 		return cell;
-		//tWPSet.AddWaypoint(new Waypoint(cell.transform.position));
-
 	}
 
-//	protected internal Hashtable GetBoardAsCustomProperties()
-//	{
-
-	//	field = new GameObject("Field");
-	//	fieldTran = field.transform;
-	//	Generate();
-	//	ballPosition = ball.transform.position;
-
-
-//	}
-	void Update () 
+	public void HighlightAdjacent(bool set, int index, int distance)
 	{
-
+		if (isHighlighted||set==false)
+			TurnOffHiglighted ();
+	
+			adjacent = new AdjacentIndexes (index, distance, length + 3);
+			int dist = distance * 2 + 1;
+			for (int h =0; h<dist; h++) 
+			{
+				for (int i =0; i<dist; i++) 
+				{
+					if (adjacent.indexes2D [h, i] >= 0 && adjacent.indexes2D [h, i] != index) 
+					{
+						if (cells [adjacent.indexes2D [h, i]].type != Cell.CellType.OutOfBounds) 
+						{
+							cells [adjacent.indexes2D [h, i]].cm.Highlight (set);
+						}
+					}
+				}
+			}
+			isHighlighted = true;
 
 	}
-	 Hashtable OnMouseOver()
+	public void TurnOffHiglighted()
 	{
-
+		if (isHighlighted) 
+		{
+			foreach (int i in adjacent.indexes2D) {
+				cells [i].cm.Highlight (false);
+			}
+			isHighlighted = true;
+		}
+	}
+	
+	protected internal Hashtable GetBoardAsCustomProperties()
+	{
 		Hashtable customProps = new Hashtable();
 		for (int i = 0; i < cellCount; i++)
 		{
@@ -156,21 +180,20 @@ public class Grid_Setup : MonoBehaviour
 
 		return customProps;
 	}
-
 	
 	protected internal bool SetBoardByCustomProperties(Hashtable customProps, bool calledByEvent)
 	{
 		if (!calledByEvent)
 		{
-			this.width = 15;    // original game had 4x4
-			this.length = 10;
+			width = 15;    
+			length = 10;
 			if (customProps.ContainsKey("tx#"))
 			{
-				this.width = (int)customProps["tx#"];
-				this.length = (int)customProps["tz#"];
+				width = (int)customProps["tx#"];
+				length = (int)customProps["tz#"];
 			}
 			
-			this.Generate();
+			this.Generate(width, length);
 		}
 		
 		int readTiles = 0;
@@ -186,4 +209,3 @@ public class Grid_Setup : MonoBehaviour
 	}
 
 }
-	

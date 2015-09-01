@@ -8,10 +8,15 @@ public class Cell
 	public GameObject boardObj;
 	public bool bHighlighted, hasBall, bOccupied;
 	public int x,z,id;
+	public Vector3 location;
 	public CellMono cm;
 	public CellType type;
 	public enum CellType{OutOfBounds, Corner, BoundLine, Field, InsideBox}
 
+	public Cell()
+	{
+		id=-1;
+	}
 	public Cell(int newID)
 	{
 		id = newID;
@@ -28,28 +33,59 @@ public class Cell
 		x = X;
 		z = Z;
 	}
+	public Vector3 GetLocation()
+	{
+		return boardObj.GetComponent<MeshRenderer>().bounds.center;
+	}
 
 	public Hashtable SaveCell()
 	{
 		Hashtable ht = new Hashtable();
-		ht["type"] = (int)type; 
+		ht["location"] = GetLocation(); 
+		ht["character"] = character.id; 
 		return ht;
 	}
 }
 public class CellMono: MonoBehaviour
 {
-	Material mat;
+	public Material mat;
+	Vector3 midpoint;
 
 	void Awake()
 	{
-		mat = GetComponent<Renderer>().material;
+
+		mat = GetComponent<MeshRenderer>().material;
+
 	}
 
-	public void RotateMat(float degrees)
+//	void OnMouseEnter()
+//	{
+//		//Highlight(true);
+//		Debug.Log(transform.GetSiblingIndex());
+//	}
+//	void OnMouseExit()
+//	{
+//		//Highlight(false);
+//		Debug.Log(transform.GetSiblingIndex());
+//	}
+	public void Highlight(bool set)
 	{
-		if(mat.GetFloat("_RotationDegree")!= null)
+		if(set)
 		{
-			mat.SetFloat("_RotationDegree", degrees* Mathf.Deg2Rad);
+			mat.SetColor ("_Color",Color.cyan);
+			mat.SetFloat ("_Alpha",0.2f);
+		}
+		else{
+			mat.SetColor("_Color",Color.black);
+			mat.SetFloat ("_Alpha",1f);
 		}
 	}
+
+//	public void RotateMat(float degrees)
+//	{
+//		if(mat.GetFloat("_RotationDegree")!= null)
+//		{
+//			mat.SetFloat("_RotationDegree", degrees* Mathf.Deg2Rad);
+//		}
+//	}
 }
