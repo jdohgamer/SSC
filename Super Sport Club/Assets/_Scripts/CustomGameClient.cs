@@ -141,7 +141,7 @@ public class CustomGameClient : LoadBalancingClient
 		{
 			// we are in a fresh room with no saved board.
 			board.Generate();
-			this.SaveBoardToProperties();
+//			this.SaveBoardToProperties();
 			Debug.Log(string.Format("Board Properties: {0}", SupportClass.DictionaryToString(roomProps)));
 		}
 
@@ -201,7 +201,7 @@ public class CustomGameClient : LoadBalancingClient
 		this.OpCreateRoom(newRoomName, roomOptions, TypedLobby.Default);
 	}
 
-	public void SaveBoardToProperties()
+/*	public void SaveBoardToProperties()
 	{
 		Hashtable boardProps = board.GetBoardAsCustomProperties();
 		//boardProps.Add("pt", this.PlayerIdToMakeThisTurn);  // "pt" is for "player turn" and contains the ID/actorNumber of the player who's turn it is
@@ -210,11 +210,11 @@ public class CustomGameClient : LoadBalancingClient
 		boardProps.Add("tz#", board.length);
 		//boardProps.Add(GetPlayerPointsPropKey(this.LocalPlayer.ID), this.MyPoints); // we always only save "our" points. this will not affect the opponent's score.
 		
-		
+		s
 		// our turn will be over if 2 tiles are clicked/flipped but not the same. in that case, we update the other player if inactive
 		bool webForwardToPush = false;
 
 		//Debug.Log(string.Format("saved board to room-props {0}", SupportClass.DictionaryToString(boardProps)));
 		this.OpSetCustomPropertiesOfRoom(boardProps, webForwardToPush);
-	}
+	} */
 }

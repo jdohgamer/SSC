@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Tile : MonoBehaviour {
+public class Tiles : MonoBehaviour {
 
 	private HighlightTileSprite highlighter;
 	private Grid_Setup gridSetup;
@@ -10,6 +10,7 @@ public class Tile : MonoBehaviour {
 	Color normalColor;
 	public Material tile;
 	public Material ogtile;
+	private Cell c;
 
 
 
@@ -40,23 +41,32 @@ public class Tile : MonoBehaviour {
 	void Start () {
 //		normalColor = renderer.material.color;
 
+		ogtile = this.GetComponent<Renderer>().material;
 
-		GameObject playerPos = GameObject.FindGameObjectWithTag("Player");
-		currentLoc = playerPos.transform.position;
-		Debug.Log (currentLoc);
 
 	}
 	
 	// Update is called once per frame
 	void Update () {
 	
-	
+		if (Input.GetKeyUp(KeyCode.G))
+		{
+		GameObject playerPos = GameObject.FindGameObjectWithTag("Player");
+		currentLoc = playerPos.transform.position;
+		Debug.Log (currentLoc);
+		
+		}
 
+//		if(c )
+//		{
+//			this.GetComponent<Renderer>().material.color = Color.red;
+//		}
 
 
 		if ( Input.GetKeyDown (KeyCode.D))
 		{
 			enableHighlighter();
+		
 		} else if 
 			(Input.GetKeyUp(KeyCode.D))
 		{
@@ -66,10 +76,14 @@ public class Tile : MonoBehaviour {
 
 		}
 	void OnMouseOver() {
-		GetComponent<Renderer>().material.color = Color.red;
+		 print = GetComponent<Renderer>().material.GetFloat("_MainTex");
+		Debug.Log(print);
+		 
 		}
 	void OnMouseExit() {
-			GetComponent<Renderer>().material = ogtile;
+		Renderer rend = GetComponent<Renderer>();
+		rend.material.shader = Shader.Find("RotateUVS");
+		print(rend.material.GetFloat("_Shininess"));
 		}
 	}
 

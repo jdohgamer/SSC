@@ -53,13 +53,38 @@
      <Compile Include="Assets\AI\Actions\StickToPlayer.cs" />
      <Compile Include="Assets\ControllerHandler.cs" />
      <Compile Include="Assets\GameController.cs" />
+     <Compile Include="Assets\PushNotificationsAndroid.cs" />
      <Compile Include="Assets\_Scripts\CameraFollow.cs" />
+     <Compile Include="Assets\_Scripts\CellMono.cs" />
      <Compile Include="Assets\_Scripts\ClickMoveHandler.cs" />
+     <Compile Include="Assets\_Scripts\CustomGameClient.cs" />
      <Compile Include="Assets\_Scripts\FSM_BASE.cs" />
      <Compile Include="Assets\_Scripts\FSM_Character.cs" />
+     <Compile Include="Assets\_Scripts\GUIController.cs" />
+     <Compile Include="Assets\_Scripts\Goalie.cs" />
      <Compile Include="Assets\_Scripts\Grid_Setup.cs" />
      <Compile Include="Assets\_Scripts\HighlightTileSprite.cs" />
      <Compile Include="Assets\_Scripts\HitHandler.cs" />
+     <Compile Include="Assets\_Scripts\MemoryGame\BgColorChanger.cs" />
+     <Compile Include="Assets\_Scripts\MemoryGame\CustomAuthConnect.cs" />
+     <Compile Include="Assets\_Scripts\MemoryGame\CustomTypes.cs" />
+     <Compile Include="Assets\_Scripts\MemoryGame\LookAtCam.cs" />
+     <Compile Include="Assets\_Scripts\MemoryGame\MemoryBoard.cs" />
+     <Compile Include="Assets\_Scripts\MemoryGame\MemoryGameClient.cs" />
+     <Compile Include="Assets\_Scripts\MemoryGame\MemoryGui.cs" />
+     <Compile Include="Assets\_Scripts\MemoryGame\MemoryNotification.cs" />
+     <Compile Include="Assets\_Scripts\MemoryGame\Tile.cs" />
+     <Compile Include="Assets\_Scripts\MemoryGame\TileMono.cs" />
+     <Compile Include="Assets\_Scripts\MemoryGame\TileMonoGroup.cs" />
+     <Compile Include="Assets\_Scripts\MemoryGame\TileMonoRandomizer.cs" />
+     <Compile Include="Assets\_Scripts\MemoryGame\UtilityScripts\DeleteOnStart.cs" />
+     <Compile Include="Assets\_Scripts\MemoryGame\UtilityScripts\InputToEvent.cs" />
+     <Compile Include="Assets\_Scripts\MemoryGame\UtilityScripts\NamepickerGui.cs" />
+     <Compile Include="Assets\_Scripts\MemoryGame\UtilityScripts\OnClickCall.cs" />
+     <Compile Include="Assets\_Scripts\MemoryGame\UtilityScripts\OnClickDestroy.cs" />
+     <Compile Include="Assets\_Scripts\MemoryGame\UtilityScripts\PointedAtGameObjectInfo.cs" />
+     <Compile Include="Assets\_Scripts\MemoryGame\UtilityScripts\QuitOnEscapeOrBack.cs" />
+     <Compile Include="Assets\_Scripts\MemoryGame\UtilityScripts\WebRpcResponse.cs" />
      <Compile Include="Assets\_Scripts\MessageBus\Message.cs" />
      <Compile Include="Assets\_Scripts\MessageBus\MessageBus.cs" />
      <Compile Include="Assets\_Scripts\MessageBus\MessageHandler.cs" />
@@ -67,9 +92,10 @@
      <Compile Include="Assets\_Scripts\MessageBus\MessageSubscriberController.cs" />
      <Compile Include="Assets\_Scripts\MouseClick.cs" />
      <Compile Include="Assets\_Scripts\NPC_FSM.cs" />
+     <Compile Include="Assets\_Scripts\OpenPlayerSettings.cs" />
      <Compile Include="Assets\_Scripts\PlayerMovement.cs" />
      <Compile Include="Assets\_Scripts\ProjectileCollision.cs" />
-     <Compile Include="Assets\_Scripts\Tile.cs" />
+     <Compile Include="Assets\_Scripts\Tiles.cs" />
      <Compile Include="Assets\_Scripts\TurnButton.cs" />
      <Compile Include="Assets\_Scripts\TweenBy.cs" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\VisualSensorRingShader.shader" />
@@ -77,19 +103,13 @@
      <None Include="Assets\Plugins\RAIN\Editor\ScriptTemplates\BehaviorTreeTemplate.xml" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\NavMeshColliderShader.shader" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\VisualSensorLineShader.shader" />
-     <None Include="Assets\RAIN\Editor\Shaders\AspectSphereShader.shader" />
+     <None Include="Assets\RotateUVs.shader" />
      <None Include="Assets\Plugins\RAIN\ReleaseNotes.txt" />
-     <None Include="Assets\RAIN\Editor\Shaders\VisualSensorLineShader.shader" />
+     <None Include="Assets\Plugins\PhotonAssets\Plugins\Photon3Unity3D.xml" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\NavMeshContourShader.shader" />
-     <None Include="Assets\RAIN\Editor\Shaders\NavMeshContourShader.shader" />
-     <None Include="Assets\RAIN\Editor\Shaders\WaypointShader.shader" />
-     <None Include="Assets\RAIN\Editor\ScriptTemplates\BehaviorTreeTemplate.xml" />
+     <None Include="Assets\_Assets\Graphics\game-icons\icons-readme.txt" />
      <None Include="Assets\Plugins\Pixelplacement\iTween\ReadMe!\ReadMe!.txt" />
-     <None Include="Assets\RAIN\Editor\Shaders\VisualSensorRingShader.shader" />
-     <None Include="Assets\RAIN\ReleaseNotes.txt" />
-     <None Include="Assets\RAIN\Editor\Shaders\AspectRingShader.shader" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\AspectRingShader.shader" />
-     <None Include="Assets\RAIN\Editor\Shaders\NavMeshColliderShader.shader" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\WaypointShader.shader" />
  <Reference Include="UnityEngine.UI">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
@@ -100,17 +120,23 @@
  <Reference Include="UnityEngine.Analytics">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>
+ <Reference Include="Photon3Unity3D">
+ <HintPath>/Users/Fox/Documents/SSC/Super Sport Club/Assets/Plugins/Photon3Unity3D.dll</HintPath>
+ </Reference>
+ <Reference Include="Photon3Unity3D">
+ <HintPath>/Users/Fox/Documents/SSC/Super Sport Club/Assets/Plugins/PhotonAssets/Plugins/Photon3Unity3D.dll</HintPath>
+ </Reference>
+ <Reference Include="Photon3Unity3D">
+ <HintPath>/Users/Fox/Documents/SSC/Super Sport Club/Assets/Plugins/PhotonAssets/Plugins/Metro/Photon3Unity3D.dll</HintPath>
+ </Reference>
+ <Reference Include="Photon3Unity3D">
+ <HintPath>/Users/Fox/Documents/SSC/Super Sport Club/Assets/Plugins/PhotonAssets/Plugins/WP8/Photon3Unity3D.dll</HintPath>
+ </Reference>
  <Reference Include="RAIN">
  <HintPath>/Users/Fox/Documents/SSC/Super Sport Club/Assets/Plugins/RAIN/RAIN.dll</HintPath>
  </Reference>
  <Reference Include="RAINMetaform">
  <HintPath>/Users/Fox/Documents/SSC/Super Sport Club/Assets/Plugins/RAIN/RAINMetaform.dll</HintPath>
- </Reference>
- <Reference Include="RAIN">
- <HintPath>/Users/Fox/Documents/SSC/Super Sport Club/Assets/RAIN/RAIN.dll</HintPath>
- </Reference>
- <Reference Include="RAINMetaform">
- <HintPath>/Users/Fox/Documents/SSC/Super Sport Club/Assets/RAIN/RAINMetaform.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.iOS.Extensions.Xcode">
  <HintPath>/Applications/Unity/Unity.app/Contents/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>

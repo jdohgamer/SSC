@@ -12,24 +12,22 @@ public class Grid_Setup : MonoBehaviour
 	public GameObject[] boardCell;
 	Cell[] cells;
 	public GameObject ball;
-<<<<<<< HEAD
+
 	public GameObject PotMove;
 	public Vector3 size;
 	public Vector3 ballPosition;
 	GameObject field;
 	Transform fieldTran;
 	GameObject cell;
-=======
-	GameObject field;
-	Transform fieldTran;
->>>>>>> BTest
+	//Transform fieldTran;
+
 
 	/* Dirt = 0
 	 * Corner Lines = 1
 	 * Lines = 2
 	 * Grass = 3
 	 */
-	private List <Vector3> gridPositions = new List <Vector3> ();
+	public List <Vector3> gridPositions = new List <Vector3> ();
 
 //	private WaypointRig wpRig = null;
 //	WaypointSet tWPSet;
@@ -84,14 +82,14 @@ public class Grid_Setup : MonoBehaviour
 				{
 					if(x==0) //left side
 					{
-						if(z==0)		{  type = 1; rot = 90f;} //bottom left
+						if(z==0)		{  type = 1; rot = -90f;} //bottom left
 						else if(z==length){type = 1; rot = 0f;;} //top left
 						else{			   type = 2; rot = 90f;} //if(z>0&&z<length)
 					}
 					else if(x==width)//right side
 					{
-						if(z==0){		   type = 1; rot = 180f;} //bottom right
-						else if(z==length){type = 1; rot = -90f;} //top right
+						if(z==0){		   type = 1; rot = -180f;} //bottom right
+						else if(z==length){type = 1; rot = 90f;} //top right
 						else {			   type = 2; rot = 90f;} //if(z>0&&z<length)
 					}else{ //if(x>0&&x<width&&z==0||z==length)
 						type = 2; rot = 0f;;
@@ -107,21 +105,21 @@ public class Grid_Setup : MonoBehaviour
 				cells[i] = new Cell(i,type);
 				cells[i].boardObj = CreateCell(type,x,z,rot);
 				cells[i].cm = cells[i].boardObj.GetComponent<CellMono>();
-				i++;
+			//	i++;
 			}
 		}
 	}
 	GameObject CreateCell(int type,int x, int z, float rotation)
 	{
-<<<<<<< HEAD
-		//GameObject cell;
+
+		GameObject cell;
 		cell = Instantiate(boardCell[type],new Vector3(x,0,z), Quaternion.identity)as GameObject;
 		cell.transform.rotation = Quaternion.AngleAxis(rotation, Vector3.up);
-=======
 
-		GameObject cell = Instantiate(boardCell[type],new Vector3(x,0,z), Quaternion.identity)as GameObject;
+
+		cell = Instantiate(boardCell[type],new Vector3(x,0,z), Quaternion.identity)as GameObject;
 		//cell.transform.rotation = Quaternion.AngleAxis(rotation, Vector3.up);
->>>>>>> BTest
+
 		cell.transform.SetParent (fieldTran);
 		if(cell.GetComponent<Renderer>().material.GetFloat("_RotationDegree")!= null)
 		{
@@ -132,23 +130,24 @@ public class Grid_Setup : MonoBehaviour
 
 	}
 
-	protected internal Hashtable GetBoardAsCustomProperties()
-	{
-<<<<<<< HEAD
-		field = new GameObject("Field");
-		fieldTran = field.transform;
-		Generate();
-		ballPosition = ball.transform.position;
+//	protected internal Hashtable GetBoardAsCustomProperties()
+//	{
 
-	}
+	//	field = new GameObject("Field");
+	//	fieldTran = field.transform;
+	//	Generate();
+	//	ballPosition = ball.transform.position;
+
+
+//	}
 	void Update () 
 	{
 
 
 	}
-	void OnMouseOver()
+	 Hashtable OnMouseOver()
 	{
-=======
+
 		Hashtable customProps = new Hashtable();
 		for (int i = 0; i < cellCount; i++)
 		{
@@ -157,7 +156,7 @@ public class Grid_Setup : MonoBehaviour
 
 		return customProps;
 	}
->>>>>>> BTest
+
 	
 	protected internal bool SetBoardByCustomProperties(Hashtable customProps, bool calledByEvent)
 	{

@@ -15,7 +15,7 @@ public class FSM_Character : FSM_Base
 		set{moveTarget = value; hasTarget = true;}
 	}
 
-	public enum Stance
+	public enuSm Stance
 	{
 		Neutral,
 		Sprint,

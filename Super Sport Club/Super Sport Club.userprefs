@@ -1,13 +1,12 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/_Scripts/Tile.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/_Scripts/Tiles.cs">
     <Files>
-      <File FileName="../../../Downloads/taicho-unity-master/Assets/TaichoC#AfterConversion/enums/TaichoColors.cs" Line="1" Column="1" />
-      <File FileName="../../../Downloads/taicho-unity-master/Assets/TaichoC#AfterConversion/utilities/TaichoColors.cs" Line="44" Column="2" />
-      <File FileName="Assets/_Scripts/Tile.cs" Line="40" Column="4" />
-      <File FileName="Assets/_Scripts/HighlightTileSprite.cs" Line="14" Column="3" />
-      <File FileName="Assets/_Scripts/MouseClick.cs" Line="1" Column="1" />
-      <File FileName="Assets/_Scripts/Grid_Setup.cs" Line="63" Column="27" />
+      <File FileName="Assets/_Scripts/Grid_Setup.cs" Line="1" Column="1" />
+      <File FileName="Assets/_Scripts/CellMono.cs" Line="1" Column="1" />
+      <File FileName="Assets/_Scripts/Tiles.cs" Line="85" Column="48" />
+      <File FileName="../../../Downloads/taicho-unity-master/Assets/scripts/Tile.cs" Line="1" Column="1" />
+      <File FileName="Assets/RotateUVs.shader" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
