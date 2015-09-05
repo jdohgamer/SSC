@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic; 
-using RAIN.Core;
-using RAIN.Navigation.Waypoints;
 using ExitGames.Client.Photon.LoadBalancing;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
@@ -35,22 +33,21 @@ struct AdjacentIndexes
 
 public class Grid_Setup : MonoBehaviour 
 {
-	[SerializeField]  GameObject[] boardCell;
-	[SerializeField] GameObject ball;
 	public static GameObject Ball;
-	public FSM_Character[] characters;
-	public Cell[] cells;
-	public int length, width, cellCount;
-	GameObject field;
-	Transform fieldTran;
-	AdjacentIndexes adjacent;
-	bool isHighlighted;
-
+	[HideInInspector]public FSM_Character[] characters;
+	[HideInInspector]public Cell[] cells;
+	[HideInInspector]public int length, width, cellCount;
+	[SerializeField]  GameObject[] boardCell;
 	/* Dirt = 0
 	 * Corner Lines = 1
 	 * Lines = 2
 	 * Grass = 3
 	 */
+	[SerializeField] GameObject ball;
+	GameObject field;
+	Transform fieldTran;
+	AdjacentIndexes adjacent;
+	bool isHighlighted;
 		
 	void Awake()
 	{
@@ -111,6 +108,7 @@ public class Grid_Setup : MonoBehaviour
 					if(x==w/2&&z==l/2)
 					{
 						Ball = Instantiate(ball,new Vector3(x,0.2f,z), Quaternion.identity)as GameObject;
+						Ball.GetComponent<BallScript>().board = this;
 					}
 				}
 				cells[i] = new Cell(i,type);
@@ -163,7 +161,9 @@ public class Grid_Setup : MonoBehaviour
 	{
 		if (isHighlighted) 
 		{
-			foreach (int i in adjacent.indexes2D) {
+			foreach (int i in adjacent.indexes2D) 
+			{
+				if(i>0)
 				cells [i].cm.Highlight (false);
 			}
 			isHighlighted = true;

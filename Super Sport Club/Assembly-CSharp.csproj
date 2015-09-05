@@ -51,6 +51,7 @@
      <Compile Include="Assets\AI\Actions\ChooseWanderPosition.cs" />
      <Compile Include="Assets\AI\Actions\GetStandOnPoint.cs" />
      <Compile Include="Assets\AI\Actions\StickToPlayer.cs" />
+     <Compile Include="Assets\BallScript.cs" />
      <Compile Include="Assets\_Scripts\Behave.cs" />
      <Compile Include="Assets\_Scripts\CameraFollow.cs" />
      <Compile Include="Assets\_Scripts\CellMono.cs" />
@@ -58,7 +59,6 @@
      <Compile Include="Assets\_Scripts\FSM_BASE.cs" />
      <Compile Include="Assets\_Scripts\FSM_Character.cs" />
      <Compile Include="Assets\_Scripts\GUIController.cs" />
-     <Compile Include="Assets\_Scripts\GameController.cs" />
      <Compile Include="Assets\_Scripts\Grid_Setup.cs" />
      <Compile Include="Assets\_Scripts\LeftRight.cs" />
      <Compile Include="Assets\_Scripts\MemoryGame\BgColorChanger.cs" />
@@ -88,6 +88,7 @@
      <Compile Include="Assets\_Scripts\MessageBus\MessageHandler.cs" />
      <Compile Include="Assets\_Scripts\MessageBus\MessageSubscriber.cs" />
      <Compile Include="Assets\_Scripts\MessageBus\MessageSubscriberController.cs" />
+     <Compile Include="Assets\_Scripts\MessageBus\PlayerAction.cs" />
      <Compile Include="Assets\_Scripts\MessageBus\ProjectileCollision.cs" />
      <Compile Include="Assets\_Scripts\NPC_FSM.cs" />
      <Compile Include="Assets\_Scripts\PlayerMovement.cs" />
@@ -119,13 +120,13 @@
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>
  <Reference Include="Photon3Unity3D">
- <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/Plugins/Photon3Unity3D.dll</HintPath>
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/Plugins/PhotonAssets/Photon3Unity3D.dll</HintPath>
  </Reference>
  <Reference Include="RAIN">
- <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/Plugins/RAIN/RAIN.dll</HintPath>
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/Plugins/RAIN/RAIN.dll</HintPath>
  </Reference>
  <Reference Include="RAINMetaform">
- <HintPath>C:/Users/Tubocass/Projects/Sport Club/Super Sport Club/Assets/Plugins/RAIN/RAINMetaform.dll</HintPath>
+ <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Assets/Plugins/RAIN/RAINMetaform.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.iOS.Extensions.Xcode">
  <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>

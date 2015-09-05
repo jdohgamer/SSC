@@ -8,7 +8,6 @@ public class Cell
 	public GameObject boardObj;
 	public bool bHighlighted, hasBall, bOccupied;
 	public int x,z,id;
-	public Vector3 location;
 	public CellMono cm;
 	public CellType type;
 	public enum CellType{OutOfBounds, Corner, BoundLine, Field, InsideBox}
@@ -49,7 +48,6 @@ public class Cell
 public class CellMono: MonoBehaviour
 {
 	public Material mat;
-	Vector3 midpoint;
 
 	void Awake()
 	{
