@@ -8,7 +8,7 @@ using System.Collections;
 public class GUIController: MonoBehaviour
 {
 	public static bool bSelection;
-	public static GameObject panel;
+	public static GameObject panel, meter;
 	public float offsetX,offsetY;
 	public float serviceInterval = 1;
 	public float timeSinceService;
@@ -19,8 +19,9 @@ public class GUIController: MonoBehaviour
 	}
 	[SerializeField] LayerMask mask;
 	[SerializeField] Image panelFab;
+	[SerializeField] SpriteRenderer meterFab;
 	[SerializeField] Button buttFab;
-	[SerializeField] Canvas can;
+	[SerializeField] Canvas UIcan, Worldcan;
 	int currentID = -1;
 	FSM_Character[] characters;
 	Grid_Setup board;
@@ -107,7 +108,9 @@ public class GUIController: MonoBehaviour
 								int index  = hit.transform.GetSiblingIndex();
 								if(isPassing)
 								{
-									PassClick(index);
+								
+									CreatePlayerMeter(index);
+									//PassClick(index);
 								}else if(isMoving)
 								{
 									MovementClick( index);
@@ -163,6 +166,36 @@ public class GUIController: MonoBehaviour
 		
 	}
 
+	void CreatePlayerMeter(int index)
+	{
+		Vector3 dir = board.cells[index].GetLocation() - CurrentSelectedChar.transform.position;
+		dir.y = 0;
+		float ang = Vector3.Angle(CurrentSelectedChar.transform.forward,dir.normalized);
+//		if(ang<45&&ang>-45)
+//		{
+//			dir = 0;
+//		}
+//		if(ang<45&&ang>-45)
+//		{
+//			dir = 0;
+//		}
+//		if(ang<45&&ang>-45)
+//		{
+//			dir = 0;
+//		}
+//		if(ang<45&&ang>-45)
+//		{
+//			dir = 0;
+//		}
+		
+		if (meter!=null)
+		{
+			Destroy(meter.gameObject);
+		}
+		Vector3 loc = CurrentSelectedChar.transform.position;//(board.cells[index].GetLocation());
+		meter = Instantiate(meterFab.gameObject, loc, Quaternion.LookRotation(dir))as GameObject;
+	}
+
 	void CreateButtonPanel(int index)
 	{
 		if (panel!=null)
@@ -172,7 +205,7 @@ public class GUIController: MonoBehaviour
 		Vector3 loc = Camera.main.WorldToScreenPoint(board.cells[index].GetLocation());
 		loc += new Vector3(offsetX,offsetY,0f);
 		panel = Instantiate(panelFab.gameObject, loc, Quaternion.identity)as GameObject;
-		panel.transform.SetParent(can.transform,false);
+		panel.transform.SetParent(UIcan.transform,false);
 		panel.transform.SetAsLastSibling();
 		
 		if ((CurrentSelectedChar.maxActions - CurrentSelectedChar.actionCount > 0)) 
