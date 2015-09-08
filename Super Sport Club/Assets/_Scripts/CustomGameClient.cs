@@ -73,7 +73,7 @@ public class CustomGameClient : LoadBalancingClient
 			}
 			if(act.action == PlayerAction.Actions.Pass)
 			{
-				act.iCh.SetTarget(act.cTo);
+				act.iCh.SetPassTarget(act.cTo);
 			}
 		}
 	}
@@ -86,7 +86,6 @@ public class CustomGameClient : LoadBalancingClient
 			{
 				MoveSet.Add(i.ToString(),actions[i].GetActionProp());
 			}
-
 		}
 		return MoveSet;
 	}
@@ -190,7 +189,6 @@ public class CustomGameClient : LoadBalancingClient
 		case EventCode.PropertiesChanged:
 			//Debug.Log("Got Properties via Event. Update board by room props.");
 			this.LoadBoardFromProperties(true);
-			//this.board.ShowFlippedTiles();
 			break;
 		case (byte)Execute:
 		{
@@ -333,10 +331,8 @@ public class CustomGameClient : LoadBalancingClient
 	}
 	public void CalcMoves()
 	{
-//		List<FSM_Character> affectedChars = new List<FSM_Character>();
-//		List<Cell> affectedCells = new List<Cell>();
 		Hashtable MoveSet = new Hashtable();
-		//List<PlayerAction.ConflictFlag> flags;
+
 		for (int i = 0; i<myActions.Length; i++) 
 		{
 			if(myActions[i]!=null)
@@ -363,36 +359,10 @@ public class CustomGameClient : LoadBalancingClient
 							MoveSet.Add((i).ToString(),myActions[i].GetActionProp());
 							MoveSet.Add((i+myActions.Length).ToString(),oppActions[j].GetActionProp());
 						}
-						//flags = PlayerAction.ActionsConflict(myActions[i],oppActions[j]);
-//						if(flags.Count>0)
-//						{
-//							for(int f = 0; f<flags.Count;f++)
-//							{
-//								switch(flags[f])
-//								{
-//									case PlayerAction.ConflictFlag.TargetCellIsSame:
-//									{
-//										if(myActions[i].action == PlayerAction.Actions.Move && oppActions[j].action== PlayerAction.Actions.Move )
-//										{
-//											//float playA = Random.Range(0,6)+myActions[i].iCh.,playB;
-//
-//											Debug.Log("You are trying to Move in the same tile as another character.");
-//										}
-//									break;
-//									}
-//								}
-//							}
-//						}
 					}
 				}
 
-//				if(affectedChars.Contains(myActions[i].iCh))
-//				{
-//					affectedChars.IndexOf(myActions[i].iCh);
-//				}
-//				MoveSet.Add(i.ToString(),myActions[i].GetActionProp());
 			}
-			
 		}
 //		for (int i = 0; i<myActions.Length; i++) 
 //		{
@@ -411,18 +381,6 @@ public class CustomGameClient : LoadBalancingClient
 //			
 //		}
 		ExecuteMoves(MoveSet);
-//
-//		Cell tCell = new Cell();
-//		for(int h = 0; h < myActions.Length; h++)
-//		{
-//			tCell = myActions[h].cTo;
-//			for(int j = 0; j < oppActions.Length; j++)
-//			{
-//				if(tCell == oppActions[j].cTo)
-//				{
-//				}
-//			}
-//		}
 
 		this.loadBalancingPeer.OpRaiseEvent(Execute, MoveSet, true, null);
 		//new RaiseEventOptions{Receivers = ReceiverGroup.All }

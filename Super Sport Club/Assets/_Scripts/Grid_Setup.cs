@@ -7,9 +7,8 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 struct AdjacentIndexes 
 {
-	//public int[] indexes;
 	public int[,] indexes2D;
-
+	
 	public AdjacentIndexes(int index, int distance,  int boardLength)
 	{
 		int dist = distance*2+1;
@@ -107,7 +106,7 @@ public class Grid_Setup : MonoBehaviour
 					type = 3; rot = 0f;
 					if(x==w/2&&z==l/2)
 					{
-						Ball = Instantiate(ball,new Vector3(x,0.2f,z), Quaternion.identity)as GameObject;
+						Ball = Instantiate(ball,new Vector3(x,0.1f,z), Quaternion.identity)as GameObject;
 						Ball.GetComponent<BallScript>().board = this;
 					}
 				}

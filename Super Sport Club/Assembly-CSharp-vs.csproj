@@ -51,7 +51,7 @@
      <Compile Include="Assets\AI\Actions\ChooseWanderPosition.cs" />
      <Compile Include="Assets\AI\Actions\GetStandOnPoint.cs" />
      <Compile Include="Assets\AI\Actions\StickToPlayer.cs" />
-     <Compile Include="Assets\BallScript.cs" />
+     <Compile Include="Assets\_Scripts\BallScript.cs" />
      <Compile Include="Assets\_Scripts\Behave.cs" />
      <Compile Include="Assets\_Scripts\CameraFollow.cs" />
      <Compile Include="Assets\_Scripts\CellMono.cs" />

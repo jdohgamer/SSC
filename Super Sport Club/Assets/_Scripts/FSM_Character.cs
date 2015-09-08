@@ -32,7 +32,7 @@ public class FSM_Character : FSM_Base
 	[SerializeField] LayerMask groundLayer, characterLayer;
 	[SerializeField] GameObject destPin;
 	GameObject[] targetPins;
-	static GameObject targetPin;
+	static GameObject passTargetPin;
 	PlayerAction[] actions;
 	Cell lastCell;
 	MeshRenderer currentMesh;
@@ -48,6 +48,8 @@ public class FSM_Character : FSM_Base
 		anim = GetComponentInChildren<Animator>();
 		actions = new PlayerAction[maxActions];
 		targetPins = new GameObject[maxActions];
+		passTargetPin = Instantiate(destPin,Vector3.zero,Quaternion.identity) as GameObject;
+		passTargetPin.SetActive(false);
 	}
 	void Update()
 	{
@@ -69,9 +71,10 @@ public class FSM_Character : FSM_Base
 		targetCount++;
 		lastCell = target;
 	}
-	public void SetTarget(Cell target)
+	public void SetPassTarget(Cell target)
 	{
-		targetPin = Instantiate(destPin,target.GetLocation(),Quaternion.identity) as GameObject;
+		passTargetPin.SetActive(true);
+		passTargetPin.transform.position = target.GetLocation();
 	}
 
 	public Hashtable GetCharacterAsProp()
@@ -96,8 +99,7 @@ public class FSM_Character : FSM_Base
 			Destroy(targetPins[t]);
 		}
 		targetCount = 0;
-		if(targetPin!=null)
-		Destroy(targetPin.gameObject);
+		passTargetPin.SetActive(false);
 		lastCell = null;
 	}
 

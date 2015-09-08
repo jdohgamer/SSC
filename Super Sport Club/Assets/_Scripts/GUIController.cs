@@ -21,12 +21,12 @@ public class GUIController: MonoBehaviour
 	[SerializeField] Image panelFab;
 	[SerializeField] SpriteRenderer meterFab;
 	[SerializeField] Button buttFab;
-	[SerializeField] Canvas UIcan, Worldcan;
+	[SerializeField] Canvas UIcan;
 	int currentID = -1;
 	FSM_Character[] characters;
 	Grid_Setup board;
 	bool isPassing, isMoving;
-	Vector3 idealPassDir, actualPassDir, simpleDir;
+	Vector3 idealPassDir, actualPassDir, simpleDir, offsetDir;
 
 	private CustomGameClient GameClientInstance;
 
@@ -165,20 +165,20 @@ public class GUIController: MonoBehaviour
 			board.TurnOffHiglighted();
 			isPassing = false;
 		}
-		
 	}
 
 	void CreatePlayerMeter(int index)
 	{
-		idealPassDir = board.cells[index].GetLocation() - CurrentSelectedChar.transform.position;
-		
+		Vector3 CharacterPosition = CurrentSelectedChar.transform.position;
+		idealPassDir = board.cells[index].GetLocation() - CharacterPosition;
 		idealPassDir.y = 0;
+		
 		float ang = Vector3.Angle(Vector3.forward,idealPassDir.normalized);
 		Debug.Log(ang);
 		if(ang<45)
 		{
-			
 			simpleDir = Vector3.forward;
+			offsetDir = Vector3.down;
 		}
 		if(ang>=45&&ang<=135)
 		{
@@ -186,19 +186,55 @@ public class GUIController: MonoBehaviour
 			{
 				simpleDir = Vector3.left;
 			}else simpleDir = Vector3.right;
+			offsetDir = -simpleDir;
 		}
 		if(ang>135)
 		{
 			simpleDir = Vector3.back;
+			offsetDir = Vector3.up;
 		}
-		
 		if (meter!=null)
 		{
 			Destroy(meter.gameObject);
 		}
-		Vector3 loc = CurrentSelectedChar.transform.position;//(board.cells[index].GetLocation());
+		Vector3 loc = CharacterPosition;
 		meter = Instantiate(meterFab.gameObject, loc, Quaternion.LookRotation(simpleDir))as GameObject;
 		meter.GetComponent<Gauge>().SetIdeal(idealPassDir);
+		
+		if (panel!=null) 
+		{
+			Destroy(panel.gameObject);
+		}
+		
+		loc= Camera.main.WorldToScreenPoint(CharacterPosition);
+		loc += offsetDir*50;
+		panel = Instantiate(panelFab.gameObject, loc, Quaternion.identity)as GameObject;
+		panel.transform.SetParent(UIcan.transform,false);
+		panel.transform.SetAsLastSibling(); 
+		
+		Button clearButton = Instantiate (buttFab) as Button;
+		clearButton.transform.SetParent (panel.transform, false);
+		clearButton.GetComponentInChildren<Text> ().text = "Kick";
+		clearButton.onClick.AddListener (() => 
+		{ 
+			Vector3 kick = meter.GetComponent<Gauge>().StopBounce();
+			Vector3 cellPos = CharacterPosition+kick* idealPassDir.magnitude;
+			Ray ray = new Ray(cellPos, Vector3.down);
+			RaycastHit hit;
+			int cell;
+			if (Physics.Raycast (ray, out hit, 10f, mask)) 
+			{
+				if(hit.transform.tag == "Field")
+				{
+					cell = hit.transform.GetSiblingIndex();
+					PassClick(cell);
+				}
+			}
+			Debug.DrawRay(CharacterPosition+Vector3.up, kick);
+			
+			Destroy(meter.gameObject);
+			Destroy(panel.gameObject);
+		});
 	}
 
 	void CreateButtonPanel(int index)
@@ -254,7 +290,6 @@ public class GUIController: MonoBehaviour
 					isPassing = true;
 					isMoving = false;
 					board.HighlightAdjacent (true, index, CurrentSelectedChar.Strength);
-				  	//GameClientInstance.SetPlayerAction (PlayerAction.Actions.Pass, CurrentSelectedChar, board.cells [index]);
 					Destroy (panel.gameObject);
 				});	
 			}	
@@ -267,25 +302,20 @@ public class GUIController: MonoBehaviour
 	}
 	public void NewGameButton()
 	{
-		//this.GameClientInstance.CreateTurnbasedRoom();
 		this.GameClientInstance.OpJoinRandomRoom(null, 0);
 	}
-
 	public void ClearButton()
 	{
-		//this.GameClientInstance.CreateTurnbasedRoom();
 		this.GameClientInstance.ClearActions();
 		foreach(FSM_Character c in characters)
 		{
 			c.ClearActions();
 		}
 	}
-
 	public void EndTurnButton()
 	{
 		Debug.Log("Fuck you");
 		this.GameClientInstance.EndTurnEvent();
-
 	}
 
 	void MyCreateRoom(string roomName, byte maxPlayers)
