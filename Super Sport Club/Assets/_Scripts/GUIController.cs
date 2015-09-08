@@ -26,6 +26,7 @@ public class GUIController: MonoBehaviour
 	FSM_Character[] characters;
 	Grid_Setup board;
 	bool isPassing, isMoving;
+	Vector3 idealPassDir, actualPassDir, simpleDir;
 
 	private CustomGameClient GameClientInstance;
 
@@ -108,7 +109,6 @@ public class GUIController: MonoBehaviour
 								int index  = hit.transform.GetSiblingIndex();
 								if(isPassing)
 								{
-								
 									CreatePlayerMeter(index);
 									//PassClick(index);
 								}else if(isMoving)
@@ -132,6 +132,8 @@ public class GUIController: MonoBehaviour
 	{
 		if(currentID!=-1)
 		{
+			isMoving = false;
+			isPassing = false;
 			CurrentSelectedChar.Highlight(false);
 			board.TurnOffHiglighted();
 			currentID = -1;
@@ -168,32 +170,35 @@ public class GUIController: MonoBehaviour
 
 	void CreatePlayerMeter(int index)
 	{
-		Vector3 dir = board.cells[index].GetLocation() - CurrentSelectedChar.transform.position;
-		dir.y = 0;
-		float ang = Vector3.Angle(CurrentSelectedChar.transform.forward,dir.normalized);
-//		if(ang<45&&ang>-45)
-//		{
-//			dir = 0;
-//		}
-//		if(ang<45&&ang>-45)
-//		{
-//			dir = 0;
-//		}
-//		if(ang<45&&ang>-45)
-//		{
-//			dir = 0;
-//		}
-//		if(ang<45&&ang>-45)
-//		{
-//			dir = 0;
-//		}
+		idealPassDir = board.cells[index].GetLocation() - CurrentSelectedChar.transform.position;
+		
+		idealPassDir.y = 0;
+		float ang = Vector3.Angle(Vector3.forward,idealPassDir.normalized);
+		Debug.Log(ang);
+		if(ang<45)
+		{
+			
+			simpleDir = Vector3.forward;
+		}
+		if(ang>=45&&ang<=135)
+		{
+			if(idealPassDir.x<0)
+			{
+				simpleDir = Vector3.left;
+			}else simpleDir = Vector3.right;
+		}
+		if(ang>135)
+		{
+			simpleDir = Vector3.back;
+		}
 		
 		if (meter!=null)
 		{
 			Destroy(meter.gameObject);
 		}
 		Vector3 loc = CurrentSelectedChar.transform.position;//(board.cells[index].GetLocation());
-		meter = Instantiate(meterFab.gameObject, loc, Quaternion.LookRotation(dir))as GameObject;
+		meter = Instantiate(meterFab.gameObject, loc, Quaternion.LookRotation(simpleDir))as GameObject;
+		meter.GetComponent<Gauge>().SetIdeal(idealPassDir);
 	}
 
 	void CreateButtonPanel(int index)
@@ -227,8 +232,9 @@ public class GUIController: MonoBehaviour
 			moveButton.transform.SetParent (panel.transform, false);
 			moveButton.GetComponentInChildren<Text> ().text = "Move";
 			moveButton.onClick.AddListener (() => 
-			{ 	
+			{ 
 				isMoving = true;
+				isPassing = false;
 				if(CurrentSelectedChar.targetCount>0)
 				{
 					board.HighlightAdjacent (true, CurrentSelectedChar.LastTargetCell.id, CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount);
@@ -246,6 +252,7 @@ public class GUIController: MonoBehaviour
 				passButton.onClick.AddListener (() => 
 				{ 
 					isPassing = true;
+					isMoving = false;
 					board.HighlightAdjacent (true, index, CurrentSelectedChar.Strength);
 				  	//GameClientInstance.SetPlayerAction (PlayerAction.Actions.Pass, CurrentSelectedChar, board.cells [index]);
 					Destroy (panel.gameObject);

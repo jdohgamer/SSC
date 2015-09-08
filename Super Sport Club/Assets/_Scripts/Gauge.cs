@@ -20,16 +20,16 @@ public class Gauge : MonoBehaviour
 		max = (transform.eulerAngles.y +225)%360;
 		degree = min;
 		Quaternion rot = Quaternion.LookRotation(transform.up);
-		rot.eulerAngles += new Vector3(90,0,0);
+		rot.eulerAngles += new Vector3(90,0,45);
 		arrow.rotation = rot;
 		
 		currentAngle = arrow.rotation.eulerAngles.y;
 	}
 	
-//	public void RotateTo(Vector3 dir)
-//	{
-//	
-//	}
+	public void SetIdeal(Vector3 dir)
+	{
+		
+	}
 
 	void Update () 
 	{

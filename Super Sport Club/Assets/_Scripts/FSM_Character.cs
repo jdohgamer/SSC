@@ -52,7 +52,6 @@ public class FSM_Character : FSM_Base
 	void Update()
 	{
 		Debug.DrawRay(tran.position,tran.forward);
-
 	}
 
 	public void SetPlayerAction(PlayerAction act)
@@ -135,10 +134,7 @@ public class FSM_Character : FSM_Base
 							ht["Speed"] = (float)Strength;
 							ht["Cell"] = actions[i].cTo.id;
 							ht["EaseType"] = ballEase.ToString();
-							//ball.transform.SetParent(null);
-							//ball.GetComponent<Rigidbody>().isKinematic = false;
 							ball.StartCoroutine("MoveTo",ht);
-							//hasBall = false;
 						}
 						break;
 					}
@@ -237,7 +233,7 @@ public class FSM_Character : FSM_Base
 	{
 		Ray ray = new Ray(tran.position,tran.forward);
 		RaycastHit hit = new RaycastHit();;
-		Physics.Raycast(ray,out hit,1f,characterLayer);
+		Physics.Raycast(ray,out hit,1.5f,characterLayer);
 		if(hit.collider!=null&& hit.collider!= this.GetComponent<Collider>() && hit.transform.tag == "Player")
 		{
 			return hit.transform.GetComponent<FSM_Character>();
@@ -257,7 +253,7 @@ public class FSM_Character : FSM_Base
 			{
 				hasBall = true;
 				other.transform.SetParent(transform);
-				//other.attachedRigidbody.isKinematic = true;
+				other.transform.position = transform.TransformPoint(0,0,1);
 				ball = other.GetComponent<BallScript>();
 				break;
 			}
@@ -271,7 +267,6 @@ public class FSM_Character : FSM_Base
 			{
 				hasBall = false;
 				other.transform.SetParent(null);
-				//other.attachedRigidbody.isKinematic = false;
 				ball = null;
 				break;
 			}
