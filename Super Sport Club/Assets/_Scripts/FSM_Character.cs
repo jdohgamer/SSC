@@ -15,6 +15,10 @@ public class FSM_Character : FSM_Base
 	{
 		get{return lastCell;}
 	}
+	public Vector3 Location
+	{
+		get{return tran.position;}
+	}
 	public enum Stance
 	{
 		Neutral,
@@ -67,14 +71,14 @@ public class FSM_Character : FSM_Base
 
 	public void SetMoveTarget(Cell target)
 	{
-		targetPins[targetCount] = Instantiate(destPin,target.GetLocation(),Quaternion.identity) as GameObject;
+		targetPins[targetCount] = Instantiate(destPin, target.Location, Quaternion.identity) as GameObject;
 		targetCount++;
 		lastCell = target;
 	}
 	public void SetPassTarget(Cell target)
 	{
 		passTargetPin.SetActive(true);
-		passTargetPin.transform.position = target.GetLocation();
+		passTargetPin.transform.position = target.Location;
 	}
 
 	public Hashtable GetCharacterAsProp()
@@ -113,7 +117,7 @@ public class FSM_Character : FSM_Base
 				{
 					case PlayerAction.Actions.Move:
 					{
-						Vector3 target = actions[i].cTo.GetLocation();
+						Vector3 target = actions[i].cTo.Location;
 						target += new Vector3(0,0.2f,0);
 						RotateTowards(target);
 						
@@ -162,7 +166,7 @@ public class FSM_Character : FSM_Base
 		if(opp!=null)
 		{
 			Debug.Log("Player ID: "+opp.id);
-			if(targetCell.GetLocation() == opp.transform.position)
+			if(targetCell.Location== opp.transform.position)
 			{
 				if(targetCell==opp.LastTargetCell)
 				{

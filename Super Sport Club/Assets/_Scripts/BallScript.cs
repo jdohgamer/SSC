@@ -27,8 +27,8 @@ public class BallScript : MonoBehaviour
 
 	public IEnumerator MoveTo(Hashtable ht)
 	{
-		targetCell = board.cells[(int)ht["Cell"]];
-		Vector3 target = targetCell.GetLocation();
+		targetCell = board.GetCellByID((int)ht["Cell"]);
+		Vector3 target = targetCell.Location;
 		moveSpeed = (float)ht["Speed"];
 		easeType = (string)ht["EaseType"];
 		while (Vector3.Distance(transform.position,target)>.1f) 

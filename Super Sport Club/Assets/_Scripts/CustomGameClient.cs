@@ -100,7 +100,7 @@ public class CustomGameClient : LoadBalancingClient
 				Hashtable ion = ht[i.ToString()]as Hashtable;
 				PlayerAction.Actions act = (PlayerAction.Actions)ion["Act"];
 				FSM_Character ich = characters[ (int)ion["iCharacter"]];
-				Cell cell =	board.cells[(int)ion["tCell"]];
+				Cell cell =	board.GetCellByID((int)ion["tCell"]);
 				actions[i] = new PlayerAction(act,ich,cell);
 			}
 		}

@@ -5,10 +5,9 @@ using System.Collections;
 public class Gauge : MonoBehaviour 
 {
 	[SerializeField] Transform arrow, idealBar;
-	public float rotationDegreesPerSecond = 45f;
-	public float degree, min, max;
-	public float currentAngle;
-	public Vector3 set;
+	[SerializeField] float rotationDegreesPerSecond = 45f;
+	float degree, min, max;
+	float currentAngle;
 	Quaternion temp;
 	bool run;
 	

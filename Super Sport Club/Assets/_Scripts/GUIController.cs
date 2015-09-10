@@ -93,10 +93,10 @@ public class GUIController: MonoBehaviour
 							
 							currentID = id;
 							CurrentSelectedChar.Highlight(true);
-							CurrentSelectedChar.OccupiedCell = board.cells[CurrentSelectedChar.RaycastToGround()];//this should be done when placing characters
+							CurrentSelectedChar.OccupiedCell = board.GetCellByLocation(CurrentSelectedChar.Location);//this should be done when placing characters
 						}
-						CurrentSelectedChar.OccupiedCell = board.cells[CurrentSelectedChar.RaycastToGround()];
-						CreateButtonPanel(CurrentSelectedChar.OccupiedCell.id);
+						CurrentSelectedChar.OccupiedCell = board.GetCellByLocation(CurrentSelectedChar.Location);
+						CreateButtonPanel(CurrentSelectedChar.OccupiedCell);
 						break;
 						
 					}
@@ -106,14 +106,16 @@ public class GUIController: MonoBehaviour
 						{
 							if(bSelection)
 							{
-								int index  = hit.transform.GetSiblingIndex();
+								Cell cell = board.GetCellByLocation(hit.point);
+								Vector3 location = cell.Location;
+								//int index  = hit.transform.GetSiblingIndex();
+								
 								if(isPassing)
 								{
-									CreatePlayerMeter(index);
-									//PassClick(index);
+									CreatePlayerMeter(location);
 								}else if(isMoving)
 								{
-									MovementClick( index);
+									MovementClick(cell);
 								}
 							}
 						}
@@ -140,37 +142,37 @@ public class GUIController: MonoBehaviour
 		}
 	}
 
-	void MovementClick(int index)
+	void MovementClick(Cell tCell)
 	{
 		int actsLeft = CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount;
 		if (actsLeft > 0) 
 		{
-			GameClientInstance.SetPlayerAction(new PlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, board.cells[index]));
+			GameClientInstance.SetPlayerAction(new PlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, tCell));
 			actsLeft--;
 			if (actsLeft <= 0) 
 			{
 				board.TurnOffHiglighted();
 				isMoving = false;
 			}else{
-				board.HighlightAdjacent (true, index, actsLeft);
+				board.HighlightAdjacent (true, tCell.id, actsLeft);
 			}
 		} 
 	}	
 
-	void PassClick(int index)
+	void PassClick(Cell tCell)
 	{
 		if (CurrentSelectedChar.maxActions -CurrentSelectedChar.actionCount > 0) 
 		{
-			GameClientInstance.SetPlayerAction(new PlayerAction(PlayerAction.Actions.Pass, CurrentSelectedChar, board.cells[index], CurrentSelectedChar.OccupiedCell));
+			GameClientInstance.SetPlayerAction(new PlayerAction(PlayerAction.Actions.Pass, CurrentSelectedChar, tCell, CurrentSelectedChar.OccupiedCell));
 			board.TurnOffHiglighted();
 			isPassing = false;
 		}
 	}
 
-	void CreatePlayerMeter(int index)
+	void CreatePlayerMeter(Vector3 location)
 	{
-		Vector3 CharacterPosition = CurrentSelectedChar.transform.position;
-		idealPassDir = board.cells[index].GetLocation() - CharacterPosition;
+		Vector3 CharacterPosition = CurrentSelectedChar.Location;
+		idealPassDir = location - CharacterPosition;
 		idealPassDir.y = 0;
 		
 		float ang = Vector3.Angle(Vector3.forward,idealPassDir.normalized);
@@ -197,7 +199,7 @@ public class GUIController: MonoBehaviour
 		{
 			Destroy(meter.gameObject);
 		}
-		Vector3 loc = CharacterPosition;
+		Vector3 loc = CharacterPosition+Vector3.up*0.2f;
 		meter = Instantiate(meterFab.gameObject, loc, Quaternion.LookRotation(simpleDir))as GameObject;
 		meter.GetComponent<Gauge>().SetIdeal(idealPassDir);
 		
@@ -218,32 +220,32 @@ public class GUIController: MonoBehaviour
 		clearButton.onClick.AddListener (() => 
 		{ 
 			Vector3 kick = meter.GetComponent<Gauge>().StopBounce();
-			Vector3 cellPos = CharacterPosition+kick* idealPassDir.magnitude;
-			Ray ray = new Ray(cellPos, Vector3.down);
-			RaycastHit hit;
-			int cell;
-			if (Physics.Raycast (ray, out hit, 10f, mask)) 
-			{
-				if(hit.transform.tag == "Field")
-				{
-					cell = hit.transform.GetSiblingIndex();
-					PassClick(cell);
-				}
-			}
-			Debug.DrawRay(CharacterPosition+Vector3.up, kick);
+			Vector3 cellPos = CharacterPosition + kick.normalized * idealPassDir.magnitude;
+			PassClick(board.GetCellByLocation(cellPos));
+//			Ray ray = new Ray(cellPos, Vector3.down);
+//			RaycastHit hit;
+//			int cell;
+//			if (Physics.Raycast (ray, out hit, 10f, mask)) 
+//			{
+//				if(hit.transform.tag == "Field")
+//				{
+//					cell = hit.transform.GetSiblingIndex();
+//					PassClick(cell);
+//				}
+//			}
 			
 			Destroy(meter.gameObject);
 			Destroy(panel.gameObject);
 		});
 	}
 
-	void CreateButtonPanel(int index)
+	void CreateButtonPanel(Cell cell)
 	{
 		if (panel!=null)
 		{
 			Destroy(panel.gameObject);
 		}
-		Vector3 loc = Camera.main.WorldToScreenPoint(board.cells[index].GetLocation());
+		Vector3 loc = Camera.main.WorldToScreenPoint(cell.Location);
 		loc += new Vector3(offsetX,offsetY,0f);
 		panel = Instantiate(panelFab.gameObject, loc, Quaternion.identity)as GameObject;
 		panel.transform.SetParent(UIcan.transform,false);
@@ -275,7 +277,7 @@ public class GUIController: MonoBehaviour
 				{
 					board.HighlightAdjacent (true, CurrentSelectedChar.LastTargetCell.id, CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount);
 				}
-				else board.HighlightAdjacent (true, index, CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount);
+				else board.HighlightAdjacent (true, cell.id, CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount);
 					
 				Destroy (panel.gameObject);
 			});
@@ -289,7 +291,7 @@ public class GUIController: MonoBehaviour
 				{ 
 					isPassing = true;
 					isMoving = false;
-					board.HighlightAdjacent (true, index, CurrentSelectedChar.Strength);
+					board.HighlightAdjacent (true, cell.id, CurrentSelectedChar.Strength);
 					Destroy (panel.gameObject);
 				});	
 			}	
