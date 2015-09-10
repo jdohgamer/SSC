@@ -7,7 +7,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class GameController
+public class GameController 
 {
 
 	Grid_Setup board;

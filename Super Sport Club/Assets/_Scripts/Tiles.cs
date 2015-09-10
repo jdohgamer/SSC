@@ -76,8 +76,8 @@ public class Tiles : MonoBehaviour {
 
 		}
 	void OnMouseOver() {
-		 print = GetComponent<Renderer>().material.GetFloat("_MainTex");
-		Debug.Log(print);
+		 
+
 		 
 		}
 	void OnMouseExit() {

@@ -63,7 +63,7 @@ public class FSM_Character : FSM_Base
 	public PlayerAction[] actions;
 	GameController.Teams team;
 
-	public enuSm Stance
+	public enum Stance
 	{
 		Neutral,
 		Sprint,
