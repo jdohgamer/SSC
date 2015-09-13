@@ -8,9 +8,18 @@ public class FSM_Character : FSM_Base
 {
 	public int id, actionCount, targetCount, maxActions = 2;
 	public int Strength = 5, Speed = 6, Defense = 4;
-	public Cell OccupiedCell;
+	public Cell OccupiedCell
+	{
+		get{
+			if(board.cells2D!=null)
+			{
+				return board.GetCellByLocation(Location);
+			}else return null;
+		}
+	}
 	public bool hasTarget, hasBall;
 	[HideInInspector]public BallScript ball;
+	[HideInInspector]public Grid_Setup board;
 	public Cell LastTargetCell
 	{
 		get{return lastCell;}
@@ -33,16 +42,17 @@ public class FSM_Character : FSM_Base
 	protected string easeType;
 	[SerializeField] protected float moveSpeed;
 	[SerializeField] protected iTween.EaseType ease, ballEase;
-	[SerializeField] LayerMask groundLayer, characterLayer;
+	[SerializeField] LayerMask characterLayer;
 	[SerializeField] GameObject destPin;
 	GameObject[] targetPins;
-	static GameObject passTargetPin;
+	GameObject passTargetPin;
 	PlayerAction[] actions;
 	Cell lastCell;
 	MeshRenderer currentMesh;
 	Animator anim;
 	Transform tran;
 	FSM_Character opp;
+	Vector3 offset = new Vector3(0,0.2f,0);
 
 	void Awake()
 	{
@@ -118,18 +128,22 @@ public class FSM_Character : FSM_Base
 					case PlayerAction.Actions.Move:
 					{
 						Vector3 target = actions[i].cTo.Location;
-						target += new Vector3(0,0.2f,0);
+						target += offset;
 						RotateTowards(target);
-						
+					
 						easeType = ease.ToString();
+						Vector3 dir, nextCell;
 						while (Vector3.Distance(tran.position,target)>.1f) 
 						{
+							dir = target - (OccupiedCell.Location + offset);
+							nextCell = (OccupiedCell.Location + offset) + dir.normalized;
 							if(CanMove(actions[i].cTo))
 							{
-								iTween.MoveTo(gameObject, iTween.Hash("position", target, "easeType", easeType, "loopType", "none", "speed", moveSpeed));
-								yield return null;
+								iTween.MoveTo(gameObject, iTween.Hash("position", nextCell, "easeType", easeType, "loopType", "none", "speed", moveSpeed));
+							yield return new WaitForSeconds(0.2f);
 							}else break;
 						}
+						
 						break;
 					}
 					case PlayerAction.Actions.Pass:
@@ -227,13 +241,6 @@ public class FSM_Character : FSM_Base
 //		StopCoroutine("MoveTo");
 //	}
 
-	public int RaycastToGround()
-	{
-		Ray ray = new Ray(tran.position,Vector3.down);
-		RaycastHit hit = new RaycastHit();;
-		Physics.Raycast(ray,out hit,5f,groundLayer);
-		return hit.transform.GetSiblingIndex();
-	}
 
 	FSM_Character PlayerInFrontOfMe()
 	{

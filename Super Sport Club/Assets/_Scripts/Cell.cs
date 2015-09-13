@@ -14,7 +14,7 @@ public class Cell
 	public Vector3 Location{get{return location;}}
 	Vector3 location;
 	Bounds bounds;
-	GameObject highlighter;
+	GameObject highlighter= null;
 
 	public Cell()
 	{
@@ -34,6 +34,11 @@ public class Cell
 		highlighter.transform.position = location+Vector3.up*.02f;
 		
 		highlighter.SetActive(false);
+	}
+	public void DestroyHighlighter()
+	{
+		if(highlighter!=null)
+		GameObject.Destroy(highlighter);
 	}
 
 	public bool IsVectorInCell(Vector3 spot)

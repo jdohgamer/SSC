@@ -51,6 +51,7 @@ public class GUIController: MonoBehaviour
 			{
 				characters[i] = temp;
 				characters[i].id = i;
+				characters[i].board = board;
 			}
 		}
 		this.GameClientInstance.characters = this.characters;
@@ -69,64 +70,72 @@ public class GUIController: MonoBehaviour
 
 	public void FixedUpdate() 
 	{
-		if (Input.GetMouseButtonUp (0)) 
+		if(GameClientInstance.CurrentRoom!=null)
 		{
-			RaycastHit hit;
-			Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
-			
-			if (Physics.Raycast (ray, out hit, 100f, mask)) 
+			if (Input.GetMouseButtonUp (0)) 
 			{
-				switch(hit.transform.tag)
+				RaycastHit hit;
+				Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+				
+				if (Physics.Raycast (ray, out hit, 100f, mask)) 
 				{
-					case "Player":
+					switch(hit.transform.tag)
 					{
-						bSelection = true;
-						
-						int id = hit.transform.gameObject.GetComponent<FSM_Character>().id;
-						if(id!= currentID)
+						case "Player":
 						{
-							if(currentID!=-1)
-							{
-								CurrentSelectedChar.Highlight(false);
-								board.TurnOffHiglighted();
-							}
+							bSelection = true;
 							
-							currentID = id;
-							CurrentSelectedChar.Highlight(true);
-							CurrentSelectedChar.OccupiedCell = board.GetCellByLocation(CurrentSelectedChar.Location);//this should be done when placing characters
-						}
-						CurrentSelectedChar.OccupiedCell = board.GetCellByLocation(CurrentSelectedChar.Location);
-						CreateButtonPanel(CurrentSelectedChar.OccupiedCell);
-						break;
-						
-					}
-					case "Field":
-					{
-						if(!EventSystem.current.IsPointerOverGameObject())
-						{
-							if(bSelection)
+							int id = hit.transform.gameObject.GetComponent<FSM_Character>().id;
+							if(id!= currentID)
 							{
-								Cell cell = board.GetCellByLocation(hit.point);
-								Vector3 location = cell.Location;
-								//int index  = hit.transform.GetSiblingIndex();
+								if(currentID!=-1)
+								{
+									CurrentSelectedChar.Highlight(false);
+									board.TurnOffHiglighted();
+								}
 								
-								if(isPassing)
+								currentID = id;
+								CurrentSelectedChar.Highlight(true);
+								//CurrentSelectedChar.OccupiedCell = board.GetCellByLocation(CurrentSelectedChar.Location);//this should be done when placing characters
+							}
+							//CurrentSelectedChar.OccupiedCell = board.GetCellByLocation(CurrentSelectedChar.Location);
+							CreateButtonPanel(CurrentSelectedChar.OccupiedCell);
+							break;
+							
+						}
+						case "Field":
+						{
+							if(!EventSystem.current.IsPointerOverGameObject())
+							{
+								if(bSelection)
 								{
-									CreatePlayerMeter(location);
-								}else if(isMoving)
-								{
-									MovementClick(cell);
+									Vector3 location= Vector3.zero;
+									Cell cell = null;
+									if(board.GetCellByLocation(hit.point)!=null)
+									{
+										cell = board.GetCellByLocation(hit.point);
+										location = cell.Location;
+									}else Debug.Log(hit.point);
+									//int index  = hit.transform.GetSiblingIndex();
+									
+									if(isPassing)
+									{
+										CreatePlayerMeter(location);
+									}else if(isMoving)
+									{
+										MovementClick(cell);
+									}
 								}
 							}
+							break;
 						}
-						break;
 					}
-				}
-			}	
-		}
-		if (Input.GetMouseButtonUp (1)) 
-		{
-			DeselectCharacter();
+				}	
+			}
+			if (Input.GetMouseButtonUp (1)) 
+			{
+				DeselectCharacter();
+			}
 		}
 	}
 
@@ -154,7 +163,7 @@ public class GUIController: MonoBehaviour
 				board.TurnOffHiglighted();
 				isMoving = false;
 			}else{
-				board.HighlightAdjacent (true, tCell.id, actsLeft);
+				board.HighlightAdjacent (true, tCell.Location, actsLeft);
 			}
 		} 
 	}	
@@ -275,9 +284,9 @@ public class GUIController: MonoBehaviour
 				isPassing = false;
 				if(CurrentSelectedChar.targetCount>0)
 				{
-					board.HighlightAdjacent (true, CurrentSelectedChar.LastTargetCell.id, CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount);
+					board.HighlightAdjacent (true, CurrentSelectedChar.LastTargetCell.Location, CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount);
 				}
-				else board.HighlightAdjacent (true, cell.id, CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount);
+				else board.HighlightAdjacent (true, cell.Location, CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount);
 					
 				Destroy (panel.gameObject);
 			});
@@ -291,7 +300,7 @@ public class GUIController: MonoBehaviour
 				{ 
 					isPassing = true;
 					isMoving = false;
-					board.HighlightAdjacent (true, cell.id, CurrentSelectedChar.Strength);
+					board.HighlightAdjacent (true, cell.Location, CurrentSelectedChar.Strength);
 					Destroy (panel.gameObject);
 				});	
 			}	
