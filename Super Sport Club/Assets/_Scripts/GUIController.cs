@@ -7,27 +7,28 @@ using System.Collections;
 
 public class GUIController: MonoBehaviour
 {
-	private CustomGameClient GameClientInstance;
-	public string AppId;            // set in inspector
-	// this is called when the client loaded and is ready to start
-	[SerializeField] LayerMask mask;
-	[SerializeField] Image panelFab;
-	[SerializeField] Button buttFab;
-	[SerializeField] Canvas can;
-	int currentID = -1;
-	FSM_Character[] characters;
+	public static bool bSelection;
+	public static GameObject panel, meter;
+	public float offsetX,offsetY;
+	public float serviceInterval = 1;
+	public float timeSinceService;
+	public string AppId;            // set in inspector. this is called when the client loaded and is ready to start
 	public FSM_Character CurrentSelectedChar
 	{
 		get{return characters[currentID];}
 	}
-	
-	public float offsetX,offsetY;
-	public static GameObject panel;
-	public float serviceInterval = 1;
-	public float timeSinceService;
-
+	[SerializeField] LayerMask mask;
+	[SerializeField] Image panelFab;
+	[SerializeField] SpriteRenderer meterFab;
+	[SerializeField] Button buttFab;
+	[SerializeField] Canvas UIcan;
+	int currentID = -1;
+	FSM_Character[] characters;
 	Grid_Setup board;
-	public static bool bSelection;
+	bool isPassing, isMoving;
+	Vector3 idealPassDir, actualPassDir, simpleDir, offsetDir;
+
+	private CustomGameClient GameClientInstance;
 
 	void Awake()
 	{
@@ -39,7 +40,6 @@ public class GUIController: MonoBehaviour
 
 		Application.runInBackground = true;
 		CustomTypes.Register();
-		// "eu" is the European region's token
 		bool connectInProcess = GameClientInstance.ConnectToRegionMaster("us");  // can return false for errors
 
 		GameObject[] charObjs = GameObject.FindGameObjectsWithTag("Player");
@@ -51,16 +51,12 @@ public class GUIController: MonoBehaviour
 			{
 				characters[i] = temp;
 				characters[i].id = i;
+				characters[i].board = board;
 			}
 		}
 		this.GameClientInstance.characters = this.characters;
 		this.board.characters = this.characters;
 	}
-	void Start()
-	{
-	
-	}
-
 	
 	void Update()
 	{
@@ -74,128 +70,242 @@ public class GUIController: MonoBehaviour
 
 	public void FixedUpdate() 
 	{
-		if (Input.GetMouseButtonUp (0)) 
+		if(GameClientInstance.CurrentRoom!=null)
 		{
-			//message.Clear();
-			
-			RaycastHit hit;
-			Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
-			
-			if (Physics.Raycast (ray, out hit, 100f, mask)) 
+			if (Input.GetMouseButtonUp (0)) 
 			{
-				switch(hit.transform.tag)
+				RaycastHit hit;
+				Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+				
+				if (Physics.Raycast (ray, out hit, 100f, mask)) 
 				{
-				case "Player":
-				{
-					bSelection = true;
-					
-					int id = hit.transform.gameObject.GetComponent<FSM_Character>().id;
-					if(id!= currentID)
+					switch(hit.transform.tag)
 					{
-						if(currentID!=-1)
+						case "Player":
 						{
-							CurrentSelectedChar.Highlight(false);
-							board.TurnOffHiglighted();
+							bSelection = true;
+							
+							int id = hit.transform.gameObject.GetComponent<FSM_Character>().id;
+							if(id!= currentID)
+							{
+								if(currentID!=-1)
+								{
+									CurrentSelectedChar.Highlight(false);
+									board.TurnOffHiglighted();
+								}
+								
+								currentID = id;
+								CurrentSelectedChar.Highlight(true);
+								//CurrentSelectedChar.OccupiedCell = board.GetCellByLocation(CurrentSelectedChar.Location);//this should be done when placing characters
+							}
+							//CurrentSelectedChar.OccupiedCell = board.GetCellByLocation(CurrentSelectedChar.Location);
+							CreateButtonPanel(CurrentSelectedChar.OccupiedCell);
+							break;
+							
 						}
-						
-						currentID = id;
-						CurrentSelectedChar.Highlight(true);
-						CurrentSelectedChar.OccupiedCell = board.cells[CurrentSelectedChar.RaycastToGround()];//this should be done when placing characters
-					}
-					CreateButtonPanel(CurrentSelectedChar.OccupiedCell.id);
-					break;
-					
-				}
-				case "Field":
-				{
-					if(!EventSystem.current.IsPointerOverGameObject())
-					{
-						if(bSelection)
+						case "Field":
 						{
-							int index  = hit.transform.GetSiblingIndex();
-							MovementClick( index);
+							if(!EventSystem.current.IsPointerOverGameObject())
+							{
+								if(bSelection)
+								{
+									Vector3 location= Vector3.zero;
+									Cell cell = null;
+									if(board.GetCellByLocation(hit.point)!=null)
+									{
+										cell = board.GetCellByLocation(hit.point);
+										location = cell.Location;
+									}else Debug.Log(hit.point);
+									//int index  = hit.transform.GetSiblingIndex();
+									
+									if(isPassing)
+									{
+										CreatePlayerMeter(location);
+									}else if(isMoving)
+									{
+										MovementClick(cell);
+									}
+								}
+							}
+							break;
 						}
 					}
-					break;
-				}
-				}
-			}	
-		}
-		if (Input.GetMouseButtonUp (1)) 
-		{
-			//actionCount = 0; //make a button
+				}	
+			}
+			if (Input.GetMouseButtonUp (1)) 
+			{
+				DeselectCharacter();
+			}
 		}
 	}
 
-
-void MovementClick(int index)
-{
-	if (CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount > 0) 
+	void DeselectCharacter()
 	{
-		GameClientInstance.SetPlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, board.cells[index]);
-		board.HighlightAdjacent (true, index, CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount );
-	} else {
-		board.TurnOffHiglighted();
-	}
-	
-}
-
-void CreateButtonPanel(int index)
-{
-	if (panel!=null)
-	{
-		Destroy(panel.gameObject);
-	}
-	Vector3 loc = Camera.main.WorldToScreenPoint(board.cells[index].GetLocation());
-	loc += new Vector3(offsetX,offsetY,0f);
-	panel = Instantiate(panelFab.gameObject, loc, Quaternion.identity)as GameObject;
-	panel.transform.SetParent(can.transform,false);
-	panel.transform.SetAsLastSibling();
-	
-	if ((CurrentSelectedChar.maxActions - CurrentSelectedChar.actionCount > 0)) 
-	{
-		if(CurrentSelectedChar.actionCount > 0|| CurrentSelectedChar.targetCount > 0) 
+		if(currentID!=-1)
 		{
-			Button clearButton = Instantiate (buttFab) as Button;
-			clearButton.transform.SetParent (panel.transform, false);
-			clearButton.GetComponentInChildren<Text> ().text = "Clear";
-			clearButton.onClick.AddListener (() => 
-			                                 { 
-				CurrentSelectedChar.ClearActions();
+			isMoving = false;
+			isPassing = false;
+			CurrentSelectedChar.Highlight(false);
+			board.TurnOffHiglighted();
+			currentID = -1;
+		}
+	}
+
+	void MovementClick(Cell tCell)
+	{
+		int actsLeft = CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount;
+		if (actsLeft > 0) 
+		{
+			GameClientInstance.SetPlayerAction(new PlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, tCell));
+			actsLeft--;
+			if (actsLeft <= 0) 
+			{
 				board.TurnOffHiglighted();
+				isMoving = false;
+			}else{
+				board.HighlightAdjacent (true, tCell.Location, actsLeft);
+			}
+		} 
+	}	
+
+	void PassClick(Cell tCell)
+	{
+		if (CurrentSelectedChar.maxActions -CurrentSelectedChar.actionCount > 0) 
+		{
+			GameClientInstance.SetPlayerAction(new PlayerAction(PlayerAction.Actions.Pass, CurrentSelectedChar, tCell, CurrentSelectedChar.OccupiedCell));
+			board.TurnOffHiglighted();
+			isPassing = false;
+		}
+	}
+
+	void CreatePlayerMeter(Vector3 location)
+	{
+		Vector3 CharacterPosition = CurrentSelectedChar.Location;
+		idealPassDir = location - CharacterPosition;
+		idealPassDir.y = 0;
+		
+		float ang = Vector3.Angle(Vector3.forward,idealPassDir.normalized);
+		Debug.Log(ang);
+		if(ang<45)
+		{
+			simpleDir = Vector3.forward;
+			offsetDir = Vector3.down;
+		}
+		if(ang>=45&&ang<=135)
+		{
+			if(idealPassDir.x<0)
+			{
+				simpleDir = Vector3.left;
+			}else simpleDir = Vector3.right;
+			offsetDir = -simpleDir;
+		}
+		if(ang>135)
+		{
+			simpleDir = Vector3.back;
+			offsetDir = Vector3.up;
+		}
+		if (meter!=null)
+		{
+			Destroy(meter.gameObject);
+		}
+		Vector3 loc = CharacterPosition+Vector3.up*0.2f;
+		meter = Instantiate(meterFab.gameObject, loc, Quaternion.LookRotation(simpleDir))as GameObject;
+		meter.GetComponent<Gauge>().SetIdeal(idealPassDir);
+		
+		if (panel!=null) 
+		{
+			Destroy(panel.gameObject);
+		}
+		
+		loc= Camera.main.WorldToScreenPoint(CharacterPosition);
+		loc += offsetDir*50;
+		panel = Instantiate(panelFab.gameObject, loc, Quaternion.identity)as GameObject;
+		panel.transform.SetParent(UIcan.transform,false);
+		panel.transform.SetAsLastSibling(); 
+		
+		Button clearButton = Instantiate (buttFab) as Button;
+		clearButton.transform.SetParent (panel.transform, false);
+		clearButton.GetComponentInChildren<Text> ().text = "Kick";
+		clearButton.onClick.AddListener (() => 
+		{ 
+			Vector3 kick = meter.GetComponent<Gauge>().StopBounce();
+			Vector3 cellPos = CharacterPosition + kick.normalized * idealPassDir.magnitude;
+			PassClick(board.GetCellByLocation(cellPos));
+//			Ray ray = new Ray(cellPos, Vector3.down);
+//			RaycastHit hit;
+//			int cell;
+//			if (Physics.Raycast (ray, out hit, 10f, mask)) 
+//			{
+//				if(hit.transform.tag == "Field")
+//				{
+//					cell = hit.transform.GetSiblingIndex();
+//					PassClick(cell);
+//				}
+//			}
+			
+			Destroy(meter.gameObject);
+			Destroy(panel.gameObject);
+		});
+	}
+
+	void CreateButtonPanel(Cell cell)
+	{
+		if (panel!=null)
+		{
+			Destroy(panel.gameObject);
+		}
+		Vector3 loc = Camera.main.WorldToScreenPoint(cell.Location);
+		loc += new Vector3(offsetX,offsetY,0f);
+		panel = Instantiate(panelFab.gameObject, loc, Quaternion.identity)as GameObject;
+		panel.transform.SetParent(UIcan.transform,false);
+		panel.transform.SetAsLastSibling();
+		
+		if ((CurrentSelectedChar.maxActions - CurrentSelectedChar.actionCount > 0)) 
+		{
+			if(CurrentSelectedChar.actionCount > 0|| CurrentSelectedChar.targetCount > 0) 
+			{
+				Button clearButton = Instantiate (buttFab) as Button;
+				clearButton.transform.SetParent (panel.transform, false);
+				clearButton.GetComponentInChildren<Text> ().text = "Clear";
+				clearButton.onClick.AddListener (() => 
+				{ 
+					CurrentSelectedChar.ClearActions();
+					board.TurnOffHiglighted();
+					Destroy (panel.gameObject);
+				});
+			}
+
+			Button moveButton = Instantiate (buttFab) as Button;
+			moveButton.transform.SetParent (panel.transform, false);
+			moveButton.GetComponentInChildren<Text> ().text = "Move";
+			moveButton.onClick.AddListener (() => 
+			{ 
+				isMoving = true;
+				isPassing = false;
+				if(CurrentSelectedChar.targetCount>0)
+				{
+					board.HighlightAdjacent (true, CurrentSelectedChar.LastTargetCell.Location, CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount);
+				}
+				else board.HighlightAdjacent (true, cell.Location, CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount);
+					
 				Destroy (panel.gameObject);
 			});
-		}
 
-		Button moveButton = Instantiate (buttFab) as Button;
-		moveButton.transform.SetParent (panel.transform, false);
-		moveButton.GetComponentInChildren<Text> ().text = "Move";
-		moveButton.onClick.AddListener (() => 
-		{ 	
-			if(CurrentSelectedChar.targetCount>0)
+			if (CurrentSelectedChar.hasBall) 
 			{
-				board.HighlightAdjacent (true, CurrentSelectedChar.LastTargetCell.id, CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount);
-			}
-			else board.HighlightAdjacent (true, index, CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount);
-				
-			Destroy (panel.gameObject);
-		});
-
-		
-		if (CurrentSelectedChar.hasBall) {
-			Button passButton = Instantiate (buttFab) as Button;
-			passButton.transform.SetParent (panel.transform, false);
-			passButton.GetComponentInChildren<Text> ().text = "Pass";
-			passButton.onClick.AddListener (() => 
-			                                { 
-			  GameClientInstance.SetPlayerAction (PlayerAction.Actions.Pass, CurrentSelectedChar, board.cells [index]);
-				Destroy (panel.gameObject);
-			});	
-		}
-		
-	} 
-	
-}
+				Button passButton = Instantiate (buttFab) as Button;
+				passButton.transform.SetParent (panel.transform, false);
+				passButton.GetComponentInChildren<Text> ().text = "Pass";
+				passButton.onClick.AddListener (() => 
+				{ 
+					isPassing = true;
+					isMoving = false;
+					board.HighlightAdjacent (true, cell.Location, CurrentSelectedChar.Strength);
+					Destroy (panel.gameObject);
+				});	
+			}	
+		} 
+	}
 	
 	void OnApplicationQuit()
 	{
@@ -203,21 +313,20 @@ void CreateButtonPanel(int index)
 	}
 	public void NewGameButton()
 	{
-		//this.GameClientInstance.CreateTurnbasedRoom();
 		this.GameClientInstance.OpJoinRandomRoom(null, 0);
 	}
-
 	public void ClearButton()
 	{
-		//this.GameClientInstance.CreateTurnbasedRoom();
 		this.GameClientInstance.ClearActions();
+		foreach(FSM_Character c in characters)
+		{
+			c.ClearActions();
+		}
 	}
-
 	public void EndTurnButton()
 	{
 		Debug.Log("Fuck you");
 		this.GameClientInstance.EndTurnEvent();
-
 	}
 
 	void MyCreateRoom(string roomName, byte maxPlayers)

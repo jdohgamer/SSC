@@ -1,86 +1,75 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class PlayerAction
-{
-	public FSM_Character iCh,tCh;
-	public Cell cFrom, cTo;
-	public enum Actions{Move, Pass, Shoot, Juke}
-	public Actions action; 
-	
-	public PlayerAction()
-	{
-	}
-	public PlayerAction(Actions act, FSM_Character iCharacter)
-	{
-		this.action=act; iCh = iCharacter;
-	}
-	public PlayerAction(Actions act, FSM_Character iCharacter, FSM_Character tCharacter)
-	{
-		this.action=act; iCh = iCharacter; tCh = tCharacter;
-	}
-	public PlayerAction(Actions act, FSM_Character iCharacter, Cell tCell)
-	{
-		this.action=act; iCh = iCharacter; cTo = tCell;
-	}
-	public static PlayerAction MoveAction(FSM_Character iCharacter, Cell tCell)
-	{
-		return new PlayerAction(Actions.Move, iCharacter, tCell);
-	}
-	public Hashtable GetActionProp()
-	{
-		Hashtable actionProp = new Hashtable ();
-
-		actionProp.Add("Act",(int)action);
-		actionProp.Add ("iCharacter",(int)iCh.id);
-		if(tCh!=null)actionProp.Add ("tCharacter",(int)tCh.id);
-		if(cTo!=null)actionProp.Add("tCell",(int)cTo.id);
-		if(cFrom!=null)actionProp.Add("fCell",(int)cFrom.id);
-		return actionProp;
-	}
-}
 
 public class FSM_Character : FSM_Base 
 {
 	public int id, actionCount, targetCount, maxActions = 2;
-	public Cell OccupiedCell;
-	[SerializeField] LayerMask layer;
-	[SerializeField] protected iTween.EaseType ease;
-	protected string easeType;
-	GameObject[] targetPins;
-	Cell lastCell;
+	public int Strength = 5, Speed = 6, Defense = 4;
+	public Cell OccupiedCell
+	{
+		get{
+			if(board.cells2D!=null)
+			{
+				return board.GetCellByLocation(Location);
+			}else return null;
+		}
+	}
+	public bool hasTarget, hasBall;
+	[HideInInspector]public BallScript ball;
+	[HideInInspector]public Grid_Setup board;
 	public Cell LastTargetCell
 	{
 		get{return lastCell;}
 	}
-	public GameObject destPin;
-	[SerializeField] protected float moveSpeed;
-	public bool hasTarget, hasBall;
-	//Vector3 moveTarget;
-	MeshRenderer currentMesh;
-	Animator anim;
-	public PlayerAction[] actions;
-	GameController.Teams team;
-
+	public Vector3 Location
+	{
+		get{return tran.position;}
+	}
 	public enum Stance
 	{
 		Neutral,
+		Move,
 		Sprint,
+		Defend,
 		Pass,
 		Shoot,
 		Cover_Man,
 		Cover_Ball
 	};
+	protected string easeType;
+	[SerializeField] protected float moveSpeed;
+	[SerializeField] protected iTween.EaseType ease, ballEase;
+	[SerializeField] LayerMask characterLayer;
+	[SerializeField] GameObject destPin;
+	GameObject[] targetPins;
+	GameObject passTargetPin;
+	PlayerAction[] actions;
+	Cell lastCell;
+	MeshRenderer currentMesh;
+	Animator anim;
+	Transform tran;
+	FSM_Character opp;
+	Vector3 offset = new Vector3(0,0.2f,0);
 
-	public void Awake()
+	void Awake()
 	{
 		CurrentState = Stance.Neutral;
+		tran = transform;
 		currentMesh = GetComponentInChildren<MeshRenderer>();
-		actions = new PlayerAction[maxActions];
 		anim = GetComponentInChildren<Animator>();
+		actions = new PlayerAction[maxActions];
 		targetPins = new GameObject[maxActions];
+		passTargetPin = Instantiate(destPin,Vector3.zero,Quaternion.identity) as GameObject;
+		passTargetPin.SetActive(false);
 	}
+	void Update()
+	{
+		Debug.DrawRay(tran.position,tran.forward);
+	}
+
 	public void SetPlayerAction(PlayerAction act)
 	{
 		if(actionCount<maxActions)
@@ -89,6 +78,19 @@ public class FSM_Character : FSM_Base
 			actionCount += 1;
 		}
 	}
+
+	public void SetMoveTarget(Cell target)
+	{
+		targetPins[targetCount] = Instantiate(destPin, target.Location, Quaternion.identity) as GameObject;
+		targetCount++;
+		lastCell = target;
+	}
+	public void SetPassTarget(Cell target)
+	{
+		passTargetPin.SetActive(true);
+		passTargetPin.transform.position = target.Location;
+	}
+
 	public Hashtable GetCharacterAsProp()
 	{
 		Hashtable props = new Hashtable ();
@@ -98,12 +100,6 @@ public class FSM_Character : FSM_Base
 		return props;
 	}
 
-	public void SetTarget(Cell target)
-	{
-		targetPins[targetCount] = Instantiate(destPin,target.GetLocation(),Quaternion.identity) as GameObject;
-		targetCount++;
-		lastCell = target;
-	}
 	public void ClearActions()
 	{
 		for(int c= 0;c<actions.Length;c++)
@@ -117,8 +113,10 @@ public class FSM_Character : FSM_Base
 			Destroy(targetPins[t]);
 		}
 		targetCount = 0;
+		passTargetPin.SetActive(false);
 		lastCell = null;
 	}
+
 	public IEnumerator ExecuteActions()
 	{
 		for (int i = 0;i<actions.Length;i++)
@@ -129,19 +127,35 @@ public class FSM_Character : FSM_Base
 				{
 					case PlayerAction.Actions.Move:
 					{
-						Vector3 target = actions[i].cTo.GetLocation();
-						target += new Vector3(0,0.2f,0);
-						//Move(target);
+						Vector3 target = actions[i].cTo.Location;
+						target += offset;
+						RotateTowards(target);
+					
 						easeType = ease.ToString();
-						while (Vector3.Distance(transform.position,target)>.1f) 
+						Vector3 dir, nextCell;
+						while (Vector3.Distance(tran.position,target)>.1f) 
 						{
-							if (anim!=null)
-							anim.SetBool ("IsWalking",true);
-							iTween.MoveTo(gameObject, iTween.Hash("position", target, "easeType", easeType, "loopType", "none", "speed", moveSpeed));
-							yield return new WaitForSeconds(1f);
+							dir = target - (OccupiedCell.Location + offset);
+							nextCell = (OccupiedCell.Location + offset) + dir.normalized;
+							if(CanMove(actions[i].cTo))
+							{
+								iTween.MoveTo(gameObject, iTween.Hash("position", nextCell, "easeType", easeType, "loopType", "none", "speed", moveSpeed));
+							yield return new WaitForSeconds(0.2f);
+							}else break;
 						}
-						if (anim!=null)
-						anim.SetBool ("IsWalking",false);
+						
+						break;
+					}
+					case PlayerAction.Actions.Pass:
+					{
+						if(hasBall)
+						{
+							Hashtable ht = new Hashtable();
+							ht["Speed"] = (float)Strength;
+							ht["Cell"] = actions[i].cTo.id;
+							ht["EaseType"] = ballEase.ToString();
+							ball.StartCoroutine("MoveTo",ht);
+						}
 						break;
 					}
 				}
@@ -149,8 +163,43 @@ public class FSM_Character : FSM_Base
 		}
 		ClearActions();	
 		yield return null;
+	}
+	void RotateTowards(Vector3 target)
+	{
+		Vector3 dir = target - tran.position;
+		Quaternion rotation = Quaternion.LookRotation(dir);
+		tran.rotation= rotation;
+		//float f = Vector3.Angle(tran.forward,dir);
+		//tran.Rotate(Vector3.up,f);
+	}
 
-
+	bool CanMove(Cell targetCell)
+	{
+		bool canMove;
+		opp = PlayerInFrontOfMe();
+		if(opp!=null)
+		{
+			Debug.Log("Player ID: "+opp.id);
+			if(targetCell.Location== opp.transform.position)
+			{
+				if(targetCell==opp.LastTargetCell)
+				{
+					canMove = false;
+				}else{
+					canMove = true;
+				}
+			}else{
+				float dotFace = Vector3.Dot(tran.forward.normalized,opp.transform.forward.normalized);
+				if(dotFace<0)
+				{
+					Debug.Log("Oh, just kiss already");
+					canMove = false;
+				}else{
+					canMove = true;
+				}
+			}
+		}else canMove = true;
+		return canMove;
 	}
 
 	public void Highlight(bool set)
@@ -187,18 +236,28 @@ public class FSM_Character : FSM_Base
 //		{
 //			iTween.MoveTo(gameObject, iTween.Hash("position", target, "easeType", easeType, "loopType", "none", "speed", moveSpeed));
 //			//transform.position = Vector3.MoveTowards (transform.position, target, deltaSpeed);
-//			yield return null;
+//			yield return new WaitForSeconds(1f);
 //		}
+//		StopCoroutine("MoveTo");
 //	}
 
-	public int RaycastToGround()
+
+	FSM_Character PlayerInFrontOfMe()
 	{
-		Ray ray = new Ray(transform.position,Vector3.down);
+		Ray ray = new Ray(tran.position,tran.forward);
 		RaycastHit hit = new RaycastHit();;
-		Physics.Raycast(ray,out hit,5f,layer);
-		return hit.transform.GetSiblingIndex();
+		Physics.Raycast(ray,out hit,1.5f,characterLayer);
+		if(hit.collider!=null&& hit.collider!= this.GetComponent<Collider>() && hit.transform.tag == "Player")
+		{
+			return hit.transform.GetComponent<FSM_Character>();
+		}
+		return null;
 	}
-	
+
+//	IEnumerator Move_EnterState()
+//	{
+//
+//	}
 	void OnTriggerEnter(Collider other)
 	{
 		switch(other.tag)
@@ -207,7 +266,21 @@ public class FSM_Character : FSM_Base
 			{
 				hasBall = true;
 				other.transform.SetParent(transform);
-				other.attachedRigidbody.isKinematic = true;
+				other.transform.position = transform.TransformPoint(0,0,1);
+				ball = other.GetComponent<BallScript>();
+				break;
+			}
+		}
+	}
+	void OnTriggerExit(Collider other)
+	{
+		switch(other.tag)
+		{
+			case "Ball":
+			{
+				hasBall = false;
+				other.transform.SetParent(null);
+				ball = null;
 				break;
 			}
 		}

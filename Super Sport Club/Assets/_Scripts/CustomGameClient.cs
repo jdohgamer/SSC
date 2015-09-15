@@ -22,20 +22,20 @@ using Random = UnityEngine.Random;
 
 public class CustomGameClient : LoadBalancingClient 
 {
-	Message message;
-	byte actionCount = 0;
-	public byte MaxActions = 5;
-	public bool bTurnDone;
 	public const byte EndTurn = 1;
 	public const byte Execute = 2;
 	public const string PropTurn = "turn";
 	public const string PropNames = "names";
 	public Grid_Setup board;
+	public byte MaxActions = 5;
+	public bool bTurnDone;
+	public GUIController gui;
+	public FSM_Character[] characters;
 	PlayerAction[] myActions, oppActions;
 	bool P1Submitted, P2Submitted;
-	public FSM_Character[] characters;
 	int TurnNumber;
-	public GUIController gui;
+	Message message;
+	byte actionCount = 0;
 
 	public CustomGameClient()
 	{
@@ -49,8 +49,8 @@ public class CustomGameClient : LoadBalancingClient
 		{
 			P1Submitted = true;
 		}else{P2Submitted=true;}
-
-		this.loadBalancingPeer.OpRaiseEvent(EndTurn, content, true, null);
+		ExecuteMoves(content);
+		//this.loadBalancingPeer.OpRaiseEvent(EndTurn, content, true, null);
 	}
 	bool IsPlayerOne()
 	{
@@ -61,15 +61,19 @@ public class CustomGameClient : LoadBalancingClient
 		return P1Submitted && P2Submitted;
 	}
 
-	public void SetPlayerAction(PlayerAction.Actions act, FSM_Character character, Cell targetCell)
+	public void SetPlayerAction(PlayerAction act)
 	{
-		if(actionCount<MaxActions&&character.actionCount<character.maxActions)
+		if(actionCount<MaxActions&&act.iCh.actionCount<act.iCh.maxActions)
 		{
-			myActions[actionCount] = new PlayerAction(act, character, targetCell);
+			myActions[actionCount] = act;
 			actionCount += 1;
-			if(act == PlayerAction.Actions.Move)
+			if(act.action == PlayerAction.Actions.Move)
 			{
-				character.SetTarget(targetCell);
+				act.iCh.SetMoveTarget(act.cTo);
+			}
+			if(act.action == PlayerAction.Actions.Pass)
+			{
+				act.iCh.SetPassTarget(act.cTo);
 			}
 		}
 	}
@@ -82,7 +86,6 @@ public class CustomGameClient : LoadBalancingClient
 			{
 				MoveSet.Add(i.ToString(),actions[i].GetActionProp());
 			}
-
 		}
 		return MoveSet;
 	}
@@ -97,7 +100,7 @@ public class CustomGameClient : LoadBalancingClient
 				Hashtable ion = ht[i.ToString()]as Hashtable;
 				PlayerAction.Actions act = (PlayerAction.Actions)ion["Act"];
 				FSM_Character ich = characters[ (int)ion["iCharacter"]];
-				Cell cell =	board.cells[(int)ion["tCell"]];
+				Cell cell =	board.GetCellByID((int)ion["tCell"]);
 				actions[i] = new PlayerAction(act,ich,cell);
 			}
 		}
@@ -117,10 +120,6 @@ public class CustomGameClient : LoadBalancingClient
 				}
 				myActions[c] = null;
 			}
-		}
-		foreach(FSM_Character c in affectedChars)
-		{
-			c.ClearActions();
 		}
 		board.TurnOffHiglighted ();
 		actionCount = 0;
@@ -190,7 +189,6 @@ public class CustomGameClient : LoadBalancingClient
 		case EventCode.PropertiesChanged:
 			//Debug.Log("Got Properties via Event. Update board by room props.");
 			this.LoadBoardFromProperties(true);
-			//this.board.ShowFlippedTiles();
 			break;
 		case (byte)Execute:
 		{
@@ -333,70 +331,60 @@ public class CustomGameClient : LoadBalancingClient
 	}
 	public void CalcMoves()
 	{
-		List<FSM_Character> affectedChars = new List<FSM_Character>();
 		Hashtable MoveSet = new Hashtable();
+
 		for (int i = 0; i<myActions.Length; i++) 
 		{
 			if(myActions[i]!=null)
 			{
-				MoveSet.Add(i.ToString(),myActions[i].GetActionProp());
-			}
-			
-		}
-		for (int i = 0; i<oppActions.Length; i++) 
-		{
-			if(oppActions[i]!=null)
-			{
-				MoveSet.Add((i+myActions.Length).ToString(),oppActions[i].GetActionProp());
-			}
-			
-		}
-		
-//		for(int h = 0; h < myActions.Length; h++)
-//		{
-//			if(myActions[h]!=null)
-//			{
-//				if(!affectedChars.Contains(myActions[h].iCh))
-//				{
-//					affectedChars.Add(myActions[h].iCh);
-//				}
-//			}else break;
-//			affected["charcter#"] = affectedChars[h].GetCharacterAsProp();
-//		}
-		
-//		foreach(FSM_Character c in affectedChars)
-//		{
-//			c.StartCoroutine("ExecuteActions");
-//		}
-//		Cell tCell = new Cell();
-//		for(int h = 0; h < myActions.Length; h++)
-//		{
-//			tCell = myActions[h].cTo;
-//			for(int j = 0; j < oppActions.Length; j++)
-//			{
-//				if(tCell == oppActions[j].cTo)
-//				{
-//				}
-//			}
-//		}
-
-		this.loadBalancingPeer.OpRaiseEvent(Execute, MoveSet, true, new RaiseEventOptions{Receivers = ReceiverGroup.All });
-		
-		//yield return null;
-		
-		/*
-		Cell tCell = new Cell();
-		for(int h = 0; h < a.Length; h++)
-		{
-			tCell = a[h].cTo;
-			for(int j = 0; j < b.Length; j++)
-			{
-				if(tCell==b[j].cTo)
+				for (int j = 0; j<oppActions.Length; j++) 
 				{
+					if(oppActions[j]!=null)
+					{
+						if(myActions[i].cTo==oppActions[j].cTo)
+						{
+							if(myActions[i].action == PlayerAction.Actions.Move && oppActions[j].action== PlayerAction.Actions.Move)
+							{
+								float m = Random.Range(0,5), o = Random.Range(0,5);
+								Debug.Log(m+", "+o);
+								if(m>o)
+								{
+									MoveSet.Add((i).ToString(),myActions[i].GetActionProp());
+								}else 
+								{
+									MoveSet.Add((i+myActions.Length).ToString(),oppActions[i].GetActionProp());
+								}
+							}
+						}else{
+							MoveSet.Add((i).ToString(),myActions[i].GetActionProp());
+							MoveSet.Add((i+myActions.Length).ToString(),oppActions[j].GetActionProp());
+						}
+					}
 				}
+
 			}
 		}
-		*/
+//		for (int i = 0; i<myActions.Length; i++) 
+//		{
+//			if(myActions[i]!=null)
+//			{
+//				MoveSet.Add((i).ToString(),myActions[i].GetActionProp());
+//			}
+//			
+//		}
+//		for (int i = 0; i<oppActions.Length; i++) 
+//		{
+//			if(oppActions[i]!=null)
+//			{
+//				MoveSet.Add((i+myActions.Length).ToString(),oppActions[i].GetActionProp());
+//			}
+//			
+//		}
+		ExecuteMoves(MoveSet);
+
+		this.loadBalancingPeer.OpRaiseEvent(Execute, MoveSet, true, null);
+		//new RaiseEventOptions{Receivers = ReceiverGroup.All }
+	
 	}
 	void ExecuteMoves(Hashtable moves)
 	{
@@ -406,7 +394,7 @@ public class CustomGameClient : LoadBalancingClient
 		{
 			if(acts[h]!=null)
 			{
-			Debug.Log(acts[h].action.ToString());
+				Debug.Log(acts[h].action.ToString());
 				if(!affectedChars.Contains(acts[h].iCh))
 				{
 					affectedChars.Add(acts[h].iCh);
@@ -418,5 +406,6 @@ public class CustomGameClient : LoadBalancingClient
 		{
 			c.StartCoroutine("ExecuteActions");
 		}
+		ClearActions();
 	}
 }
