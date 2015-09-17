@@ -108,5 +108,5 @@ public class RightClickSell : MonoBehaviour//, IPointerClickHandler
 			rt.rotation = m_DraggingPlane.rotation;
 		}
 	}
-	*/
+*/	
 }

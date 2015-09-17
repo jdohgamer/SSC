@@ -5,10 +5,8 @@ using System.Collections;
 public class Cell
 {
 	public FSM_Character character;
-	//public GameObject boardObj;
 	public bool bHighlighted, hasBall, bOccupied;
 	public int id;
-	//public CellMono cm;
 	public CellType type;
 	public enum CellType{OutOfBounds, Corner, BoundLine, Field, InsideBox}
 	public Vector3 Location{get{return location;}}
@@ -60,45 +58,3 @@ public class Cell
 		}else highlighter.SetActive(false);
 	}
 }
-//public class CellMono: MonoBehaviour
-//{
-//	public Material mat;
-//
-//	void Awake()
-//	{
-//
-//		mat = GetComponent<MeshRenderer>().material;
-//
-//	}
-//
-////	void OnMouseEnter()
-////	{
-////		//Highlight(true);
-////		Debug.Log(transform.GetSiblingIndex());
-////	}
-////	void OnMouseExit()
-////	{
-////		//Highlight(false);
-////		Debug.Log(transform.GetSiblingIndex());
-////	}
-//	public void Highlight(bool set)
-//	{
-//		if(set)
-//		{
-//			mat.SetColor ("_Color",Color.cyan);
-//			mat.SetFloat ("_Alpha",0.2f);
-//		}
-//		else{
-//			mat.SetColor("_Color",Color.black);
-//			mat.SetFloat ("_Alpha",1f);
-//		}
-//	}
-//
-////	public void RotateMat(float degrees)
-////	{
-////		if(mat.GetFloat("_RotationDegree")!= null)
-////		{
-////			mat.SetFloat("_RotationDegree", degrees* Mathf.Deg2Rad);
-////		}
-////	}
-//}

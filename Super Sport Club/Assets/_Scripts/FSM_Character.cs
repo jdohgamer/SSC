@@ -7,7 +7,11 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 public class FSM_Character : FSM_Base 
 {
 	public int id, actionCount, targetCount, maxActions = 2;
-	public int Strength = 5, Speed = 6, Defense = 4;
+	//public int Strength = 5, Speed = 6, Defense = 4;
+	public CharacterData charData; // contains Name, Id, and stats
+	public bool hasTarget, hasBall;
+	[HideInInspector]public BallScript ball;
+	[HideInInspector]public Grid_Setup board;
 	public Cell OccupiedCell
 	{
 		get{
@@ -17,9 +21,6 @@ public class FSM_Character : FSM_Base
 			}else return null;
 		}
 	}
-	public bool hasTarget, hasBall;
-	[HideInInspector]public BallScript ball;
-	[HideInInspector]public Grid_Setup board;
 	public Cell LastTargetCell
 	{
 		get{return lastCell;}
@@ -40,7 +41,7 @@ public class FSM_Character : FSM_Base
 		Cover_Ball
 	};
 	protected string easeType;
-	[SerializeField] protected float moveSpeed;
+	//[SerializeField] protected float moveSpeed;
 	[SerializeField] protected iTween.EaseType ease, ballEase;
 	[SerializeField] LayerMask characterLayer;
 	[SerializeField] GameObject destPin;
@@ -139,7 +140,7 @@ public class FSM_Character : FSM_Base
 							nextCell = (OccupiedCell.Location + offset) + dir.normalized;
 							if(CanMove(actions[i].cTo))
 							{
-								iTween.MoveTo(gameObject, iTween.Hash("position", nextCell, "easeType", easeType, "loopType", "none", "speed", moveSpeed));
+								iTween.MoveTo(gameObject, iTween.Hash("position", nextCell, "easeType", easeType, "loopType", "none", "speed", charData.Speed));
 							yield return new WaitForSeconds(0.2f);
 							}else break;
 						}
@@ -151,7 +152,7 @@ public class FSM_Character : FSM_Base
 						if(hasBall)
 						{
 							Hashtable ht = new Hashtable();
-							ht["Speed"] = (float)Strength;
+							ht["Speed"] = (float)charData.Strength;
 							ht["Cell"] = actions[i].cTo.id;
 							ht["EaseType"] = ballEase.ToString();
 							ball.StartCoroutine("MoveTo",ht);
@@ -285,7 +286,8 @@ public class FSM_Character : FSM_Base
 			}
 		}
 	}
-
-
-
+	void OnMouseDrag()
+	{
+		
+	}
 }

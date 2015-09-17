@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using ExitGames.Client.Photon;
 using ExitGames.Client.Photon.LoadBalancing;
 using System.Collections.Generic;
@@ -121,7 +121,7 @@ public class CustomGameClient : LoadBalancingClient
 				myActions[c] = null;
 			}
 		}
-		board.TurnOffHiglighted ();
+		board.TurnOffHiglightedAdjacent ();
 		actionCount = 0;
 	}
 
@@ -299,7 +299,6 @@ public class CustomGameClient : LoadBalancingClient
 		//boardProps.Add(GetPlayerPointsPropKey(this.LocalPlayer.ID), this.MyPoints); // we always only save "our" points. this will not affect the opponent's score.
 		
 		
-		// our turn will be over if 2 tiles are clicked/flipped but not the same. in that case, we update the other player if inactive
 		bool webForwardToPush = false;
 
 		//Debug.Log(string.Format("saved board to room-props {0}", SupportClass.DictionaryToString(boardProps)));

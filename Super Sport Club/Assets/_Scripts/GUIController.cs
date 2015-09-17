@@ -33,6 +33,7 @@ public class GUIController: MonoBehaviour
 	void Awake()
 	{
 		this.board = GetComponent<Grid_Setup>();
+		Grid_Setup.Instance = this.board;
 		this.GameClientInstance  = new CustomGameClient();
 		this.GameClientInstance.AppId = AppId;  // edit this!
 		this.GameClientInstance.board = board;
@@ -91,14 +92,11 @@ public class GUIController: MonoBehaviour
 								if(currentID!=-1)
 								{
 									CurrentSelectedChar.Highlight(false);
-									board.TurnOffHiglighted();
+									board.TurnOffHiglightedAdjacent();
 								}
-								
 								currentID = id;
 								CurrentSelectedChar.Highlight(true);
-								//CurrentSelectedChar.OccupiedCell = board.GetCellByLocation(CurrentSelectedChar.Location);//this should be done when placing characters
 							}
-							//CurrentSelectedChar.OccupiedCell = board.GetCellByLocation(CurrentSelectedChar.Location);
 							CreateButtonPanel(CurrentSelectedChar.OccupiedCell);
 							break;
 							
@@ -136,6 +134,7 @@ public class GUIController: MonoBehaviour
 			{
 				DeselectCharacter();
 			}
+			
 		}
 	}
 
@@ -146,7 +145,7 @@ public class GUIController: MonoBehaviour
 			isMoving = false;
 			isPassing = false;
 			CurrentSelectedChar.Highlight(false);
-			board.TurnOffHiglighted();
+			board.TurnOffHiglightedAdjacent();
 			currentID = -1;
 		}
 	}
@@ -160,7 +159,7 @@ public class GUIController: MonoBehaviour
 			actsLeft--;
 			if (actsLeft <= 0) 
 			{
-				board.TurnOffHiglighted();
+				board.TurnOffHiglightedAdjacent();
 				isMoving = false;
 			}else{
 				board.HighlightAdjacent (true, tCell.Location, actsLeft);
@@ -173,7 +172,7 @@ public class GUIController: MonoBehaviour
 		if (CurrentSelectedChar.maxActions -CurrentSelectedChar.actionCount > 0) 
 		{
 			GameClientInstance.SetPlayerAction(new PlayerAction(PlayerAction.Actions.Pass, CurrentSelectedChar, tCell, CurrentSelectedChar.OccupiedCell));
-			board.TurnOffHiglighted();
+			board.TurnOffHiglightedAdjacent();
 			isPassing = false;
 		}
 	}
@@ -230,19 +229,7 @@ public class GUIController: MonoBehaviour
 		{ 
 			Vector3 kick = meter.GetComponent<Gauge>().StopBounce();
 			Vector3 cellPos = CharacterPosition + kick.normalized * idealPassDir.magnitude;
-			PassClick(board.GetCellByLocation(cellPos));
-//			Ray ray = new Ray(cellPos, Vector3.down);
-//			RaycastHit hit;
-//			int cell;
-//			if (Physics.Raycast (ray, out hit, 10f, mask)) 
-//			{
-//				if(hit.transform.tag == "Field")
-//				{
-//					cell = hit.transform.GetSiblingIndex();
-//					PassClick(cell);
-//				}
-//			}
-			
+			PassClick(board.GetCellByLocation(cellPos));			
 			Destroy(meter.gameObject);
 			Destroy(panel.gameObject);
 		});
@@ -270,7 +257,7 @@ public class GUIController: MonoBehaviour
 				clearButton.onClick.AddListener (() => 
 				{ 
 					CurrentSelectedChar.ClearActions();
-					board.TurnOffHiglighted();
+					board.TurnOffHiglightedAdjacent();
 					Destroy (panel.gameObject);
 				});
 			}
@@ -300,7 +287,7 @@ public class GUIController: MonoBehaviour
 				{ 
 					isPassing = true;
 					isMoving = false;
-					board.HighlightAdjacent (true, cell.Location, CurrentSelectedChar.Strength);
+					board.HighlightAdjacent (true, cell.Location, (int)CurrentSelectedChar.charData.Strength);
 					Destroy (panel.gameObject);
 				});	
 			}	
