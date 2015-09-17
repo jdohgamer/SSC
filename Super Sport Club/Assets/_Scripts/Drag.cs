@@ -8,10 +8,18 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 {
 	public bool dragOnSurfaces = true;
 	public static bool bDragging;
-	
+	[SerializeField] GameObject dragFab;
+	[SerializeField] GUIController GUI;
 	private GameObject m_DraggingIcon;
 	private RectTransform m_DraggingPlane;
+	LayerMask mask;// = 1<<LayerMask.NameToLayer("Ground");
+	Ray ray;
+	RaycastHit hit;
 	
+	void Awake()
+	{
+		mask = 1<<LayerMask.NameToLayer("Ground");
+	}
 	public void OnBeginDrag(PointerEventData eventData)
 	{
 		var canvas = FindInParents<Canvas>(gameObject);
@@ -21,19 +29,18 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 		StartCoroutine("GetHigh");
 		// We have clicked something that can be dragged.
 		// What we want to do is create an icon for this.
-		m_DraggingIcon = new GameObject("icon");
+		m_DraggingIcon = Instantiate(dragFab,transform.position,Quaternion.identity)as GameObject;//new GameObject("icon");
 		
 		m_DraggingIcon.transform.SetParent (canvas.transform, false);
 		m_DraggingIcon.transform.SetAsLastSibling();
 		
-		var image = m_DraggingIcon.AddComponent<Image>();
+		//var image = m_DraggingIcon.AddComponent<Image>();
 		// The icon will be under the cursor.
 		// We want it to be ignored by the event system.
 		CanvasGroup group = m_DraggingIcon.AddComponent<CanvasGroup>();
 		group.blocksRaycasts = false;
 		
-		image.sprite = GetComponent<Image>().sprite;
-		
+		//image.sprite = GetComponent<Image>().sprite;
 		
 		if (dragOnSurfaces)
 			m_DraggingPlane = transform as RectTransform;
@@ -53,9 +60,7 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 	{
 		while(Drag.bDragging)
 		{
-			RaycastHit hit;
-			Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
-			LayerMask mask = 1<<LayerMask.NameToLayer("Ground");
+			ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 			
 			if (Physics.Raycast (ray, out hit, 100f, mask) && hit.transform.tag == "Field") 
 			{
@@ -86,6 +91,12 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 			Destroy(m_DraggingIcon);
 			bDragging = false;
 			Grid_Setup.Instance.TurnOffSingle();
+			
+			if (Physics.Raycast (ray, out hit, 100f, mask) && hit.transform.tag == "Field") 
+			{
+				Grid_Setup.Instance.AddCharacter(hit.point);
+			}
+			
 		}
 	}
 	

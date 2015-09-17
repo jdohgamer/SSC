@@ -15,14 +15,14 @@ public class GUIController: MonoBehaviour
 	public string AppId;            // set in inspector. this is called when the client loaded and is ready to start
 	public FSM_Character CurrentSelectedChar
 	{
-		get{return characters[currentID];}
+		get{return board.characters[currentID];}
 	}
 	[SerializeField] LayerMask mask;
 	[SerializeField] Image panelFab;
 	[SerializeField] SpriteRenderer meterFab;
 	[SerializeField] Button buttFab;
 	[SerializeField] Canvas UIcan;
-	int currentID = -1;
+	int currentID = -1, characterCount = 0, maxCharacters = 5;
 	FSM_Character[] characters;
 	Grid_Setup board;
 	bool isPassing, isMoving;
@@ -42,21 +42,21 @@ public class GUIController: MonoBehaviour
 		Application.runInBackground = true;
 		CustomTypes.Register();
 		bool connectInProcess = GameClientInstance.ConnectToRegionMaster("us");  // can return false for errors
-
-		GameObject[] charObjs = GameObject.FindGameObjectsWithTag("Player");
-		characters = new FSM_Character[charObjs.Length];
-		for(int i = 0; i< charObjs.Length;i++)
-		{
-			FSM_Character temp = charObjs[i].GetComponent<FSM_Character>();
-			if(temp!= null)
-			{
-				characters[i] = temp;
-				characters[i].id = i;
-				characters[i].board = board;
-			}
-		}
-		this.GameClientInstance.characters = this.characters;
-		this.board.characters = this.characters;
+		
+//		GameObject[] charObjs = GameObject.FindGameObjectsWithTag("Player");
+//		characters = new FSM_Character[charObjs.Length];
+//		for(int i = 0; i< charObjs.Length;i++)
+//		{
+//			FSM_Character temp = charObjs[i].GetComponent<FSM_Character>();
+//			if(temp!= null)
+//			{
+//				characters[i] = temp;
+//				characters[i].id = i;
+//				characters[i].board = board;
+//			}
+//		}
+//		this.GameClientInstance.characters = this.characters;
+//		this.board.characters = this.characters;
 	}
 	
 	void Update()
@@ -134,7 +134,6 @@ public class GUIController: MonoBehaviour
 			{
 				DeselectCharacter();
 			}
-			
 		}
 	}
 
@@ -149,7 +148,7 @@ public class GUIController: MonoBehaviour
 			currentID = -1;
 		}
 	}
-
+	
 	void MovementClick(Cell tCell)
 	{
 		int actsLeft = CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount;
@@ -222,10 +221,10 @@ public class GUIController: MonoBehaviour
 		panel.transform.SetParent(UIcan.transform,false);
 		panel.transform.SetAsLastSibling(); 
 		
-		Button clearButton = Instantiate (buttFab) as Button;
-		clearButton.transform.SetParent (panel.transform, false);
-		clearButton.GetComponentInChildren<Text> ().text = "Kick";
-		clearButton.onClick.AddListener (() => 
+		Button kickButton = Instantiate (buttFab) as Button;
+		kickButton.transform.SetParent (panel.transform, false);
+		kickButton.GetComponentInChildren<Text> ().text = "Kick";
+		kickButton.onClick.AddListener (() => 
 		{ 
 			Vector3 kick = meter.GetComponent<Gauge>().StopBounce();
 			Vector3 cellPos = CharacterPosition + kick.normalized * idealPassDir.magnitude;
@@ -305,14 +304,14 @@ public class GUIController: MonoBehaviour
 	public void ClearButton()
 	{
 		this.GameClientInstance.ClearActions();
-		foreach(FSM_Character c in characters)
+		foreach(FSM_Character c in board.characters)
 		{
 			c.ClearActions();
 		}
 	}
 	public void EndTurnButton()
 	{
-		Debug.Log("Fuck you");
+		DeselectCharacter();
 		this.GameClientInstance.EndTurnEvent();
 	}
 

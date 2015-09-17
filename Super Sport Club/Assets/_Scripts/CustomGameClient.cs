@@ -292,9 +292,12 @@ public class CustomGameClient : LoadBalancingClient
 		//boardProps.Add("t#", this.TurnNumber);
 		boardProps.Add("tx#", board.width);
 		boardProps.Add("tz#", board.length);
-		foreach(FSM_Character c in characters)
+		if(characters !=null)
 		{
-			boardProps.Add("character#"+c.id,c.GetCharacterAsProp());
+			foreach(FSM_Character c in characters)
+			{
+				//boardProps.Add("character#"+c.id,c.GetCharacterAsProp());
+			}	
 		}
 		//boardProps.Add(GetPlayerPointsPropKey(this.LocalPlayer.ID), this.MyPoints); // we always only save "our" points. this will not affect the opponent's score.
 		

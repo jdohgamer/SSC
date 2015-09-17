@@ -44,16 +44,19 @@ public class Grid_Setup : MonoBehaviour
 	[HideInInspector]public int length, width, cellCount;
 	[SerializeField] GameObject highlight;
 	[SerializeField] GameObject ball;
+	[SerializeField] GameObject charFab;
 	static Cell highlightSingle;
 	GameObject field;
 	Transform fieldTran;
 	AdjacentIndexes adjacent;
 	bool isHighlighted, isCreated;
-		
+	int  characterCount = 0, maxCharacters = 5;
+
 	void Awake()
 	{
 		field = new GameObject("Field");
 		fieldTran = field.transform;
+		characters = new FSM_Character[maxCharacters];
 	}
 
 	void DestroyBoard ()
@@ -66,6 +69,16 @@ public class Grid_Setup : MonoBehaviour
 			}
 		}
 		Destroy (Ball);
+	}
+	
+	public void AddCharacter(Vector3 location)
+	{
+		if(characterCount<maxCharacters)
+		{
+			GameObject newGuy = Instantiate(charFab,GetCellByLocation(location).Location + new Vector3(0,0.2f,0),Quaternion.identity) as GameObject;
+			characters[characterCount] =  newGuy.GetComponent<FSM_Character>();
+			characterCount++;
+		}
 	}
 	public void Generate (int w, int l) 
 	{
@@ -108,7 +121,7 @@ public class Grid_Setup : MonoBehaviour
 			for (int c = 0; c<characters.Length; c++) 
 			{
 				//characters[c].OccupiedCell = GetCellByLocation(characters[c].Location);
-				characters[c].OccupiedCell.character = characters[c];
+				//characters[c].OccupiedCell.character = characters[c];
 			}
 		}
 	}
@@ -117,7 +130,7 @@ public class Grid_Setup : MonoBehaviour
 	{
 		int x = (int)Mathf.Round(locaton.x);
 		int z = (int)Mathf.Round(locaton.z);
-		if(cells2D[x,z]!=null)
+		if(cells2D!=null&& cells2D[x,z]!=null)
 		return cells2D[x,z];
 		else return null;
 	}

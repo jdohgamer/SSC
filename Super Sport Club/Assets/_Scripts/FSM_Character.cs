@@ -286,8 +286,4 @@ public class FSM_Character : FSM_Base
 			}
 		}
 	}
-	void OnMouseDrag()
-	{
-		
-	}
 }

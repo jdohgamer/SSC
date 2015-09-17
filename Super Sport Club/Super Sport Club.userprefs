@@ -1,22 +1,22 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\_Scripts\Drag.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\_Scripts\Grid_Setup.cs">
     <Files>
-      <File FileName="Assets\_Scripts\GUIController.cs" Line="137" Column="4" />
-      <File FileName="Assets\_Scripts\FSM_Character.cs" Line="2" Column="1" />
-      <File FileName="..\..\Dealer\Dealer_5\Assets\_Scripts\Inventories\Dragging.cs" Line="98" Column="5" />
+      <File FileName="Assets\_Scripts\FSM_Character.cs" Line="288" Column="3" />
       <File FileName="Assets\_Scripts\SetPieceSetup.cs" Line="1" Column="1" />
-      <File FileName="..\..\Dealer\Dealer_5\Assets\_Scripts\UI\NPC_UI.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\Grid_Setup.cs" Line="1" Column="1" />
+      <File FileName="Assets\_Scripts\Grid_Setup.cs" Line="77" Column="103" />
       <File FileName="Assets\_Scripts\Cell.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\Drag.cs" Line="17" Column="50" />
+      <File FileName="Assets\_Scripts\Drag.cs" Line="97" Column="49" />
+      <File FileName="Assets\_Scripts\CustomGameClient.cs" Line="1" Column="1" />
+      <File FileName="..\..\Dealer\Dealer_5\Assets\_Scripts\Inventories\Dragging.cs" Line="1" Column="1" />
+      <File FileName="Assets\_Scripts\GUIController.cs" Line="1" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Assembly-CSharp" expanded="True">
             <Node name="_Scripts" expanded="True">
-              <Node name="Drag.cs" selected="True" />
+              <Node name="Grid_Setup.cs" selected="True" />
             </Node>
           </Node>
         </State>
