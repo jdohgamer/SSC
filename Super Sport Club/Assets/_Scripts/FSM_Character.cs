@@ -7,17 +7,18 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 public class FSM_Character : FSM_Base 
 {
 	public int id, actionCount, targetCount, maxActions = 2;
+	public CustomGameClient.Team team;
+	public Vector3 newLocation = Vector3.zero;
 	//public int Strength = 5, Speed = 6, Defense = 4;
 	public CharacterData charData; // contains Name, Id, and stats
 	public bool hasTarget, hasBall;
 	[HideInInspector]public BallScript ball;
-	[HideInInspector]public Grid_Setup board;
 	public Cell OccupiedCell
 	{
 		get{
-			if(board.cells2D!=null)
+			if(Grid_Setup.Instance.cells2D!=null)
 			{
-				return board.GetCellByLocation(Location);
+				return Grid_Setup.Instance.GetCellByLocation(Location);
 			}else return null;
 		}
 	}
@@ -55,8 +56,30 @@ public class FSM_Character : FSM_Base
 	FSM_Character opp;
 	Vector3 offset = new Vector3(0,0.2f,0);
 
+	public void ReturnCharacter(Hashtable ht)
+	{
+		CharacterData cd = ScriptableObject.CreateInstance<CharacterData>();
+		this.id = (int)ht["ID"];
+		cd.name = (string)ht["Name"];
+		cd.Strength = (float)ht["Strength"];
+		cd.Speed = (float)ht["Speed"];
+		cd.Defense = (float)ht["Defense"];
+		this.charData = cd;
+		this.team = (CustomGameClient.Team)ht["Team"];
+//		this.charData.name = (string)ht["Name"];
+//		this.charData.Strength = (float)ht["Strength"];
+//		this.charData.Speed = (float)ht["Speed"];
+//		this.charData.Defense = (float)ht["Defense"];
+		this.newLocation = (Vector3)ht["Location"];
+	}
+	public FSM_Character()
+	{
+		
+	}
+
 	void Awake()
 	{
+		//charData = new CharacterData();
 		CurrentState = Stance.Neutral;
 		tran = transform;
 		currentMesh = GetComponentInChildren<MeshRenderer>();
@@ -94,11 +117,16 @@ public class FSM_Character : FSM_Base
 
 	public Hashtable GetCharacterAsProp()
 	{
-		Hashtable props = new Hashtable ();
-		props["Stance"] = (int)(Stance)CurrentState;
-		props["Cell"] = (int)OccupiedCell.id;
-
-		return props;
+		Hashtable ht = new Hashtable();
+		ht["Location"] = Location;
+		ht["Name"] = charData.name;
+		ht["ID"] = id;
+		ht["Strength"] = charData.Strength;
+		ht["Speed"] = charData.Speed;
+		ht["Defense"] = charData.Defense;
+		ht["Team"] = (int)team;
+		
+		return ht;
 	}
 
 	public void ClearActions()

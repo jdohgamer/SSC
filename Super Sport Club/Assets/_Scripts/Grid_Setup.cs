@@ -11,26 +11,26 @@ struct AdjacentIndexes
 	public AdjacentIndexes(Vector3 index, int distance,  int boardLength, int boardWidth)
 	{
 		neighbors = new List<Vector3>();
-		int dist = distance*2+1;
-		int negDist = -distance;
-		int negDistColumn;
-		int negDistRow;
-		float row, col;
+		int dist = distance*2+1; //total width of square we look in
+		int negDist = -distance; //we want to itereate between the positive and negative value
+		int negDistColumn; //relative "z" value going "up", think of as typical "y"
+		int negDistRow; //relative "x" value going "right"
+		float row, col; //these will be the actual positions in our return Vector
 		for(int x = 0; x<dist; x++)
 		{
-			negDistRow = negDist ;
-			negDistColumn = -distance;
+			negDistRow = negDist; // our "x" value will change in this outer loop from -dist to dist (equaling width)
+			negDistColumn = -distance; //our "y" value change in the inner loop from -distance to disance (equaling height)
 			for(int z = 0; z<dist; z++)
 			{
 				row = negDistRow+index.x;
 				col = negDistColumn+index.z;
 				if(row<boardWidth && row >=0 && col<boardLength && col>=0)
 				{
-					neighbors.Add(new Vector3(row,0,col));
+					neighbors.Add(new Vector3(row,0,col)); //only adding valid board locations
 				}
-				negDistColumn++;
+				negDistColumn++;//increment until we reach height
 			}
-			negDist++;
+			negDist++; //increment until we reach width
 		}
 	}
 } 
@@ -39,24 +39,25 @@ public class Grid_Setup : MonoBehaviour
 {
 	public static GameObject Ball;
 	public static Grid_Setup Instance;
-	[HideInInspector]public FSM_Character[] characters;
+	public FSM_Character[] characters;
+	public FSM_Character[,] characters2D;
 	[HideInInspector]public Cell[,] cells2D;
-	[HideInInspector]public int length, width, cellCount;
+	public int length, width, cellCount;
 	[SerializeField] GameObject highlight;
 	[SerializeField] GameObject ball;
 	[SerializeField] GameObject charFab;
+	[SerializeField] CharacterData[] positionData;
 	static Cell highlightSingle;
 	GameObject field;
 	Transform fieldTran;
 	AdjacentIndexes adjacent;
 	bool isHighlighted, isCreated;
-	int  characterCount = 0, maxCharacters = 5;
+	int characterCount = 0, maxCharacters = 10, teamSize = 5, teamOneSize, teamTwoSize;
 
 	void Awake()
 	{
 		field = new GameObject("Field");
 		fieldTran = field.transform;
-		characters = new FSM_Character[maxCharacters];
 	}
 
 	void DestroyBoard ()
@@ -70,23 +71,48 @@ public class Grid_Setup : MonoBehaviour
 		}
 		Destroy (Ball);
 	}
-	
-	public void AddCharacter(Vector3 location)
+	public FSM_Character GetCharacter(int Team, int index)
+	{
+		return characters2D[Team,index];
+	}
+	public FSM_Character GetCharacter(int index)
+	{
+		if(index>=teamSize)
+		return characters2D[1,index%teamSize];
+		else
+		return characters2D[0,index];
+	}
+	public FSM_Character AddCharacter(int Team,int index, Vector3 location, string playPosition)
 	{
 		if(characterCount<maxCharacters)
 		{
 			GameObject newGuy = Instantiate(charFab,GetCellByLocation(location).Location + new Vector3(0,0.2f,0),Quaternion.identity) as GameObject;
-			characters[characterCount] =  newGuy.GetComponent<FSM_Character>();
+			//characters[characterCount] =  newGuy.GetComponent<FSM_Character>();
+			//characters[characterCount].id = characterCount;
+			characters2D[Team,index] =  newGuy.GetComponent<FSM_Character>();
+			characters2D[Team,index].id = index;
+			characters2D[Team,index].team = (CustomGameClient.Team)Team;
+			foreach(CharacterData cd in positionData)
+			{
+				if(cd.name == playPosition)
+				{
+					characters2D[Team,index].charData = cd;
+					break;
+				}
+			}
 			characterCount++;
-		}
+			return characters2D[Team,index];
+		}else return null;
 	}
 	public void Generate (int w, int l) 
 	{
 		if(!isCreated)
 		{
+			characters = new FSM_Character[maxCharacters];
+			characters2D = new FSM_Character[2,teamSize];
 			isCreated = true;
-			width = w+3;
-			length = l+3;
+			width = w+2;
+			length = l+2;
 			cellCount = length*width;
 			cells2D = new Cell[width,length];
 			GameObject high;
@@ -118,11 +144,11 @@ public class Grid_Setup : MonoBehaviour
 					i++;
 				}
 			}
-			for (int c = 0; c<characters.Length; c++) 
-			{
-				//characters[c].OccupiedCell = GetCellByLocation(characters[c].Location);
-				//characters[c].OccupiedCell.character = characters[c];
-			}
+//			for (int c = 0; c<characters.Length; c++) 
+//			{
+//				characters[c].OccupiedCell = GetCellByLocation(characters[c].Location);
+//				characters[c].OccupiedCell.character = characters[c];
+//			}
 		}
 	}
 	
@@ -200,6 +226,12 @@ public class Grid_Setup : MonoBehaviour
 		{
 			customProps[i.ToString()] = (int)GetCellByID(i).type;
 		}
+//		foreach(FSM_Character c in characters2D)
+//		{
+//			if(c!=null)
+//			customProps.Add("character#"+c.id,c.GetCharacterAsProp());
+//		}	
+		
 		return customProps;
 	}
 	
@@ -207,14 +239,14 @@ public class Grid_Setup : MonoBehaviour
 	{ 
 		if (!calledByEvent)
 		{
-			width = 20;    
-			length = 10;
+			int tempWidth = 21;    
+			int tempLength = 11;
 			if (customProps.ContainsKey("tx#"))
 			{
 				width = (int)customProps["tx#"];
 				length = (int)customProps["tz#"];
 			}
-			this.Generate(width, length);
+			this.Generate(tempWidth, tempLength);
 		}
 
 		int readTiles = 0;
@@ -226,7 +258,7 @@ public class Grid_Setup : MonoBehaviour
 			}
 		}
 
-		return readTiles == cellCount;
+		return true;//readTiles == cellCount;
 	}
 
 }

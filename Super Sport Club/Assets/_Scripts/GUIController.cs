@@ -7,7 +7,7 @@ using System.Collections;
 
 public class GUIController: MonoBehaviour
 {
-	public static bool bSelection;
+	public static bool isCharacterSelected;
 	public static GameObject panel, meter;
 	public float offsetX,offsetY;
 	public float serviceInterval = 1;
@@ -15,17 +15,19 @@ public class GUIController: MonoBehaviour
 	public string AppId;            // set in inspector. this is called when the client loaded and is ready to start
 	public FSM_Character CurrentSelectedChar
 	{
-		get{return board.characters[currentID];}
+		get{return board.GetCharacter((int)GameClientInstance.team,currentID);}
 	}
 	[SerializeField] LayerMask mask;
 	[SerializeField] Image panelFab;
 	[SerializeField] SpriteRenderer meterFab;
 	[SerializeField] Button buttFab;
 	[SerializeField] Canvas UIcan;
-	int currentID = -1, characterCount = 0, maxCharacters = 5;
+	[SerializeField] RectTransform MainMenu;
+	Drag[] cards;
+	int currentID = -1;
 	FSM_Character[] characters;
 	Grid_Setup board;
-	bool isPassing, isMoving;
+	bool isPassing, isMoving, isSetupPhase;
 	Vector3 idealPassDir, actualPassDir, simpleDir, offsetDir;
 
 	private CustomGameClient GameClientInstance;
@@ -42,6 +44,17 @@ public class GUIController: MonoBehaviour
 		Application.runInBackground = true;
 		CustomTypes.Register();
 		bool connectInProcess = GameClientInstance.ConnectToRegionMaster("us");  // can return false for errors
+		GameObject[] charObjs = GameObject.FindGameObjectsWithTag("CharacterCard");
+		cards = new Drag[charObjs.Length];
+		for(int i = 0; i< charObjs.Length;i++)
+		{
+			Drag temp = charObjs[i].GetComponent<Drag>();
+			if(temp!= null)
+			{
+				cards[i] = temp;
+				cards[i].gameClient = GameClientInstance;
+			}
+		}
 		
 //		GameObject[] charObjs = GameObject.FindGameObjectsWithTag("Player");
 //		characters = new FSM_Character[charObjs.Length];
@@ -84,9 +97,9 @@ public class GUIController: MonoBehaviour
 					{
 						case "Player":
 						{
-							bSelection = true;
-							
-							int id = hit.transform.gameObject.GetComponent<FSM_Character>().id;
+							isCharacterSelected = true;
+							FSM_Character character = hit.transform.gameObject.GetComponent<FSM_Character>();
+							int id = character.id;
 							if(id!= currentID)
 							{
 								if(currentID!=-1)
@@ -105,7 +118,7 @@ public class GUIController: MonoBehaviour
 						{
 							if(!EventSystem.current.IsPointerOverGameObject())
 							{
-								if(bSelection)
+								if(isCharacterSelected)
 								{
 									Vector3 location= Vector3.zero;
 									Cell cell = null;
@@ -299,7 +312,13 @@ public class GUIController: MonoBehaviour
 	}
 	public void NewGameButton()
 	{
+		MainMenu.gameObject.SetActive(false);
+		isSetupPhase = true;
 		this.GameClientInstance.OpJoinRandomRoom(null, 0);
+	}
+	public void QuitGameButton()
+	{
+		Application.Quit();
 	}
 	public void ClearButton()
 	{
@@ -311,8 +330,15 @@ public class GUIController: MonoBehaviour
 	}
 	public void EndTurnButton()
 	{
-		DeselectCharacter();
-		this.GameClientInstance.EndTurnEvent();
+		if(isSetupPhase)
+		{
+			isSetupPhase = false;
+			this.GameClientInstance.SubmitTeamEvent();
+		}else
+		{
+			DeselectCharacter();
+			this.GameClientInstance.EndTurnEvent();
+		}
 	}
 
 	void MyCreateRoom(string roomName, byte maxPlayers)

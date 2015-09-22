@@ -6,19 +6,26 @@ using System.Collections;
 [RequireComponent(typeof(Image))]
 public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-	public bool dragOnSurfaces = true;
 	public static bool bDragging;
-	[SerializeField] GameObject dragFab;
+	public CustomGameClient gameClient;
+	public bool dragOnSurfaces = true;	[SerializeField] GameObject dragFab;
 	[SerializeField] GUIController GUI;
+	[SerializeField] string PlayerPosition;
+	private Text text;
 	private GameObject m_DraggingIcon;
 	private RectTransform m_DraggingPlane;
 	LayerMask mask;// = 1<<LayerMask.NameToLayer("Ground");
 	Ray ray;
 	RaycastHit hit;
+	Image image;
 	
 	void Awake()
 	{
+		text = GetComponentInChildren<Text>();
+		text.text = PlayerPosition;
+		image = GetComponent<Image>();
 		mask = 1<<LayerMask.NameToLayer("Ground");
+		gameClient = new CustomGameClient();
 	}
 	public void OnBeginDrag(PointerEventData eventData)
 	{
@@ -27,6 +34,8 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 			return;
 		bDragging = true;
 		StartCoroutine("GetHigh");
+		image.enabled = false;
+		text.enabled = false;
 		// We have clicked something that can be dragged.
 		// What we want to do is create an icon for this.
 		m_DraggingIcon = Instantiate(dragFab,transform.position,Quaternion.identity)as GameObject;//new GameObject("icon");
@@ -94,9 +103,9 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 			
 			if (Physics.Raycast (ray, out hit, 100f, mask) && hit.transform.tag == "Field") 
 			{
-				Grid_Setup.Instance.AddCharacter(hit.point);
+				gameClient.AddCharacter(hit.point, PlayerPosition);
 			}
-			
+			Destroy(gameObject);
 		}
 	}
 	

@@ -47,7 +47,8 @@ public class Cell
 	{
 		Hashtable ht = new Hashtable();
 		ht["location"] = Location; 
-		ht["character"] = character.id; 
+		ht["type"] = (int)type; 
+		ht["id"] = id; 
 		return ht;
 	}
 	public void Highlight(bool set)

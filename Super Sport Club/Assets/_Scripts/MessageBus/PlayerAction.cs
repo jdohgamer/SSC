@@ -80,6 +80,7 @@ public class PlayerAction
 		
 		actionProp.Add("Act",(int)action);
 		actionProp.Add ("iCharacter",(int)iCh.id);
+		actionProp.Add ("iCharacterTeam",(int)iCh.team);
 		if(tCh!=null)actionProp.Add ("tCharacter",(int)tCh.id);
 		if(cTo!=null)actionProp.Add("tCell",(int)cTo.id);
 		if(cFrom!=null)actionProp.Add("fCell",(int)cFrom.id);

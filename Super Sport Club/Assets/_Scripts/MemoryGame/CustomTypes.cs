@@ -38,7 +38,7 @@ public static class CustomTypes
         return Protocol.Serialize(parts);
     }
 
-    private static object DeserializeTransform(byte[] serializedcustomobject)
+	private static object DeserializeTransform(byte[] serializedcustomobject)
     {
         object x = Protocol.Deserialize(serializedcustomobject);
         return x;

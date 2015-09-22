@@ -2,8 +2,10 @@
 using System.Collections;
 
 [System.Serializable]
+[CreateAssetMenuAttribute] 
 public class CharacterData: ScriptableObject
 {
+	
 	public string Name;
 	public int ID;
 	public float Strength, Speed, Defense;
