@@ -9,28 +9,27 @@ public class GUIController: MonoBehaviour
 {
 	public static bool isCharacterSelected;
 	public static GameObject panel, meter;
-	public float offsetX,offsetY;
-	public float serviceInterval = 1;
 	public float timeSinceService;
-	public string AppId;            // set in inspector. this is called when the client loaded and is ready to start
 	public FSM_Character CurrentSelectedChar
 	{
 		get{return board.GetCharacter((int)GameClientInstance.team,currentID);}
 	}
+	[SerializeField] string AppId;// set in inspector. this is called when the client loaded and is ready to start
+	[SerializeField] float offsetX,offsetY;
+	[SerializeField] float serviceInterval = 1;
 	[SerializeField] LayerMask mask;
-	[SerializeField] Image panelFab;
+	[SerializeField] Image panelFab, characterCardFab;
 	[SerializeField] SpriteRenderer meterFab;
 	[SerializeField] Button buttFab;
 	[SerializeField] Canvas UIcan;
-	[SerializeField] RectTransform MainMenu;
-	Drag[] cards;
-	int currentID = -1;
-	FSM_Character[] characters;
-	Grid_Setup board;
-	bool isPassing, isMoving, isSetupPhase;
-	Vector3 idealPassDir, actualPassDir, simpleDir, offsetDir;
-
+	[SerializeField] RectTransform MainMenu, CharacterPanel;
+	//Drag[] cards;
+	private Vector3 idealPassDir, simpleDir, offsetDir;
 	private CustomGameClient GameClientInstance;
+	private Grid_Setup board;
+	private int currentID = -1;
+	private bool isPassing, isMoving, isSetupPhase;
+
 
 	void Awake()
 	{
@@ -44,32 +43,19 @@ public class GUIController: MonoBehaviour
 		Application.runInBackground = true;
 		CustomTypes.Register();
 		bool connectInProcess = GameClientInstance.ConnectToRegionMaster("us");  // can return false for errors
-		GameObject[] charObjs = GameObject.FindGameObjectsWithTag("CharacterCard");
-		cards = new Drag[charObjs.Length];
-		for(int i = 0; i< charObjs.Length;i++)
-		{
-			Drag temp = charObjs[i].GetComponent<Drag>();
-			if(temp!= null)
-			{
-				cards[i] = temp;
-				cards[i].gameClient = GameClientInstance;
-			}
-		}
-		
-//		GameObject[] charObjs = GameObject.FindGameObjectsWithTag("Player");
-//		characters = new FSM_Character[charObjs.Length];
+//		GameObject[] charObjs = GameObject.FindGameObjectsWithTag("CharacterCard");
+//		cards = new Drag[charObjs.Length];
 //		for(int i = 0; i< charObjs.Length;i++)
 //		{
-//			FSM_Character temp = charObjs[i].GetComponent<FSM_Character>();
+//			Drag temp = charObjs[i].GetComponent<Drag>();
 //			if(temp!= null)
 //			{
-//				characters[i] = temp;
-//				characters[i].id = i;
-//				characters[i].board = board;
+//				cards[i] = temp;
+//				cards[i].gameClient = GameClientInstance;
+//				cards[i].PlayerPosition = Positions[i];
+//				cards[i].index = i;
 //			}
 //		}
-//		this.GameClientInstance.characters = this.characters;
-//		this.board.characters = this.characters;
 	}
 	
 	void Update()
@@ -82,7 +68,7 @@ public class GUIController: MonoBehaviour
 		}
 	}
 
-	public void FixedUpdate() 
+	void FixedUpdate() 
 	{
 		if(GameClientInstance.CurrentRoom!=null)
 		{
@@ -102,15 +88,13 @@ public class GUIController: MonoBehaviour
 							int id = character.id;
 							if(id!= currentID)
 							{
-								if(currentID!=-1)
-								{
-									CurrentSelectedChar.Highlight(false);
-									board.TurnOffHiglightedAdjacent();
-								}
+								DeselectCharacter ();
 								currentID = id;
 								CurrentSelectedChar.Highlight(true);
 							}
+							//if CurrentSelectedChar.team == GameClientInstance.team
 							CreateButtonPanel(CurrentSelectedChar.OccupiedCell);
+							//else CreatePlayerInfoPanel(CurrentSelectedChar.OccupiedCell) //show some info about character to opposing player
 							break;
 							
 						}
@@ -120,18 +104,10 @@ public class GUIController: MonoBehaviour
 							{
 								if(isCharacterSelected)
 								{
-									Vector3 location= Vector3.zero;
-									Cell cell = null;
-									if(board.GetCellByLocation(hit.point)!=null)
-									{
-										cell = board.GetCellByLocation(hit.point);
-										location = cell.Location;
-									}else Debug.Log(hit.point);
-									//int index  = hit.transform.GetSiblingIndex();
-									
+									Cell cell = board.GetCellByLocation(hit.point);
 									if(isPassing)
 									{
-										CreatePlayerMeter(location);
+										CreatePlayerMeter(cell.Location);
 									}else if(isMoving)
 									{
 										MovementClick(cell);
@@ -150,12 +126,34 @@ public class GUIController: MonoBehaviour
 		}
 	}
 
+	public void SetupCharacterPanel()
+	{
+		for (int c = 0; c < Grid_Setup.Instance.Teams [(int)GameClientInstance.team].mates.Length; c++) 
+		{
+			CharacterPanel.gameObject.SetActive (true);
+			Image charObject = Instantiate (characterCardFab, Vector3.zero, Quaternion.identity) as Image;
+			charObject.transform.SetParent (CharacterPanel);
+			Drag drag = charObject.GetComponent<Drag> ();
+			drag.PlayerPosition = Grid_Setup.Instance.GetCharacter((int)GameClientInstance.team,c).charData.Name;
+			drag.index = c;
+			drag.gameClient = GameClientInstance;
+		}
+	}
+
 	void DeselectCharacter()
 	{
 		if(currentID!=-1)
 		{
 			isMoving = false;
 			isPassing = false;
+			if (panel!=null) 
+			{
+				Destroy(panel.gameObject);
+			}
+			if (meter!=null) 
+			{
+				Destroy(meter.gameObject);
+			}
 			CurrentSelectedChar.Highlight(false);
 			board.TurnOffHiglightedAdjacent();
 			currentID = -1;
@@ -228,8 +226,7 @@ public class GUIController: MonoBehaviour
 			Destroy(panel.gameObject);
 		}
 		
-		loc= Camera.main.WorldToScreenPoint(CharacterPosition);
-		loc += offsetDir*50;
+		loc= Camera.main.WorldToScreenPoint(CharacterPosition) + offsetDir*50; //re-using a variable
 		panel = Instantiate(panelFab.gameObject, loc, Quaternion.identity)as GameObject;
 		panel.transform.SetParent(UIcan.transform,false);
 		panel.transform.SetAsLastSibling(); 
@@ -240,7 +237,7 @@ public class GUIController: MonoBehaviour
 		kickButton.onClick.AddListener (() => 
 		{ 
 			Vector3 kick = meter.GetComponent<Gauge>().StopBounce();
-			Vector3 cellPos = CharacterPosition + kick.normalized * idealPassDir.magnitude;
+			Vector3 cellPos = location + kick.normalized * idealPassDir.magnitude;
 			PassClick(board.GetCellByLocation(cellPos));			
 			Destroy(meter.gameObject);
 			Destroy(panel.gameObject);
@@ -323,7 +320,7 @@ public class GUIController: MonoBehaviour
 	public void ClearButton()
 	{
 		this.GameClientInstance.ClearActions();
-		foreach(FSM_Character c in board.characters)
+		foreach(FSM_Character c in board.Teams[(int)GameClientInstance.team].mates)
 		{
 			c.ClearActions();
 		}

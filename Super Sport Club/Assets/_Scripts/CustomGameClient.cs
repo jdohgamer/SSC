@@ -21,7 +21,6 @@ using Random = UnityEngine.Random;
 //}
 public class CustomGameClient : LoadBalancingClient 
 {
-	public enum Team{TeamOne=0,TeamTwo=1}
 	public const byte EndTurn = 1;
 	public const byte Execute = 2;
 	public const byte SubmitTeam = 3;
@@ -32,7 +31,8 @@ public class CustomGameClient : LoadBalancingClient
 	public bool bTurnDone;
 	public GUIController gui;
 	public FSM_Character[] myCharacters, oppCharacers;
-	public Team team;
+	public Team.TeamNumber team;
+	Team myTeam;
 	PlayerAction[] myActions, oppActions;
 	bool P1Submitted, P2Submitted;
 	int TurnNumber;
@@ -40,6 +40,7 @@ public class CustomGameClient : LoadBalancingClient
 	byte actionCount = 0;
 	Hashtable oppHT;
 	int characterCount = 0, maxCharacters = 10, teamSize = 5, teamOneSize, teamTwoSize;
+
 	
 	public CustomGameClient()
 	{
@@ -75,15 +76,9 @@ public class CustomGameClient : LoadBalancingClient
 			P2Submitted=true;
 		}
 		SetTeams(oppHT);
-		Hashtable Team = new Hashtable ();
-		for (int i = 0; i<myCharacters.Length; i++) 
-		{
-			if(myCharacters[i]!=null)
-			{
-				Team.Add(i.ToString(),myCharacters[i].GetCharacterAsProp());
-			}
-		}
-		this.loadBalancingPeer.OpRaiseEvent(SubmitTeam, Team, true, null);
+		Hashtable TeamHT = myTeam.GetTeamAsProps();
+	
+		this.loadBalancingPeer.OpRaiseEvent(SubmitTeam, TeamHT, true, null);
 			
 	}
 	bool IsPlayerOne()
@@ -100,7 +95,7 @@ public class CustomGameClient : LoadBalancingClient
 		if(characterCount<teamSize)
 		{
 			//cInfo[characterCount] = new CharacterInfo((int)team, playPosition, location);
-			myCharacters[characterCount] = Grid_Setup.Instance.AddCharacter((int)team, characterCount, location, playPosition);
+			myCharacters[characterCount] = Grid_Setup.Instance.SetCharacter((int)team, characterCount, location, playPosition);
 			characterCount++;
 		}
 	}
@@ -141,7 +136,7 @@ public class CustomGameClient : LoadBalancingClient
 			int team = (int)hash["Team"];
 			Vector3 loc = (Vector3)hash["Location"];
 			string role = (string)hash["Name"];
-			otherTeam[i] = Grid_Setup.Instance.AddCharacter(team, i, loc, role);
+			otherTeam[i] = Grid_Setup.Instance.SetCharacter(team, i, loc, role);
 			//team[i].ReturnCharacter(hash);
 		}return otherTeam;
 	}
@@ -153,11 +148,11 @@ public class CustomGameClient : LoadBalancingClient
 			if(ht[i.ToString()]!=null)
 			{
 				Hashtable ion = ht[i.ToString()]as Hashtable;
-				PlayerAction.Actions act = (PlayerAction.Actions)ion["Act"];
-				int iChId = (int)ion["iCharacter"];
-				int iChTeam = (int)ion["iCharacterTeam"];
-				Cell cell =	board.GetCellByID((int)ion["tCell"]);
-				actions[i] = new PlayerAction(act,Grid_Setup.Instance.GetCharacter(iChTeam,iChId),cell);
+//				PlayerAction.Actions act = (PlayerAction.Actions)ion["Act"];
+//				int iChId = (int)ion["iCharacter"];
+//				int iChTeam = (int)ion["iCharacterTeam"];
+//				Cell cell =	Grid_Setup.Instance.GetCellByID((int)ion["tCell"]);
+				actions[i] = PlayerAction.GetActionFromProps(ion);
 			}
 		}
 		return actions;
@@ -200,8 +195,8 @@ public class CustomGameClient : LoadBalancingClient
 				{
 					if(IsPlayerOne())
 					{
-						team = Team.TeamOne;
-					}else team = Team.TeamTwo;
+						team = Team.TeamNumber.TeamOne;
+					}else team = Team.TeamNumber.TeamTwo;
 					this.LoadBoardFromProperties(false);
 				}
 			}
@@ -302,6 +297,7 @@ public class CustomGameClient : LoadBalancingClient
 		{
 			// we are in a fresh room with no saved board.
 			board.Generate(21,11);
+			gui.SetupCharacterPanel ();
 			this.SaveBoardToProperties();
 			Debug.Log(string.Format("Board Properties: {0}", SupportClass.DictionaryToString(roomProps)));
 		}
@@ -312,7 +308,7 @@ public class CustomGameClient : LoadBalancingClient
 		{
 			Debug.LogError("Not loaded board from props?");
 		}
-		
+		this.myTeam = Grid_Setup.Instance.Teams [(int)team];
 
 		// we set properties "pt" (player turn) and "t#" (turn number). those props might have changed
 		// it's easier to use a variable in gui, so read the latter property now
@@ -376,8 +372,8 @@ public class CustomGameClient : LoadBalancingClient
 		Hashtable boardProps = board.GetBoardAsCustomProperties();
 		//boardProps.Add("pt", this.PlayerIdToMakeThisTurn);  // "pt" is for "player turn" and contains the ID/actorNumber of the player who's turn it is
 		//boardProps.Add("t#", this.TurnNumber);
-		boardProps.Add("tx#", board.width);
-		boardProps.Add("tz#", board.length);
+		boardProps.Add("tx#", board.Width);
+		boardProps.Add("tz#", board.Length);
 		
 		//boardProps.Add(GetPlayerPointsPropKey(this.LocalPlayer.ID), this.MyPoints); // we always only save "our" points. this will not affect the opponent's score.
 		bool webForwardToPush = false;

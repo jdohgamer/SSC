@@ -39,20 +39,20 @@ public class Grid_Setup : MonoBehaviour
 {
 	public static GameObject Ball;
 	public static Grid_Setup Instance;
-	public FSM_Character[] characters;
-	public FSM_Character[,] characters2D;
-	[HideInInspector]public Cell[,] cells2D;
-	public int length, width, cellCount;
-	[SerializeField] GameObject highlight;
-	[SerializeField] GameObject ball;
-	[SerializeField] GameObject charFab;
+	public Team[] Teams;
+	public int Length{get{return length;}}
+	public int Width{get{return width;}}
+	[SerializeField] GameObject highlightFab, ballFab, charFab;
 	[SerializeField] CharacterData[] positionData;
-	static Cell highlightSingle;
-	GameObject field;
-	Transform fieldTran;
-	AdjacentIndexes adjacent;
-	bool isHighlighted, isCreated;
-	int characterCount = 0, maxCharacters = 10, teamSize = 5, teamOneSize, teamTwoSize;
+	[SerializeField] Color[] TeamColors =  {Color.black, Color.white};
+	[SerializeField] int teamSize = 5;
+	private static Cell highlightSingle;
+	private Cell[,] cells2D;
+	private GameObject field;
+	private Transform fieldTran;
+	private AdjacentIndexes adjacent;
+	private bool isHighlighted, isCreated;
+	private int length, width, cellCount;
 
 	void Awake()
 	{
@@ -73,43 +73,49 @@ public class Grid_Setup : MonoBehaviour
 	}
 	public FSM_Character GetCharacter(int Team, int index)
 	{
-		return characters2D[Team,index];
+		return Teams [Team].mates [index];
 	}
-	public FSM_Character GetCharacter(int index)
+
+	public FSM_Character SetCharacter(int team,int index, Vector3 location, string playPosition)
 	{
-		if(index>=teamSize)
-		return characters2D[1,index%teamSize];
-		else
-		return characters2D[0,index];
-	}
-	public FSM_Character AddCharacter(int Team,int index, Vector3 location, string playPosition)
-	{
-		if(characterCount<maxCharacters)
+		if(team<Teams.Length && index<teamSize)
 		{
-			GameObject newGuy = Instantiate(charFab,GetCellByLocation(location).Location + new Vector3(0,0.2f,0),Quaternion.identity) as GameObject;
-			//characters[characterCount] =  newGuy.GetComponent<FSM_Character>();
-			//characters[characterCount].id = characterCount;
-			characters2D[Team,index] =  newGuy.GetComponent<FSM_Character>();
-			characters2D[Team,index].id = index;
-			characters2D[Team,index].team = (CustomGameClient.Team)Team;
-			foreach(CharacterData cd in positionData)
-			{
-				if(cd.name == playPosition)
-				{
-					characters2D[Team,index].charData = cd;
-					break;
-				}
-			}
-			characterCount++;
-			return characters2D[Team,index];
+			//GameObject newGuy = Instantiate(charFab,GetCellByLocation(location).Location + new Vector3(0,0.2f,0),Quaternion.identity) as GameObject;
+			//characters2D[Team,index] =  newGuy.GetComponent<FSM_Character>();
+			//characters2D[Team,index].id = index;
+			//characters2D[Team,index].team = (Team.TeamNumber)Team;
+//			foreach(CharacterData cd in positionData)
+//			{
+//				if(cd.name == playPosition)
+//				{
+//					Teams[team].mates[index].charData = cd;
+//					break;
+//				}
+//			}
+			Teams[team].mates[index].gameObject.SetActive(true);
+			Teams[team].mates[index].MoveTransform(GetCellByLocation(location).Location + new Vector3(0,0.2f,0));
+			return Teams[team].mates[index];
 		}else return null;
 	}
 	public void Generate (int w, int l) 
 	{
 		if(!isCreated)
 		{
-			characters = new FSM_Character[maxCharacters];
-			characters2D = new FSM_Character[2,teamSize];
+			Teams = new Team[2];
+			for(int t = 0; t<2 ; t++)
+			{
+				Teams [t] = new Team ((Team.TeamNumber)t, TeamColors[t], teamSize);
+				//Teams [t].mates = new FSM_Character[teamSize];
+
+				for(int c = 0; c <teamSize; c++)
+				{
+					GameObject newGuy = Instantiate(charFab,Vector3.zero + new Vector3((float)t,0.2f,(float)c),Quaternion.identity) as GameObject;
+					Teams [t].AddMate(newGuy.GetComponent<FSM_Character>());
+					Teams [t].mates [c].charData = positionData [c];
+					newGuy.SetActive (false);
+				}
+			}
+			//characters2D = new FSM_Character[2,teamSize];
 			isCreated = true;
 			width = w+2;
 			length = l+2;
@@ -131,24 +137,19 @@ public class Grid_Setup : MonoBehaviour
 						if(x==width/2&&z==length/2)
 						{
 							if(Ball==null)
-							Ball = Instantiate(ball,new Vector3(x,0.1f,z), Quaternion.identity)as GameObject;
+							Ball = Instantiate(ballFab,new Vector3(x,0.1f,z), Quaternion.identity)as GameObject;
 							Ball.GetComponent<BallScript>().board = this;
 						}
 					}
 					loc.x = x;
 					loc.z = z;
 					cells2D[x,z] = new Cell(i,type,loc, size);
-					high = Instantiate(highlight,loc,Quaternion.identity) as GameObject;
+					high = Instantiate(highlightFab,loc,Quaternion.identity) as GameObject;
 					high.transform.SetParent(fieldTran);
 					cells2D[x,z].SetHighlighter(high);
 					i++;
 				}
-			}
-//			for (int c = 0; c<characters.Length; c++) 
-//			{
-//				characters[c].OccupiedCell = GetCellByLocation(characters[c].Location);
-//				characters[c].OccupiedCell.character = characters[c];
-//			}
+			}		
 		}
 	}
 	

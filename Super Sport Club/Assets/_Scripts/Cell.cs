@@ -28,9 +28,7 @@ public class Cell
 	public void SetHighlighter(GameObject obj)
 	{
 		highlighter = obj;
-		if(location != null)
 		highlighter.transform.position = location+Vector3.up*.02f;
-		
 		highlighter.SetActive(false);
 	}
 	public void DestroyHighlighter()

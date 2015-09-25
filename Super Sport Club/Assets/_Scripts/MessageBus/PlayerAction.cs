@@ -86,4 +86,15 @@ public class PlayerAction
 		if(cFrom!=null)actionProp.Add("fCell",(int)cFrom.id);
 		return actionProp;
 	}
+	public static PlayerAction GetActionFromProps(Hashtable ht)
+	{
+		Actions act = (Actions)ht["Act"];
+		int iChId = (int)ht["iCharacter"];
+		int iChTeam = (int)ht["iCharacterTeam"];
+		Cell cell =	Grid_Setup.Instance.GetCellByID((int)ht["tCell"]);
+		return new PlayerAction(act,Grid_Setup.Instance.GetCharacter(iChTeam,iChId),cell);
+	}
+
+
+	
 }

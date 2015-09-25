@@ -7,19 +7,15 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 public class FSM_Character : FSM_Base 
 {
 	public int id, actionCount, targetCount, maxActions = 2;
-	public CustomGameClient.Team team;
+	public Team.TeamNumber team;
 	public Vector3 newLocation = Vector3.zero;
-	//public int Strength = 5, Speed = 6, Defense = 4;
 	public CharacterData charData; // contains Name, Id, and stats
 	public bool hasTarget, hasBall;
-	[HideInInspector]public BallScript ball;
 	public Cell OccupiedCell
 	{
-		get{
-			if(Grid_Setup.Instance.cells2D!=null)
-			{
-				return Grid_Setup.Instance.GetCellByLocation(Location);
-			}else return null;
+		get
+		{
+			return Grid_Setup.Instance.GetCellByLocation(Location);
 		}
 	}
 	public Cell LastTargetCell
@@ -46,12 +42,14 @@ public class FSM_Character : FSM_Base
 	[SerializeField] protected iTween.EaseType ease, ballEase;
 	[SerializeField] LayerMask characterLayer;
 	[SerializeField] GameObject destPin;
+	[SerializeField] Color teamColor;
+	BallScript ball;
 	GameObject[] targetPins;
 	GameObject passTargetPin;
 	PlayerAction[] actions;
 	Cell lastCell;
 	MeshRenderer currentMesh;
-	Animator anim;
+	//Animator anim;
 	Transform tran;
 	FSM_Character opp;
 	Vector3 offset = new Vector3(0,0.2f,0);
@@ -65,16 +63,8 @@ public class FSM_Character : FSM_Base
 		cd.Speed = (float)ht["Speed"];
 		cd.Defense = (float)ht["Defense"];
 		this.charData = cd;
-		this.team = (CustomGameClient.Team)ht["Team"];
-//		this.charData.name = (string)ht["Name"];
-//		this.charData.Strength = (float)ht["Strength"];
-//		this.charData.Speed = (float)ht["Speed"];
-//		this.charData.Defense = (float)ht["Defense"];
+		this.team = (Team.TeamNumber)ht["Team"];
 		this.newLocation = (Vector3)ht["Location"];
-	}
-	public FSM_Character()
-	{
-		
 	}
 
 	void Awake()
@@ -83,7 +73,7 @@ public class FSM_Character : FSM_Base
 		CurrentState = Stance.Neutral;
 		tran = transform;
 		currentMesh = GetComponentInChildren<MeshRenderer>();
-		anim = GetComponentInChildren<Animator>();
+		//anim = GetComponentInChildren<Animator>();
 		actions = new PlayerAction[maxActions];
 		targetPins = new GameObject[maxActions];
 		passTargetPin = Instantiate(destPin,Vector3.zero,Quaternion.identity) as GameObject;
@@ -108,6 +98,10 @@ public class FSM_Character : FSM_Base
 		targetPins[targetCount] = Instantiate(destPin, target.Location, Quaternion.identity) as GameObject;
 		targetCount++;
 		lastCell = target;
+	}
+	public void MoveTransform(Vector3 newLoc)
+	{
+		tran.position = newLoc;
 	}
 	public void SetPassTarget(Cell target)
 	{
@@ -205,30 +199,31 @@ public class FSM_Character : FSM_Base
 	bool CanMove(Cell targetCell)
 	{
 		bool canMove;
-		opp = PlayerInFrontOfMe();
-		if(opp!=null)
-		{
-			Debug.Log("Player ID: "+opp.id);
-			if(targetCell.Location== opp.transform.position)
-			{
-				if(targetCell==opp.LastTargetCell)
-				{
-					canMove = false;
-				}else{
-					canMove = true;
-				}
-			}else{
-				float dotFace = Vector3.Dot(tran.forward.normalized,opp.transform.forward.normalized);
-				if(dotFace<0)
-				{
-					Debug.Log("Oh, just kiss already");
-					canMove = false;
-				}else{
-					canMove = true;
-				}
-			}
-		}else canMove = true;
-		return canMove;
+//		opp = PlayerInFrontOfMe();
+//		if(opp!=null)
+//		{
+//			Debug.Log("Player ID: "+opp.id);
+//			if(targetCell.Location== opp.transform.position)
+//			{
+//				if(targetCell==opp.LastTargetCell)
+//				{
+//					canMove = false;
+//				}else{
+//					canMove = true;
+//				}
+//			}else{
+//				float dotFace = Vector3.Dot(tran.forward.normalized,opp.transform.forward.normalized);
+//				if(dotFace<0)
+//				{
+//					Debug.Log("Oh, just kiss already");
+//					canMove = false;
+//				}else{
+//					canMove = true;
+//				}
+//			}
+//		}else canMove = true;
+		return(!Physics.CheckSphere(Location+tran.forward, 1, characterLayer));
+		 
 	}
 
 	public void Highlight(bool set)
@@ -238,9 +233,14 @@ public class FSM_Character : FSM_Base
 			currentMesh.material.color = Color.cyan;
 		} else 
 		{
-			currentMesh.material.color = Color.white;
+			currentMesh.material.color = teamColor;
 		}
 		ShowTargets(set);
+	}
+	public void SetColor(Color NewColor)
+	{
+		teamColor = NewColor;
+		currentMesh.material.color = teamColor;
 	}
 	void ShowTargets(bool set)
 	{

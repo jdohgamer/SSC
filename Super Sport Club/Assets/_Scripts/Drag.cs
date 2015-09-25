@@ -10,7 +10,12 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 	public CustomGameClient gameClient;
 	public bool dragOnSurfaces = true;	[SerializeField] GameObject dragFab;
 	[SerializeField] GUIController GUI;
-	[SerializeField] string PlayerPosition;
+	public string PlayerPosition{
+		get{return playerPosition;}
+		set{playerPosition = value; text.text = playerPosition;}
+	}
+	public int index;
+	private string playerPosition;
 	private Text text;
 	private GameObject m_DraggingIcon;
 	private RectTransform m_DraggingPlane;
@@ -103,7 +108,7 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 			
 			if (Physics.Raycast (ray, out hit, 100f, mask) && hit.transform.tag == "Field") 
 			{
-				gameClient.AddCharacter(hit.point, PlayerPosition);
+				Grid_Setup.Instance.SetCharacter((int)gameClient.team,index ,hit.point, PlayerPosition);
 			}
 			Destroy(gameObject);
 		}
