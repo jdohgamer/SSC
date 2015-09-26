@@ -8,13 +8,15 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 {
 	public static bool bDragging;
 	public CustomGameClient gameClient;
-	public bool dragOnSurfaces = true;	[SerializeField] GameObject dragFab;
-	[SerializeField] GUIController GUI;
+	public bool dragOnSurfaces = true;	
+	public int index;
+	//[SerializeField] GUIController GUI;
+	public UISetPiece gui;
 	public string PlayerPosition{
 		get{return playerPosition;}
 		set{playerPosition = value; text.text = playerPosition;}
 	}
-	public int index;
+	[SerializeField] GameObject dragFab;
 	private string playerPosition;
 	private Text text;
 	private GameObject m_DraggingIcon;
@@ -82,6 +84,7 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 			}
 			yield return new WaitForSeconds(0.1f);
 		}
+		Grid_Setup.Instance.TurnOffSingle();
 		StopCoroutine("GetHigh");
 	}
 	private void SetDraggedPosition(PointerEventData data)
@@ -104,14 +107,28 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 		{
 			Destroy(m_DraggingIcon);
 			bDragging = false;
-			Grid_Setup.Instance.TurnOffSingle();
-			
 			if (Physics.Raycast (ray, out hit, 100f, mask) && hit.transform.tag == "Field") 
 			{
-				Grid_Setup.Instance.SetCharacter((int)gameClient.team,index ,hit.point, PlayerPosition);
+				if (gui.PlaceCharacter (hit.point)) 
+				{
+					Grid_Setup.Instance.SetCharacter ((int)gameClient.team, index, hit.point);
+					DisableMe ();
+				} else {
+					EnableMe ();
+				}
 			}
-			Destroy(gameObject);
+			//Destroy(gameObject);
 		}
+	}
+	public void DisableMe()
+	{
+		this.gameObject.SetActive(false);
+	}
+	public void EnableMe()
+	{
+		this.gameObject.SetActive(true);
+		image.enabled = true;
+		text.enabled = true;
 	}
 	
 	static public T FindInParents<T>(GameObject go) where T : Component

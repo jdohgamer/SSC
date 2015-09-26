@@ -58,7 +58,6 @@
      <Compile Include="Assets\_Scripts\Drag.cs" />
      <Compile Include="Assets\_Scripts\FSM_BASE.cs" />
      <Compile Include="Assets\_Scripts\FSM_Character.cs" />
-     <Compile Include="Assets\_Scripts\GUIController.cs" />
      <Compile Include="Assets\_Scripts\Gauge.cs" />
      <Compile Include="Assets\_Scripts\Grid_Setup.cs" />
      <Compile Include="Assets\_Scripts\LeftRight.cs" />
@@ -94,10 +93,14 @@
      <Compile Include="Assets\_Scripts\PushNotificationsAndroid.cs" />
      <Compile Include="Assets\_Scripts\RightClickSell.cs" />
      <Compile Include="Assets\_Scripts\SSB_Player.cs" />
-     <Compile Include="Assets\_Scripts\SetPieceSetup.cs" />
      <Compile Include="Assets\_Scripts\Team.cs" />
      <Compile Include="Assets\_Scripts\TurnButton.cs" />
      <Compile Include="Assets\_Scripts\TweenBy.cs" />
+     <Compile Include="Assets\_Scripts\UI Scripts\GUIController.cs" />
+     <Compile Include="Assets\_Scripts\UI Scripts\IUIState.cs" />
+     <Compile Include="Assets\_Scripts\UI Scripts\UIGameHUD.cs" />
+     <Compile Include="Assets\_Scripts\UI Scripts\UIMainMenu.cs" />
+     <Compile Include="Assets\_Scripts\UI Scripts\UISetPiece.cs" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\VisualSensorRingShader.shader" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\AspectSphereShader.shader" />
      <None Include="Assets\Plugins\RAIN\Editor\ScriptTemplates\BehaviorTreeTemplate.xml" />

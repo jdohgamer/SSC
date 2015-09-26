@@ -5,7 +5,7 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 [System.Serializable]
 public class Team 
 {
-	public enum TeamNumber{TeamOne=0,TeamTwo=1}
+	public enum TeamNumber{TeamOne=0,TeamTwo=1, NONE = -1}
 	public TeamNumber team;
 	public Color teamColor;
 	public FSM_Character[] mates;

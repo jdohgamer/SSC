@@ -26,6 +26,7 @@ public class CustomGameClient : LoadBalancingClient
 	public const byte SubmitTeam = 3;
 	public const string PropTurn = "turn";
 	public const string PropNames = "names";
+	public int TurnNumber{get{ return turnNumber;}}
 	public Grid_Setup board;
 	public byte MaxActions = 5;
 	public bool bTurnDone;
@@ -34,8 +35,8 @@ public class CustomGameClient : LoadBalancingClient
 	public Team.TeamNumber team;
 	Team myTeam;
 	PlayerAction[] myActions, oppActions;
-	bool P1Submitted, P2Submitted;
-	int TurnNumber;
+	public bool P1Submitted, P2Submitted;
+	int turnNumber;
 	Message message;
 	byte actionCount = 0;
 	Hashtable oppHT;
@@ -57,6 +58,7 @@ public class CustomGameClient : LoadBalancingClient
 			P1Submitted = true;
 			if(BothPlayersHaveSubmitted())
 			{
+				turnNumber++;
 				CalcMoves();
 				Debug.Log("Go and get yourself a good fucking");
 			}
@@ -85,20 +87,20 @@ public class CustomGameClient : LoadBalancingClient
 	{
 		return this.LocalPlayer.IsMasterClient;
 	}
+	public bool HasOppSubmitted()
+	{
+		if (IsPlayerOne ()) 
+		{
+			return P2Submitted;
+		} else
+			return P1Submitted;
+	}
 	bool BothPlayersHaveSubmitted()
 	{
 		return P1Submitted && P2Submitted;
 	}
 
-	public void AddCharacter(Vector3 location, string playPosition)
-	{
-		if(characterCount<teamSize)
-		{
-			//cInfo[characterCount] = new CharacterInfo((int)team, playPosition, location);
-			myCharacters[characterCount] = Grid_Setup.Instance.SetCharacter((int)team, characterCount, location, playPosition);
-			characterCount++;
-		}
-	}
+
 	public void SetPlayerAction(PlayerAction act)
 	{
 		if(actionCount<MaxActions&&act.iCh.actionCount<act.iCh.maxActions)
@@ -136,7 +138,7 @@ public class CustomGameClient : LoadBalancingClient
 			int team = (int)hash["Team"];
 			Vector3 loc = (Vector3)hash["Location"];
 			string role = (string)hash["Name"];
-			otherTeam[i] = Grid_Setup.Instance.SetCharacter(team, i, loc, role);
+			otherTeam[i] = Grid_Setup.Instance.SetCharacter(team, i, loc);
 			//team[i].ReturnCharacter(hash);
 		}return otherTeam;
 	}
@@ -229,6 +231,7 @@ public class CustomGameClient : LoadBalancingClient
 					P2Submitted = true;
 					if(BothPlayersHaveSubmitted())
 					{
+						turnNumber++;
 						CalcMoves();
 						Debug.Log("Go and get yourself a good fucking");
 					}
@@ -297,7 +300,7 @@ public class CustomGameClient : LoadBalancingClient
 		{
 			// we are in a fresh room with no saved board.
 			board.Generate(21,11);
-			gui.SetupCharacterPanel ();
+			//gui.UIState = gui.UISP;
 			this.SaveBoardToProperties();
 			Debug.Log(string.Format("Board Properties: {0}", SupportClass.DictionaryToString(roomProps)));
 		}
@@ -314,11 +317,11 @@ public class CustomGameClient : LoadBalancingClient
 		// it's easier to use a variable in gui, so read the latter property now
 		if (this.CurrentRoom.CustomProperties.ContainsKey("t#"))
 		{
-			this.TurnNumber = (int) this.CurrentRoom.CustomProperties["t#"];
+			this.turnNumber = (int) this.CurrentRoom.CustomProperties["t#"];
 		}
 		else
 		{
-			this.TurnNumber = 1;
+			this.turnNumber = 1;
 		}
 		/*
 		if (this.CurrentRoom.CustomProperties.ContainsKey("pt"))
@@ -371,7 +374,7 @@ public class CustomGameClient : LoadBalancingClient
 	{
 		Hashtable boardProps = board.GetBoardAsCustomProperties();
 		//boardProps.Add("pt", this.PlayerIdToMakeThisTurn);  // "pt" is for "player turn" and contains the ID/actorNumber of the player who's turn it is
-		//boardProps.Add("t#", this.TurnNumber);
+		boardProps.Add("t#", this.TurnNumber);
 		boardProps.Add("tx#", board.Width);
 		boardProps.Add("tz#", board.Length);
 		

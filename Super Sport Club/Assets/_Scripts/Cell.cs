@@ -10,6 +10,7 @@ public class Cell
 	public CellType type;
 	public enum CellType{OutOfBounds, Corner, BoundLine, Field, InsideBox}
 	public Vector3 Location{get{return location;}}
+	public Team.TeamNumber team;
 	Vector3 location;
 	Bounds bounds;
 	GameObject highlighter= null;
@@ -24,6 +25,14 @@ public class Cell
 		type = (CellType)newType;
 		location = loc;
 		bounds = new Bounds(loc,size);
+	}
+	public Cell(int newID, int newType, Team.TeamNumber Team, Vector3 loc, Vector3 size)
+	{
+		id = newID;
+		type = (CellType)newType;
+		location = loc;
+		bounds = new Bounds(loc,size);
+		team = Team;
 	}
 	public void SetHighlighter(GameObject obj)
 	{

@@ -42,6 +42,7 @@ public class Grid_Setup : MonoBehaviour
 	public Team[] Teams;
 	public int Length{get{return length;}}
 	public int Width{get{return width;}}
+	public int TeamSize{ get { return teamSize;}}
 	[SerializeField] GameObject highlightFab, ballFab, charFab;
 	[SerializeField] CharacterData[] positionData;
 	[SerializeField] Color[] TeamColors =  {Color.black, Color.white};
@@ -51,7 +52,7 @@ public class Grid_Setup : MonoBehaviour
 	private GameObject field;
 	private Transform fieldTran;
 	private AdjacentIndexes adjacent;
-	private bool isHighlighted, isCreated;
+	public bool isHighlighted, isCreated;
 	private int length, width, cellCount;
 
 	void Awake()
@@ -76,7 +77,7 @@ public class Grid_Setup : MonoBehaviour
 		return Teams [Team].mates [index];
 	}
 
-	public FSM_Character SetCharacter(int team,int index, Vector3 location, string playPosition)
+	public FSM_Character SetCharacter(int team,int index, Vector3 location)
 	{
 		if(team<Teams.Length && index<teamSize)
 		{
@@ -105,8 +106,6 @@ public class Grid_Setup : MonoBehaviour
 			for(int t = 0; t<2 ; t++)
 			{
 				Teams [t] = new Team ((Team.TeamNumber)t, TeamColors[t], teamSize);
-				//Teams [t].mates = new FSM_Character[teamSize];
-
 				for(int c = 0; c <teamSize; c++)
 				{
 					GameObject newGuy = Instantiate(charFab,Vector3.zero + new Vector3((float)t,0.2f,(float)c),Quaternion.identity) as GameObject;
@@ -115,7 +114,7 @@ public class Grid_Setup : MonoBehaviour
 					newGuy.SetActive (false);
 				}
 			}
-			//characters2D = new FSM_Character[2,teamSize];
+
 			isCreated = true;
 			width = w+2;
 			length = l+2;
@@ -123,6 +122,7 @@ public class Grid_Setup : MonoBehaviour
 			cells2D = new Cell[width,length];
 			GameObject high;
 			Vector3 loc = Vector3.zero, size = new Vector3 (1,0,1);
+			Team.TeamNumber fieldSide = Team.TeamNumber.NONE;
 			int type = 0;
 			int i = 0;
 			for (int x = 0; x<width; x++)
@@ -134,6 +134,12 @@ public class Grid_Setup : MonoBehaviour
 						type = 0;
 					}else{
 						type = 3;
+						if (x < width / 2) 
+						{
+							fieldSide = Team.TeamNumber.TeamOne;
+						} else if (x > width / 2){
+							fieldSide = Team.TeamNumber.TeamTwo;
+						}
 						if(x==width/2&&z==length/2)
 						{
 							if(Ball==null)
@@ -143,9 +149,9 @@ public class Grid_Setup : MonoBehaviour
 					}
 					loc.x = x;
 					loc.z = z;
-					cells2D[x,z] = new Cell(i,type,loc, size);
+					cells2D[x,z] = new Cell(i,type,fieldSide,loc,size);
 					high = Instantiate(highlightFab,loc,Quaternion.identity) as GameObject;
-					high.transform.SetParent(fieldTran);
+					high.transform.SetParent(fieldTran);//set position globally before parenting
 					cells2D[x,z].SetHighlighter(high);
 					i++;
 				}
@@ -155,7 +161,7 @@ public class Grid_Setup : MonoBehaviour
 	
 	public Cell GetCellByLocation(Vector3 locaton)
 	{
-		int x = (int)Mathf.Round(locaton.x);
+		int x = (int)Mathf.Round(locaton.x);//we use a unit size of 1, elsewise multiply by size
 		int z = (int)Mathf.Round(locaton.z);
 		if(cells2D!=null&& cells2D[x,z]!=null)
 		return cells2D[x,z];
@@ -163,8 +169,8 @@ public class Grid_Setup : MonoBehaviour
 	}
 	public Cell GetCellByID(int id)
 	{
-		int row = (int)Mathf.Floor(id/length);
-		int col = (int)(id % length);
+		int row = (int)Mathf.Floor(id/length);//truncate to "ten's" place
+		int col = (int)(id % length);//get the remainder of length
 		if(cells2D[row,col]!=null)
 		{
 			return cells2D[row,col];
@@ -190,6 +196,17 @@ public class Grid_Setup : MonoBehaviour
 		}
 		isHighlighted = true;
 	}
+	public void TurnOffHiglightedAdjacent()
+	{
+		if (isHighlighted) 
+		{
+			foreach(Vector3 v in adjacent.neighbors)
+			{
+				GetCellByLocation(v).Highlight(false);
+			}
+			isHighlighted = false;
+		}
+	}
 	
 	public void HighlightSingle(Vector3 location)
 	{
@@ -200,23 +217,11 @@ public class Grid_Setup : MonoBehaviour
 		highlightSingle = GetCellByLocation(location);
 		highlightSingle.Highlight(true);
 	}
-	
 	public void TurnOffSingle()
 	{
 		if(highlightSingle!=null)
 		{
 			highlightSingle.Highlight(false);
-		}
-	}
-	public void TurnOffHiglightedAdjacent()
-	{
-		if (isHighlighted) 
-		{
-			foreach(Vector3 v in adjacent.neighbors)
-			{
-				GetCellByLocation(v).Highlight(false);
-			}
-			isHighlighted = false;
 		}
 	}
 	

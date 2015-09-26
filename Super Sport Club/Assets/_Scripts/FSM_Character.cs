@@ -199,30 +199,30 @@ public class FSM_Character : FSM_Base
 	bool CanMove(Cell targetCell)
 	{
 		bool canMove;
-//		opp = PlayerInFrontOfMe();
-//		if(opp!=null)
-//		{
-//			Debug.Log("Player ID: "+opp.id);
-//			if(targetCell.Location== opp.transform.position)
-//			{
-//				if(targetCell==opp.LastTargetCell)
-//				{
-//					canMove = false;
-//				}else{
-//					canMove = true;
-//				}
-//			}else{
-//				float dotFace = Vector3.Dot(tran.forward.normalized,opp.transform.forward.normalized);
-//				if(dotFace<0)
-//				{
-//					Debug.Log("Oh, just kiss already");
-//					canMove = false;
-//				}else{
-//					canMove = true;
-//				}
-//			}
-//		}else canMove = true;
-		return(!Physics.CheckSphere(Location+tran.forward, 1, characterLayer));
+		opp = PlayerInFrontOfMe();
+		if(opp!=null)
+		{
+			Debug.Log("Player ID: "+opp.id);
+			if(targetCell.Location== opp.transform.position)
+			{
+				if(targetCell==opp.LastTargetCell)
+				{
+					canMove = false;
+				}else{
+					canMove = true;
+				}
+			}else{
+				float dotFace = Vector3.Dot(tran.forward.normalized,opp.transform.forward.normalized);
+				if(dotFace<0)
+				{
+					Debug.Log("Oh, just kiss already");
+					canMove = false;
+				}else{
+					canMove = true;
+				}
+			}
+		}else canMove = true;
+		return canMove;//(!Physics.CheckSphere(Location+tran.forward, 1, characterLayer));
 		 
 	}
 
