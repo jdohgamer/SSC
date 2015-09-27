@@ -12,11 +12,6 @@ public class UIGameHUD : IUIState
 	}
 	CustomGameClient GameClientInstance;
 	GUIController gui;
-	Canvas UICanvas;
-	Button buttFab;
-	Image panelFab;
-	SpriteRenderer meterFab;
-	Text infoText;
 	float offsetX = -50,offsetY;
 	bool isCharacterSelected;
 	private Vector3 idealPassDir, simpleDir, offsetDir;
@@ -28,19 +23,11 @@ public class UIGameHUD : IUIState
 	{
 		this.gui = GUI;
 		GameClientInstance = GameClient;
-	}
-	public void SetFabs (Canvas can, Image Panelfab, Button ButtFab, SpriteRenderer MeterFab, Text Info)
-	{
-		UICanvas = can;
-		panelFab = Panelfab;
-		buttFab = ButtFab;
-		meterFab = MeterFab;
-		infoText = Info;
 		board = Grid_Setup.Instance;
 	}
 	public void EnterState ()
 	{
-
+		gui.EnableHUD (true);
 	}
 
 	public void Update ()
@@ -52,6 +39,7 @@ public class UIGameHUD : IUIState
 	}
 	public void ExitState()
 	{
+		gui.EnableHUD (false);
 		DeselectCharacter ();
 	}
 	public void ToMainMenu ()
@@ -174,7 +162,7 @@ public class UIGameHUD : IUIState
 			GameObject.Destroy(meter.gameObject);
 		}
 		Vector3 loc = CharacterPosition+Vector3.up*0.2f;
-		meter = GameObject.Instantiate(meterFab.gameObject, loc, Quaternion.LookRotation(simpleDir))as GameObject;
+		meter = GameObject.Instantiate(gui.meterFab.gameObject, loc, Quaternion.LookRotation(simpleDir))as GameObject;
 		meter.GetComponent<Gauge>().SetIdeal(idealPassDir);
 
 		if (panel!=null) 
@@ -183,14 +171,12 @@ public class UIGameHUD : IUIState
 		}
 
 		loc= Camera.main.WorldToScreenPoint(CharacterPosition) + offsetDir*50; //re-using a variable
-		panel = GameObject.Instantiate(panelFab.gameObject, loc, Quaternion.identity)as GameObject;
-		panel.transform.SetParent(UICanvas.transform,false);
+		panel = GameObject.Instantiate(gui.panelFab.gameObject, loc, Quaternion.identity)as GameObject;
+		panel.transform.SetParent(gui.UIcan.transform,false);
 		panel.transform.SetAsLastSibling(); 
+		PanelController pc = panel.GetComponent<PanelController> ();
 
-		Button kickButton = GameObject.Instantiate (buttFab) as Button;
-		kickButton.transform.SetParent (panel.transform, false);
-		kickButton.GetComponentInChildren<Text> ().text = "Kick";
-		kickButton.onClick.AddListener (() => 
+		pc.AddButton("Kick", false).onClick.AddListener (() => 
 			{ 
 				Vector3 kick = meter.GetComponent<Gauge>().StopBounce();
 				Vector3 cellPos = location + kick.normalized * idealPassDir.magnitude;
@@ -208,54 +194,47 @@ public class UIGameHUD : IUIState
 		}
 		Vector3 loc = Camera.main.WorldToScreenPoint(cellLocation);
 		loc += new Vector3(offsetX,offsetY,0f);
-		panel = GameObject.Instantiate(panelFab.gameObject, loc, Quaternion.identity)as GameObject;
-		panel.transform.SetParent(UICanvas.transform,false);
+		panel = GameObject.Instantiate(gui.panelFab.gameObject, loc, Quaternion.identity)as GameObject;
+		panel.transform.SetParent(gui.UIcan.transform,false);
 		panel.transform.SetAsLastSibling();
+		PanelController pc = panel.GetComponent<PanelController> ();
 
-		if ((CurrentSelectedChar.maxActions - CurrentSelectedChar.actionCount > 0)) 
+		if(CurrentSelectedChar.actionCount > 0|| CurrentSelectedChar.targetCount > 0) 
 		{
-			if(CurrentSelectedChar.actionCount > 0|| CurrentSelectedChar.targetCount > 0) 
+			pc.AddButton("Clear", false).onClick.AddListener (() => 
+				{ 
+					CurrentSelectedChar.ClearActions();
+					board.TurnOffHiglightedAdjacent();
+					GameObject.Destroy (panel.gameObject);
+				});
+		}
+		if (GameClientInstance.ActionsLeft > 0) 
+		{
+			if ((CurrentSelectedChar.maxActions - CurrentSelectedChar.actionCount > 0))
 			{
-				Button clearButton = GameObject.Instantiate (buttFab) as Button;
-				clearButton.transform.SetParent (panel.transform, false);
-				clearButton.GetComponentInChildren<Text> ().text = "Clear";
-				clearButton.onClick.AddListener (() => 
-					{ 
-						CurrentSelectedChar.ClearActions();
-						board.TurnOffHiglightedAdjacent();
-						GameObject.Destroy (panel.gameObject);
-					});
-			}
-
-			Button moveButton = GameObject.Instantiate (buttFab) as Button;
-			moveButton.transform.SetParent (panel.transform, false);
-			moveButton.GetComponentInChildren<Text> ().text = "Move";
-			moveButton.onClick.AddListener (() => 
+				pc.AddButton("Move", false).onClick.AddListener (() => 
 				{ 
 					isMoving = true;
 					isPassing = false;
-					if(CurrentSelectedChar.targetCount>0)
+					if (CurrentSelectedChar.targetCount > 0) 
 					{
 						board.HighlightAdjacent (true, CurrentSelectedChar.LastTargetCell.Location, CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount);
-					}
-					else board.HighlightAdjacent (true, cellLocation, CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount);
+					} else
+						board.HighlightAdjacent (true, cellLocation, CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount);
 
 					GameObject.Destroy (panel.gameObject);
 				});
 
-			if (CurrentSelectedChar.hasBall) 
-			{
-				Button passButton = GameObject.Instantiate (buttFab) as Button;
-				passButton.transform.SetParent (panel.transform, false);
-				passButton.GetComponentInChildren<Text> ().text = "Pass";
-				passButton.onClick.AddListener (() => 
+				if (CurrentSelectedChar.hasBall) {
+					pc.AddButton("Pass", false).onClick.AddListener (() => 
 					{ 
 						isPassing = true;
 						isMoving = false;
 						board.HighlightAdjacent (true, cellLocation, (int)CurrentSelectedChar.charData.Strength);
 						GameObject.Destroy (panel.gameObject);
 					});	
-			}	
+				}
+			}
 		} 
 	}
 }

@@ -90,6 +90,7 @@
      <Compile Include="Assets\_Scripts\MessageBus\MessageSubscriberController.cs" />
      <Compile Include="Assets\_Scripts\MessageBus\PlayerAction.cs" />
      <Compile Include="Assets\_Scripts\MessageBus\ProjectileCollision.cs" />
+     <Compile Include="Assets\_Scripts\PanelController.cs" />
      <Compile Include="Assets\_Scripts\PushNotificationsAndroid.cs" />
      <Compile Include="Assets\_Scripts\RightClickSell.cs" />
      <Compile Include="Assets\_Scripts\SSB_Player.cs" />

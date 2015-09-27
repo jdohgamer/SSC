@@ -7,7 +7,7 @@ public class UIMainMenu : IUIState
 {
 	CustomGameClient GameClientInstance;
 	GUIController gui;
-	RectTransform MainMenu;
+
 	bool connectInProcess;
 
 	public UIMainMenu(GUIController GUI, ref CustomGameClient GameClient)
@@ -15,14 +15,9 @@ public class UIMainMenu : IUIState
 		this.gui = GUI;
 		GameClientInstance = GameClient;
 	}
-	public void SetFabs (RectTransform Main, Button NewGame)
-	{
-		MainMenu = Main;
-
-	}
 	public void EnterState ()
 	{
-		MainMenu.gameObject.SetActive (true);
+		gui.EnableMainMenu (true);
 		if(GameClientInstance.CurrentRoom==null)
 		connectInProcess = GameClientInstance.ConnectToRegionMaster("us");  // can return false for errors
 	}
@@ -33,13 +28,9 @@ public class UIMainMenu : IUIState
 			Application.Quit ();
 		}
 	}
-	public IEnumerator SlowUpdate ()
-	{
-		yield return null;
-	}
 	public void ExitState()
 	{
-		MainMenu.gameObject.SetActive (false);
+		gui.EnableMainMenu(false);
 	}
 	public void ToMainMenu ()
 	{

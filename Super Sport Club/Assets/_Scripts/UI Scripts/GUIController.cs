@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GUIController: MonoBehaviour
 {
@@ -24,18 +25,19 @@ public class GUIController: MonoBehaviour
 	public UIMainMenu UIMM;
 	public UISetPiece UISP;
 	public UIGameHUD UIHUD;
+	public Image panelFab, characterCardFab;
+	public SpriteRenderer meterFab;
+	public Button buttFab;
+	public Canvas UIcan;
+	public RectTransform MainMenu, MainMenuPanel, CharacterPanel, InGameHUD;
 	[SerializeField] string AppId;// set in inspector. this is called when the client loaded and is ready to start
 	[SerializeField] float serviceInterval = 1;
 	[SerializeField] LayerMask mask;
-	[SerializeField] Image panelFab, characterCardFab;
-	[SerializeField] SpriteRenderer meterFab;
-	[SerializeField] Button buttFab, NewGame;
 	[SerializeField] Text infoText;
-	[SerializeField] Canvas UIcan;
-	[SerializeField] RectTransform MainMenu, CharacterPanel;
 	private IUIState uiState;
 	private CustomGameClient GameClientInstance;
 	private Grid_Setup board;
+	private bool bUpdatingInfo;
 
 	void Awake()
 	{
@@ -48,13 +50,9 @@ public class GUIController: MonoBehaviour
 
 		Application.runInBackground = true;
 		CustomTypes.Register();
-
 		UIMM = new UIMainMenu(this,ref GameClientInstance);
-		UIMM.SetFabs (MainMenu, NewGame);
 		UISP = new UISetPiece (this,ref GameClientInstance);
-		UISP.SetFabs (CharacterPanel, characterCardFab, infoText);
 		UIHUD = new UIGameHUD(this,ref GameClientInstance);
-		UIHUD.SetFabs (UIcan, panelFab,buttFab,meterFab, infoText);
 		UIState = UIMM;
 	}
 	
@@ -68,17 +66,15 @@ public class GUIController: MonoBehaviour
 		}
 		UIState.Update ();
 	}
-	void Start()
-	{
-		StartCoroutine ("UpdateInfo");
-	}
+
 	public IEnumerator UpdateInfo ()
 	{
-		while (true) 
+		bUpdatingInfo = true;
+		while (GameClientInstance.CurrentRoom!=null) 
 		{
 			string side =  (int)GameClientInstance.team>0 ? "Right":"Left" ;
-			infoText.text = string.Format("team: {0}. \n You're on the: {1} side. \n Turn: {2}", (int)GameClientInstance.team , side, GameClientInstance.TurnNumber);
-			infoText.text += string.Format("Opponenent ready: {0}", GameClientInstance.HasOppSubmitted());
+			infoText.text = string.Format(" Turn: {2}\n team: {0}. \n You're on the: {1} side. \n", (int)GameClientInstance.team , side, GameClientInstance.TurnNumber);
+			infoText.text += string.Format(" Opponenent ready: {0}\n", GameClientInstance.HasOppSubmitted());
 			yield return new WaitForSeconds (1f);
 		}
 		yield return null;
@@ -88,6 +84,10 @@ public class GUIController: MonoBehaviour
 	{
 		if(GameClientInstance.CurrentRoom!=null)
 		{
+			if (!bUpdatingInfo) 
+			{
+				StartCoroutine ("UpdateInfo");
+			}
 			if (Input.GetMouseButtonUp (0)) 
 			{
 				RaycastHit hit;
@@ -95,22 +95,23 @@ public class GUIController: MonoBehaviour
 				
 				if (Physics.Raycast (ray, out hit, 100f, mask)) 
 				{
-					switch(hit.transform.tag)
+					if (!EventSystem.current.IsPointerOverGameObject ()) 
 					{
-						case "Player":
-						{
-							int id = hit.transform.gameObject.GetComponent<FSM_Character>().id;
-							UIState.ClickOnPlayer (id);
-							break;
-							
-						}
-						case "Field":
-						{
-							if(!EventSystem.current.IsPointerOverGameObject())
-							{
-								UIState.ClickOnField (hit.point);
-							}
-							break;
+						switch (hit.transform.tag) {
+							case "Player":
+								{
+									int id = hit.transform.gameObject.GetComponent<FSM_Character> ().id;
+									UIState.ClickOnPlayer (id);
+									break;
+								
+								}
+							case "Field":
+								{
+
+									UIState.ClickOnField (hit.point);
+								
+									break;
+								}
 						}
 					}
 				}	
@@ -122,6 +123,18 @@ public class GUIController: MonoBehaviour
 		}
 	}
 
+	public void EnableHUD(bool set)
+	{
+		InGameHUD.gameObject.SetActive (set);
+	}
+	public void EnableMainMenu(bool set)
+	{
+		MainMenu.gameObject.SetActive (set);
+	}
+	public void EnableCharacterPanel(bool set)
+	{
+		CharacterPanel.gameObject.SetActive (set);
+	}
 
 	void OnApplicationQuit()
 	{

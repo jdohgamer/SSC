@@ -5,11 +5,8 @@ using System.Collections;
 
 public class UISetPiece : IUIState 
 {
-	RectTransform CharacterPanel;
-	Image characterCardFab;
 	CustomGameClient GameClientInstance;
 	GUIController gui;
-	Text infoText;
 	Drag[] dragPortraits;
 	int activeCards = 0;
 	bool bSetup;
@@ -45,7 +42,7 @@ public class UISetPiece : IUIState
 	public void ExitState()
 	{
 		Debug.Log ("Exiting SetPiece");
-		CharacterPanel.gameObject.SetActive (false);
+		gui.EnableCharacterPanel(false);
 		for (int c = 0; c < dragPortraits.Length; c++) 
 		{
 			dragPortraits [c].DisableMe();
@@ -62,12 +59,6 @@ public class UISetPiece : IUIState
 	public void ToGameHUD ()
 	{
 		gui.UIState = gui.UIHUD;
-	}
-	public void SetFabs (RectTransform charPan, Image cardFab, Text Info)
-	{
-		CharacterPanel = charPan;
-		characterCardFab = cardFab;
-		infoText = Info;
 	}
 	public void EndTurnButton()
 	{
@@ -114,12 +105,13 @@ public class UISetPiece : IUIState
 
 	public void SetupCharacterPanel()
 	{
-		CharacterPanel.gameObject.SetActive (true);
+		gui.EnableHUD (true);
+		gui.EnableCharacterPanel(true);
 
 		for (int c = 0; c < dragPortraits.Length; c++) 
 		{
-			Image charObject = GameObject.Instantiate (characterCardFab, Vector3.zero, Quaternion.identity) as Image;
-			charObject.transform.SetParent (CharacterPanel);
+			Image charObject = GameObject.Instantiate (gui.characterCardFab, Vector3.zero, Quaternion.identity) as Image;
+			charObject.transform.SetParent (gui.CharacterPanel);
 			dragPortraits [c] = charObject.GetComponent<Drag> ();
 			dragPortraits [c].PlayerPosition = Grid_Setup.Instance.GetCharacter ((int)GameClientInstance.team, c).charData.Name;
 			dragPortraits [c].index = c;
@@ -131,7 +123,7 @@ public class UISetPiece : IUIState
 	}
 	public void ResetCharacterPanel()
 	{
-		CharacterPanel.gameObject.SetActive (true);
+		gui.EnableCharacterPanel(true);
 		for (int c = 0; c < dragPortraits.Length; c++) 
 		{
 			dragPortraits [c].EnableMe();

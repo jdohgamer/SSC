@@ -77,7 +77,7 @@ public class Grid_Setup : MonoBehaviour
 		return Teams [Team].mates [index];
 	}
 
-	public FSM_Character SetCharacter(int team,int index, Vector3 location)
+	public void SetCharacter(int team,int index, Vector3 location)
 	{
 		if(team<Teams.Length && index<teamSize)
 		{
@@ -95,8 +95,17 @@ public class Grid_Setup : MonoBehaviour
 //			}
 			Teams[team].mates[index].gameObject.SetActive(true);
 			Teams[team].mates[index].MoveTransform(GetCellByLocation(location).Location + new Vector3(0,0.2f,0));
-			return Teams[team].mates[index];
-		}else return null;
+		}
+	}
+	public void LoadCharactersFromProps(Hashtable ht)
+	{
+		for(int i = 0;i<ht.Count;i++)
+		{
+			Hashtable hash = ht[i.ToString()]as Hashtable;
+			int team = (int)hash["Team"];
+			Vector3 loc = (Vector3)hash["Location"];
+			this.SetCharacter(team, i, loc);
+		}
 	}
 	public void Generate (int w, int l) 
 	{
@@ -192,7 +201,7 @@ public class Grid_Setup : MonoBehaviour
 			if(c !=null && c.type!=Cell.CellType.OutOfBounds)
 			{
 				c.Highlight(true);
-			}else Debug.Log(v);
+			}//else Debug.Log(v);
 		}
 		isHighlighted = true;
 	}

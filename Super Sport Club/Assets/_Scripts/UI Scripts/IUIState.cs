@@ -5,7 +5,8 @@ public interface IUIState
 {
 	void EnterState ();
 	void Update ();
-	void ExitState();
+	//void UpdateHUD ();
+	void ExitState ();
 	void ToMainMenu ();
 	void ToSetPiece ();
 	void ToGameHUD ();

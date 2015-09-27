@@ -31,22 +31,22 @@ public class CustomGameClient : LoadBalancingClient
 	public byte MaxActions = 5;
 	public bool bTurnDone;
 	public GUIController gui;
-	public FSM_Character[] myCharacters, oppCharacers;
+	public FSM_Character[] oppCharacers;
 	public Team.TeamNumber team;
+	public byte ActionsLeft{get{return (byte)(MaxActions - actionCount);}}
 	Team myTeam;
 	PlayerAction[] myActions, oppActions;
-	public bool P1Submitted, P2Submitted;
+	bool P1Submitted, P2Submitted;
 	int turnNumber;
-	Message message;
+	//Message message;
 	byte actionCount = 0;
 	Hashtable oppHT;
-	int characterCount = 0, maxCharacters = 10, teamSize = 5, teamOneSize, teamTwoSize;
+	int maxCharacters = 10, teamSize = 5;
 
 	
 	public CustomGameClient()
 	{
 		myActions = new PlayerAction[MaxActions];
-		myCharacters = new FSM_Character[maxCharacters];
 		oppCharacers = new FSM_Character[maxCharacters];
 	}
 	
@@ -56,6 +56,7 @@ public class CustomGameClient : LoadBalancingClient
 		if (IsPlayerOne()) 
 		{
 			P1Submitted = true;
+			this.loadBalancingPeer.OpRaiseEvent(EndTurn, null, true, null);
 			if(BothPlayersHaveSubmitted())
 			{
 				turnNumber++;
@@ -129,19 +130,7 @@ public class CustomGameClient : LoadBalancingClient
 		}
 		return MoveSet;
 	}
-	FSM_Character[] LoadCharactersFromProps(Hashtable ht)
-	{
-		FSM_Character[] otherTeam = new FSM_Character[ht.Count];
-		for(int i = 0;i<ht.Count;i++)
-		{
-			Hashtable hash = ht[i.ToString()]as Hashtable;
-			int team = (int)hash["Team"];
-			Vector3 loc = (Vector3)hash["Location"];
-			string role = (string)hash["Name"];
-			otherTeam[i] = Grid_Setup.Instance.SetCharacter(team, i, loc);
-			//team[i].ReturnCharacter(hash);
-		}return otherTeam;
-	}
+
 	PlayerAction[] LoadActionsFromProps(Hashtable ht)
 	{
 		PlayerAction[] actions = new PlayerAction[ht.Count];
@@ -223,12 +212,12 @@ public class CustomGameClient : LoadBalancingClient
 		{
 			case (byte)EndTurn:
 			{
-				object content = photonEvent.Parameters[ParameterCode.CustomEventContent];
-				Hashtable turnClick = content as Hashtable;
-				oppActions = LoadActionsFromProps(turnClick);
 				if(IsPlayerOne())
 				{
 					P2Submitted = true;
+					object content = photonEvent.Parameters[ParameterCode.CustomEventContent];
+					Hashtable turnClick = content as Hashtable;
+					oppActions = LoadActionsFromProps(turnClick);
 					if(BothPlayersHaveSubmitted())
 					{
 						turnNumber++;
@@ -364,7 +353,8 @@ public class CustomGameClient : LoadBalancingClient
 	{
 		if(BothPlayersHaveSubmitted())
 		{
-			oppCharacers = LoadCharactersFromProps(HT);
+			turnNumber++;
+			board.LoadCharactersFromProps(HT);
 			P1Submitted = false;
 			P2Submitted = false;
 		}
