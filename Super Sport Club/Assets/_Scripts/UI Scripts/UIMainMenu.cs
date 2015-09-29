@@ -10,7 +10,7 @@ public class UIMainMenu : IUIState
 
 	bool connectInProcess;
 
-	public UIMainMenu(GUIController GUI, ref CustomGameClient GameClient)
+	public UIMainMenu(GUIController GUI, CustomGameClient GameClient)
 	{
 		this.gui = GUI;
 		GameClientInstance = GameClient;
@@ -43,6 +43,10 @@ public class UIMainMenu : IUIState
 	public void ToGameHUD ()
 	{
 		gui.UIState = gui.UIHUD;
+	}
+	public void ToShotState ()
+	{
+		gui.UIState = gui.UISOG;
 	}
 	public void NewGameButt ()
 	{

@@ -259,7 +259,7 @@ public class CustomGameClient : LoadBalancingClient
 				}
 				break;
 			case EventCode.Leave:
-				//if (this.CurrentRoom.Players.Count == 1 && !this.GameWasAbandoned)
+				if (this.CurrentRoom.Players.Count == 1 && !this.GameWasAbandoned)
 				{
 					this.CurrentRoom.IsOpen = true;
 					this.CurrentRoom.IsVisible = true;
@@ -384,7 +384,10 @@ public class CustomGameClient : LoadBalancingClient
 		boardProps[PropNames] = string.Format("{0};{1}", this.LocalPlayer.NickName, this.Opponent.NickName);
 		this.OpSetCustomPropertiesOfRoom(boardProps, false);
 	}
-
+	public bool GameWasAbandoned
+	{
+		get { return this.CurrentRoom != null && this.CurrentRoom.Players.Count < 2 && this.CurrentRoom.CustomProperties.ContainsKey("t#"); }
+	}
 	public Player Opponent
 	{
 		get

@@ -25,11 +25,13 @@ public class GUIController: MonoBehaviour
 	public UIMainMenu UIMM;
 	public UISetPiece UISP;
 	public UIGameHUD UIHUD;
+	public UIShotState UISOG;
 	public Image panelFab, characterCardFab;
 	public SpriteRenderer meterFab;
 	public Button buttFab;
 	public Canvas UIcan;
-	public RectTransform MainMenu, MainMenuPanel, CharacterPanel, InGameHUD;
+	public RectTransform CharacterPanel;
+	[SerializeField] RectTransform MainMenu, MainMenuPanel,  InGameHUD;
 	[SerializeField] string AppId;// set in inspector. this is called when the client loaded and is ready to start
 	[SerializeField] float serviceInterval = 1;
 	[SerializeField] LayerMask mask;
@@ -50,9 +52,10 @@ public class GUIController: MonoBehaviour
 
 		Application.runInBackground = true;
 		CustomTypes.Register();
-		UIMM = new UIMainMenu(this,ref GameClientInstance);
-		UISP = new UISetPiece (this,ref GameClientInstance);
-		UIHUD = new UIGameHUD(this,ref GameClientInstance);
+		UIMM = new UIMainMenu(this, GameClientInstance);
+		UISP = new UISetPiece (this, GameClientInstance);
+		UIHUD = new UIGameHUD(this, GameClientInstance);
+		UISOG = new UIShotState(this, GameClientInstance);
 		UIState = UIMM;
 	}
 	

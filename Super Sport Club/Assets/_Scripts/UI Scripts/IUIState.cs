@@ -10,6 +10,7 @@ public interface IUIState
 	void ToMainMenu ();
 	void ToSetPiece ();
 	void ToGameHUD ();
+	void ToShotState ();
 	void EndTurnButton();
 	void ClickOnPlayer(int id);
 	void DeselectCharacter();

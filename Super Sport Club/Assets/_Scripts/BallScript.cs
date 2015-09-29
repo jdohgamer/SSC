@@ -4,7 +4,6 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class BallScript : MonoBehaviour 
 {
-	public Grid_Setup board;
 	//[SerializeField] protected iTween.EaseType ease;
 	[SerializeField] protected float moveSpeed;
 	[SerializeField] float offset = 0.2f;
@@ -19,7 +18,7 @@ public class BallScript : MonoBehaviour
 
 	public IEnumerator MoveTo(Hashtable ht)
 	{
-		targetCell = board.GetCellByID((int)ht["Cell"]);
+		targetCell = Grid_Setup.Instance.GetCellByID((int)ht["Cell"]);
 		moveSpeed = (float)ht["Speed"];
 		easeType = (string)ht["EaseType"];
 		Vector3 target = targetCell.Location;

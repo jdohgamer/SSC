@@ -38,6 +38,7 @@ struct AdjacentIndexes
 public class Grid_Setup : MonoBehaviour 
 {
 	public static GameObject Ball;
+	public Vector3 BallLocation{get{return Ball.transform.position;}}
 	public static Grid_Setup Instance;//not technically a singleton
 	public Team[] Teams;
 	public int Length{get{return length;}}
@@ -103,9 +104,10 @@ public class Grid_Setup : MonoBehaviour
 			for(int t = 0; t<2 ; t++)
 			{
 				Teams [t] = new Team ((Team.TeamNumber)t, TeamColors[t], teamSize);
+				Quaternion face = t>0 ? Quaternion.LookRotation(-Vector3.right):Quaternion.LookRotation(Vector3.right) ;
 				for(int c = 0; c <teamSize; c++)
 				{
-					GameObject newGuy = Instantiate(charFab,Vector3.zero + new Vector3((float)t,0.2f,(float)c),Quaternion.identity) as GameObject;
+					GameObject newGuy = Instantiate(charFab,Vector3.zero + new Vector3((float)t,0.2f,(float)c),face) as GameObject;
 					Teams [t].AddMate(newGuy.GetComponent<FSM_Character>());
 					Teams [t].mates [c].charData = positionData [c];
 					newGuy.SetActive (false);
@@ -141,7 +143,6 @@ public class Grid_Setup : MonoBehaviour
 						{
 							if(Ball==null)
 							Ball = Instantiate(ballFab,new Vector3(x,0.1f,z), Quaternion.identity)as GameObject;
-							Ball.GetComponent<BallScript>().board = this;
 						}
 					}
 					loc.x = x;

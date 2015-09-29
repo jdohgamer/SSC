@@ -17,9 +17,9 @@ public class UIGameHUD : IUIState
 	private Vector3 idealPassDir, simpleDir, offsetDir;
 	private Grid_Setup board;
 	private int currentID = -1;
-	private bool isPassing, isMoving;
+	private bool isPassing, isMoving, shotFired;
 
-	public UIGameHUD(GUIController GUI,ref CustomGameClient GameClient)
+	public UIGameHUD(GUIController GUI, CustomGameClient GameClient)
 	{
 		this.gui = GUI;
 		GameClientInstance = GameClient;
@@ -36,6 +36,11 @@ public class UIGameHUD : IUIState
 		{
 			ToMainMenu ();
 		}
+		if((board.BallLocation.x<6||board.BallLocation.x>16)&&!shotFired)
+		{
+			shotFired = true;
+			ToShotState ();
+		}
 	}
 	public void ExitState()
 	{
@@ -49,6 +54,10 @@ public class UIGameHUD : IUIState
 	public void ToSetPiece ()
 	{
 		gui.UIState = gui.UISP;
+	}
+	public void ToShotState ()
+	{
+		gui.UIState = gui.UISOG;
 	}
 	public void ToGameHUD ()
 	{

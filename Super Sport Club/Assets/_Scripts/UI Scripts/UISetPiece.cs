@@ -11,7 +11,7 @@ public class UISetPiece : IUIState
 	int activeCards = 0;
 	bool bSetup;
 
-	public UISetPiece(GUIController GUI,ref CustomGameClient GameClient)
+	public UISetPiece(GUIController GUI, CustomGameClient GameClient)
 	{
 		this.gui = GUI;
 		GameClientInstance = GameClient;
@@ -55,6 +55,10 @@ public class UISetPiece : IUIState
 	public void ToMainMenu ()
 	{
 		gui.UIState = gui.UIMM;
+	}
+	public void ToShotState ()
+	{
+		gui.UIState = gui.UISOG;
 	}
 	public void ToSetPiece ()
 	{
