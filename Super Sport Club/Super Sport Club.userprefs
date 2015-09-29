@@ -1,19 +1,16 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\_Scripts\UI Scripts\UIGameHUD.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\_Scripts\FSM_Character.cs">
     <Files>
-      <File FileName="Assets\_Scripts\UI Scripts\GUIController.cs" Line="28" Column="42" />
-      <File FileName="Assets\_Scripts\UI Scripts\UIGameHUD.cs" Line="201" Column="4" />
-      <File FileName="Assets\_Scripts\UI Scripts\UIMainMenu.cs" Line="33" Column="21" />
-      <File FileName="Assets\_Scripts\UI Scripts\UISetPiece.cs" Line="114" Column="57" />
-      <File FileName="Assets\_Scripts\CustomGameClient.cs" Line="224" Column="19" />
-      <File FileName="Assets\_Scripts\FSM_Character.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\Team.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\Cell.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\Drag.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\MessageBus\PlayerAction.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\Grid_Setup.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\UI Scripts\IUIState.cs" Line="1" Column="1" />
+      <File FileName="Assets\_Scripts\UI Scripts\GUIController.cs" Line="44" Column="43" />
+      <File FileName="Assets\_Scripts\UI Scripts\UIGameHUD.cs" Line="120" Column="5" />
+      <File FileName="Assets\_Scripts\UI Scripts\UIMainMenu.cs" Line="1" Column="1" />
+      <File FileName="Assets\_Scripts\UI Scripts\UISetPiece.cs" Line="1" Column="1" />
+      <File FileName="Assets\_Scripts\CustomGameClient.cs" Line="135" Column="3" />
+      <File FileName="Assets\_Scripts\FSM_Character.cs" Line="173" Column="18" />
+      <File FileName="Assets\_Scripts\MessageBus\PlayerAction.cs" Line="86" Column="56" />
+      <File FileName="Assets\_Scripts\Drag.cs" Line="108" Column="28" />
+      <File FileName="Assets\_Scripts\BallScript.cs" Line="19" Column="2" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

@@ -84,8 +84,7 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 			}
 			yield return new WaitForSeconds(0.1f);
 		}
-		Grid_Setup.Instance.TurnOffSingle();
-		StopCoroutine("GetHigh");
+
 	}
 	private void SetDraggedPosition(PointerEventData data)
 	{
@@ -107,6 +106,8 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 		{
 			Destroy(m_DraggingIcon);
 			bDragging = false;
+			Grid_Setup.Instance.TurnOffSingle();
+			StopCoroutine("GetHigh");
 			if (Physics.Raycast (ray, out hit, 100f, mask) && hit.transform.tag == "Field") 
 			{
 				if (gui.PlaceCharacter (hit.point)) 

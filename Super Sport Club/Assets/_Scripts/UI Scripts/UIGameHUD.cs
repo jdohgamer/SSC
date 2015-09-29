@@ -12,7 +12,7 @@ public class UIGameHUD : IUIState
 	}
 	CustomGameClient GameClientInstance;
 	GUIController gui;
-	float offsetX = -50,offsetY;
+	float offsetX = -50,offsetY =0;
 	bool isCharacterSelected;
 	private Vector3 idealPassDir, simpleDir, offsetDir;
 	private Grid_Setup board;
@@ -125,7 +125,7 @@ public class UIGameHUD : IUIState
 	{
 		if (CurrentSelectedChar.maxActions -CurrentSelectedChar.actionCount > 0) 
 		{
-			GameClientInstance.SetPlayerAction(new PlayerAction(PlayerAction.Actions.Pass, CurrentSelectedChar, tCell, CurrentSelectedChar.OccupiedCell));
+			GameClientInstance.SetPlayerAction(PlayerAction.PassAction (CurrentSelectedChar,tCell));
 			board.TurnOffHiglightedAdjacent();
 			isPassing = false;
 		}
@@ -133,6 +133,7 @@ public class UIGameHUD : IUIState
 
 	void CreatePlayerMeter(Vector3 location)
 	{
+		Debug.Log(location);
 		Vector3 CharacterPosition = CurrentSelectedChar.Location;
 		idealPassDir = location - CharacterPosition;
 		idealPassDir.y = 0;
@@ -179,7 +180,8 @@ public class UIGameHUD : IUIState
 		pc.AddButton("Kick", false).onClick.AddListener (() => 
 			{ 
 				Vector3 kick = meter.GetComponent<Gauge>().StopBounce();
-				Vector3 cellPos = location + kick.normalized * idealPassDir.magnitude;
+				Debug.Log(location);
+				Vector3 cellPos = CharacterPosition + kick.normalized * idealPassDir.magnitude;
 				PassClick(board.GetCellByLocation(cellPos));			
 				GameObject.Destroy(meter.gameObject);
 				GameObject.Destroy(panel.gameObject);

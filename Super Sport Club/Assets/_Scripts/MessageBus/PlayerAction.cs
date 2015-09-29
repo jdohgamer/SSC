@@ -54,25 +54,25 @@ public class PlayerAction
 	public PlayerAction()
 	{
 	}
-	public PlayerAction(Actions act, FSM_Character iCharacter)
+	public PlayerAction(Actions act, FSM_Character iCharacter)//Actions done to a character that don't affect anything else
 	{
 		this.action=act; iCh = iCharacter;
 	}
-	public PlayerAction(Actions act, FSM_Character iCharacter, FSM_Character tCharacter)
+	public PlayerAction(Actions act, FSM_Character iCharacter, FSM_Character tCharacter)// Actions one character does to another
 	{
 		this.action=act; iCh = iCharacter; tCh = tCharacter;
 	}
-	public PlayerAction(Actions act, FSM_Character iCharacter, Cell tCell)
+	public PlayerAction(Actions act, FSM_Character iCharacter, Cell tCell)// Actions done by a character on the field, 
 	{
 		this.action=act; iCh = iCharacter; cTo = tCell;
 	}
-	public PlayerAction(Actions act, FSM_Character iCharacter, Cell tCell, Cell fCell)
+	public PlayerAction(Actions act, FSM_Character iCharacter, Cell tCell, Cell fCell)// Actions done by a character from one part of the field to another, e.g. passing the ball
 	{
 		this.action=act; iCh = iCharacter; cTo = tCell; cFrom = fCell;
 	}
-	public static PlayerAction PassAction(FSM_Character iCharacter, Cell tCell)
+	public static PlayerAction PassAction(FSM_Character iCharacter, Cell tCell)// just easier to right.
 	{
-		return new PlayerAction(Actions.Pass, iCharacter, tCell, iCharacter.OccupiedCell);
+		return new PlayerAction(Actions.Pass, iCharacter, tCell);
 	}
 	public Hashtable GetActionProp()
 	{

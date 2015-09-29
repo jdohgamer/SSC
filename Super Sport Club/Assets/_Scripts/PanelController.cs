@@ -6,13 +6,13 @@ using System.Collections.Generic;
 public class PanelController : MonoBehaviour 
 {
 	[SerializeField] Button buttFab;
-	List <Button> buttons;
+	//List <Button> buttons;
 	RectTransform rectTran;
 	int buttCount = 0;
 	void Awake()
 	{
 		rectTran = transform as RectTransform;
-		buttons = new List<Button>();
+		//buttons = new List<Button>();
 	}
 
 	public Button AddButton(string name, bool StayInWorlPosition)

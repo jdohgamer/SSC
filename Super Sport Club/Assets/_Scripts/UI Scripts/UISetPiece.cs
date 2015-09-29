@@ -43,10 +43,14 @@ public class UISetPiece : IUIState
 	{
 		Debug.Log ("Exiting SetPiece");
 		gui.EnableCharacterPanel(false);
-		for (int c = 0; c < dragPortraits.Length; c++) 
-		{
-			dragPortraits [c].DisableMe();
-		}
+
+			for (int c = 0; c < dragPortraits.Length; c++)
+			{
+				if (dragPortraits[c] != null) 
+				{
+					dragPortraits [c].DisableMe ();
+				}
+			}
 	}
 	public void ToMainMenu ()
 	{

@@ -37,17 +37,15 @@ public class CustomGameClient : LoadBalancingClient
 	Team myTeam;
 	PlayerAction[] myActions, oppActions;
 	bool P1Submitted, P2Submitted;
-	int turnNumber;
-	//Message message;
+	int turnNumber, teamSize = 5;
 	byte actionCount = 0;
 	Hashtable oppHT;
-	int maxCharacters = 10, teamSize = 5;
 
 	
 	public CustomGameClient()
 	{
 		myActions = new PlayerAction[MaxActions];
-		oppCharacers = new FSM_Character[maxCharacters];
+		oppCharacers = new FSM_Character[teamSize];
 	}
 	
 	public void EndTurnEvent()
@@ -63,7 +61,7 @@ public class CustomGameClient : LoadBalancingClient
 				CalcMoves();
 				Debug.Log("Go and get yourself a good fucking");
 			}
-			//ExecuteMoves(content);
+			ExecuteMoves(content);
 		}else{
 			P2Submitted=true;
 			this.loadBalancingPeer.OpRaiseEvent(EndTurn, content, true, null);
@@ -100,15 +98,14 @@ public class CustomGameClient : LoadBalancingClient
 	{
 		return P1Submitted && P2Submitted;
 	}
-
-
+		
 	public void SetPlayerAction(PlayerAction act)
 	{
 		if(actionCount<MaxActions&&act.iCh.actionCount<act.iCh.maxActions)
 		{
 			myActions[actionCount] = act;
 			actionCount += 1;
-			if(act.action == PlayerAction.Actions.Move)
+			if(act.action == PlayerAction.Actions.Move)// preview waypoints
 			{
 				act.iCh.SetMoveTarget(act.cTo);
 			}

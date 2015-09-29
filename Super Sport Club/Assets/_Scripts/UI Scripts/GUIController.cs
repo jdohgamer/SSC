@@ -74,6 +74,7 @@ public class GUIController: MonoBehaviour
 		{
 			string side =  (int)GameClientInstance.team>0 ? "Right":"Left" ;
 			infoText.text = string.Format(" Turn: {2}\n team: {0}. \n You're on the: {1} side. \n", (int)GameClientInstance.team , side, GameClientInstance.TurnNumber);
+			infoText.text += string.Format (" You have {0} moves left \n", GameClientInstance.ActionsLeft);
 			infoText.text += string.Format(" Opponenent ready: {0}\n", GameClientInstance.HasOppSubmitted());
 			yield return new WaitForSeconds (1f);
 		}
@@ -93,25 +94,21 @@ public class GUIController: MonoBehaviour
 				RaycastHit hit;
 				Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 				
-				if (Physics.Raycast (ray, out hit, 100f, mask)) 
+				if (!EventSystem.current.IsPointerOverGameObject () && Physics.Raycast (ray, out hit, 100f, mask)) 
 				{
-					if (!EventSystem.current.IsPointerOverGameObject ()) 
+					switch (hit.transform.tag) 
 					{
-						switch (hit.transform.tag) {
-							case "Player":
-								{
-									int id = hit.transform.gameObject.GetComponent<FSM_Character> ().id;
-									UIState.ClickOnPlayer (id);
-									break;
-								
-								}
-							case "Field":
-								{
-
-									UIState.ClickOnField (hit.point);
-								
-									break;
-								}
+						case "Player":
+						{
+							int id = hit.transform.gameObject.GetComponent<FSM_Character> ().id;
+							UIState.ClickOnPlayer (id);
+							break;
+						
+						}
+						case "Field":
+						{
+							UIState.ClickOnField (hit.point);
+							break;
 						}
 					}
 				}	
@@ -135,7 +132,6 @@ public class GUIController: MonoBehaviour
 	{
 		CharacterPanel.gameObject.SetActive (set);
 	}
-
 	void OnApplicationQuit()
 	{
 		GameClientInstance.Disconnect();

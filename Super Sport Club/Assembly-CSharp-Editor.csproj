@@ -54,7 +54,7 @@
      <None Include="Assets\Plugins\RAIN\Editor\ScriptTemplates\BehaviorTreeTemplate.xml" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\NavMeshColliderShader.shader" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\VisualSensorLineShader.shader" />
-     <None Include="Assets\RotateUVs.shader" />
+     <None Include="Assets\_Scripts\RotateUVs.shader" />
      <None Include="Assets\Plugins\RAIN\ReleaseNotes.txt" />
      <None Include="Assets\Editor\Todo\README.txt" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\NavMeshContourShader.shader" />

@@ -38,14 +38,14 @@ public class FSM_Character : FSM_Base
 		Cover_Ball
 	};
 	protected string easeType;
-	//[SerializeField] protected float moveSpeed;
 	[SerializeField] protected iTween.EaseType ease, ballEase;
 	[SerializeField] LayerMask characterLayer;
 	[SerializeField] GameObject destPin;
 	[SerializeField] Color teamColor;
+	[SerializeField] float rayLength = 1.5f;
 	BallScript ball;
 	GameObject[] targetPins;
-	GameObject passTargetPin;
+	GameObject passTargetPin;//this could be put with targetPins[] and just given a different color
 	PlayerAction[] actions;
 	Cell lastCell;
 	MeshRenderer currentMesh;
@@ -69,7 +69,6 @@ public class FSM_Character : FSM_Base
 
 	void Awake()
 	{
-		//charData = new CharacterData();
 		CurrentState = Stance.Neutral;
 		tran = transform;
 		currentMesh = GetComponentInChildren<MeshRenderer>();
@@ -163,10 +162,10 @@ public class FSM_Character : FSM_Base
 							if(CanMove(actions[i].cTo))
 							{
 								iTween.MoveTo(gameObject, iTween.Hash("position", nextCell, "easeType", easeType, "loopType", "none", "speed", charData.Speed));
-							yield return new WaitForSeconds(0.2f);
+
+								yield return new WaitForSeconds(0.2f);
 							}else break;
 						}
-						
 						break;
 					}
 					case PlayerAction.Actions.Pass:
@@ -187,7 +186,7 @@ public class FSM_Character : FSM_Base
 		ClearActions();	
 		yield return null;
 	}
-	void RotateTowards(Vector3 target)
+	void RotateTowards(Vector3 target)// this is really a SetRotation function
 	{
 		Vector3 dir = target - tran.position;
 		Quaternion rotation = Quaternion.LookRotation(dir);
@@ -196,6 +195,17 @@ public class FSM_Character : FSM_Base
 		//tran.Rotate(Vector3.up,f);
 	}
 
+	FSM_Character PlayerInFrontOfMe()
+	{
+		Ray ray = new Ray(tran.position,tran.forward);
+		RaycastHit hit = new RaycastHit();;
+		Physics.Raycast(ray,out hit,rayLength,characterLayer);
+		if(hit.collider!=null&& hit.collider!= this.GetComponent<Collider>() && hit.transform.tag == "Player")
+		{
+			return hit.transform.GetComponent<FSM_Character>();
+		}
+		return null;
+	}
 	bool CanMove(Cell targetCell)
 	{
 		bool canMove;
@@ -212,7 +222,7 @@ public class FSM_Character : FSM_Base
 					canMove = true;
 				}
 			}else{
-				float dotFace = Vector3.Dot(tran.forward.normalized,opp.transform.forward.normalized);
+				float dotFace = Vector3.Dot(tran.forward,opp.transform.forward);
 				if(dotFace<0)
 				{
 					Debug.Log("Oh, just kiss already");
@@ -270,23 +280,6 @@ public class FSM_Character : FSM_Base
 //		StopCoroutine("MoveTo");
 //	}
 
-
-	FSM_Character PlayerInFrontOfMe()
-	{
-		Ray ray = new Ray(tran.position,tran.forward);
-		RaycastHit hit = new RaycastHit();;
-		Physics.Raycast(ray,out hit,1.5f,characterLayer);
-		if(hit.collider!=null&& hit.collider!= this.GetComponent<Collider>() && hit.transform.tag == "Player")
-		{
-			return hit.transform.GetComponent<FSM_Character>();
-		}
-		return null;
-	}
-
-//	IEnumerator Move_EnterState()
-//	{
-//
-//	}
 	void OnTriggerEnter(Collider other)
 	{
 		switch(other.tag)

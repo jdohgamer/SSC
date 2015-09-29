@@ -38,7 +38,7 @@ struct AdjacentIndexes
 public class Grid_Setup : MonoBehaviour 
 {
 	public static GameObject Ball;
-	public static Grid_Setup Instance;
+	public static Grid_Setup Instance;//not technically a singleton
 	public Team[] Teams;
 	public int Length{get{return length;}}
 	public int Width{get{return width;}}
@@ -81,18 +81,6 @@ public class Grid_Setup : MonoBehaviour
 	{
 		if(team<Teams.Length && index<teamSize)
 		{
-			//GameObject newGuy = Instantiate(charFab,GetCellByLocation(location).Location + new Vector3(0,0.2f,0),Quaternion.identity) as GameObject;
-			//characters2D[Team,index] =  newGuy.GetComponent<FSM_Character>();
-			//characters2D[Team,index].id = index;
-			//characters2D[Team,index].team = (Team.TeamNumber)Team;
-//			foreach(CharacterData cd in positionData)
-//			{
-//				if(cd.name == playPosition)
-//				{
-//					Teams[team].mates[index].charData = cd;
-//					break;
-//				}
-//			}
 			Teams[team].mates[index].gameObject.SetActive(true);
 			Teams[team].mates[index].MoveTransform(GetCellByLocation(location).Location + new Vector3(0,0.2f,0));
 		}
