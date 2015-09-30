@@ -7,50 +7,9 @@ public class PlayerAction
 {
 	public FSM_Character iCh,tCh;
 	public Cell cFrom, cTo;
-	public enum Actions{Move, Pass, Shoot, Juke}
+	public enum Actions{Move, Kick, Juke, Pass, Shoot, Cross}
 	public Actions action; 
-	
-//	public enum ConflictFlag
-//	{
-//		None,
-//		TargetCellIsSame,
-//		TargetCellIsOriginatingCell,
-//		TargetCharacterIsSame,
-//		TargetCharacterIsInitiatingCharacter,
-//		InitiatingCharacterIsTargetCharacter,
-//		OriginatingCellIsTargetCell
-//	}
-//	
-//	public static List<ConflictFlag> ActionsConflict(PlayerAction a, PlayerAction b)
-//	{
-//		List<ConflictFlag> conflicts = new List<ConflictFlag>();
-//		if(a.iCh == b.tCh)
-//		{
-//			conflicts.Add(ConflictFlag.InitiatingCharacterIsTargetCharacter);
-//		}
-//		if(a.tCh == b.iCh)
-//		{
-//			conflicts.Add(ConflictFlag.TargetCharacterIsInitiatingCharacter);
-//		}
-//		if(a.tCh == b.tCh)
-//		{
-//			conflicts.Add(ConflictFlag.TargetCharacterIsSame);
-//		}
-//		if(a.cTo == b.cTo)
-//		{
-//			conflicts.Add(ConflictFlag.TargetCellIsSame);
-//		}
-//		if(a.cTo == b.cFrom)
-//		{
-//			conflicts.Add(ConflictFlag.TargetCellIsOriginatingCell);
-//		}
-//		if(a.cFrom == b.cTo)
-//		{
-//			conflicts.Add(ConflictFlag.OriginatingCellIsTargetCell);
-//		}
-//		return conflicts;
-//	}
-	
+
 	public PlayerAction()
 	{
 	}
@@ -66,21 +25,18 @@ public class PlayerAction
 	{
 		this.action=act; iCh = iCharacter; cTo = tCell;
 	}
-	public PlayerAction(Actions act, FSM_Character iCharacter, Cell tCell, Cell fCell)// Actions done by a character from one part of the field to another, e.g. passing the ball
+	public PlayerAction(Actions act, FSM_Character iCharacter, Cell tCell, Cell fCell)// Actions done by a character from one part of the field to another
 	{
 		this.action=act; iCh = iCharacter; cTo = tCell; cFrom = fCell;
 	}
-	public static PlayerAction PassAction(FSM_Character iCharacter, Cell tCell)// just easier to right.
-	{
-		return new PlayerAction(Actions.Pass, iCharacter, tCell);
-	}
+
 	public Hashtable GetActionProp()
 	{
 		Hashtable actionProp = new Hashtable ();
 		
 		actionProp.Add("Act",(int)action);
 		actionProp.Add ("iCharacter",(int)iCh.id);
-		actionProp.Add ("iCharacterTeam",(int)iCh.team);
+		actionProp.Add ("iCharacterTeam",(int)iCh.team);;
 		if(tCh!=null)actionProp.Add ("tCharacter",(int)tCh.id);
 		if(cTo!=null)actionProp.Add("tCell",(int)cTo.id);
 		if(cFrom!=null)actionProp.Add("fCell",(int)cFrom.id);

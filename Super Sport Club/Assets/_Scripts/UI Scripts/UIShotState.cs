@@ -28,8 +28,8 @@ public class UIShotState : IUIState
 	public void ExitState ()
 	{
 		//move camera back
-		camAnim.SetFloat("PanDir", 0);
-		//maybe don't move if going menu screen?
+		camAnim.SetInteger("PanDir", 0);
+		//maybe don't move if going to menu screen?
 	}
 	public void ToMainMenu ()
 	{
@@ -56,15 +56,15 @@ public class UIShotState : IUIState
 	}
 	public void ClickOnPlayer(int id)
 	{
-		Debug.Log ("Nope");
+		Debug.Log ("No Character Selection");
 	}
 	public void DeselectCharacter()
 	{
-		Debug.Log ("Nope");
+		Debug.Log ("No Character Selection");
 	}
 	public void ClickOnField(Vector3 hit)
 	{
-		Debug.Log ("Nope");
+		Debug.Log ("No Field Selection");
 	}
 
 }

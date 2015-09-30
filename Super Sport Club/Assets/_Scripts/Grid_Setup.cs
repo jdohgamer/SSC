@@ -39,6 +39,7 @@ public class Grid_Setup : MonoBehaviour
 {
 	public static GameObject Ball;
 	public Vector3 BallLocation{get{return Ball.transform.position;}}
+	public Vector3 BallTarget{get{return Ball.transform.position;}}
 	public static Grid_Setup Instance;//not technically a singleton
 	public Team[] Teams;
 	public int Length{get{return length;}}
@@ -48,6 +49,7 @@ public class Grid_Setup : MonoBehaviour
 	[SerializeField] CharacterData[] positionData;
 	[SerializeField] Color[] TeamColors =  {Color.black, Color.white};
 	[SerializeField] int teamSize = 5;
+	[SerializeField] Vector3 TeamOneGoal, TeamTwoGoal, GoalSize;
 	private static Cell highlightSingle;
 	private Cell[,] cells2D;
 	private GameObject field;
@@ -103,8 +105,10 @@ public class Grid_Setup : MonoBehaviour
 			Teams = new Team[2];
 			for(int t = 0; t<2 ; t++)
 			{
-				Teams [t] = new Team ((Team.TeamNumber)t, TeamColors[t], teamSize);
-				Quaternion face = t>0 ? Quaternion.LookRotation(-Vector3.right):Quaternion.LookRotation(Vector3.right) ;
+				bool teamOne = t == 0;
+				Vector3 goal = teamOne ? TeamOneGoal : TeamTwoGoal;
+				Teams [t] = new Team ((Team.TeamNumber)t, TeamColors[t], teamSize, goal, GoalSize);
+				Quaternion face = teamOne ? Quaternion.LookRotation(Vector3.right):Quaternion.LookRotation(-Vector3.right) ;
 				for(int c = 0; c <teamSize; c++)
 				{
 					GameObject newGuy = Instantiate(charFab,Vector3.zero + new Vector3((float)t,0.2f,(float)c),face) as GameObject;
@@ -133,10 +137,11 @@ public class Grid_Setup : MonoBehaviour
 						type = 0;
 					}else{
 						type = 3;
-						if (x < width / 2) 
+						if (x < (width / 2)+1) 
 						{
 							fieldSide = Team.TeamNumber.TeamOne;
-						} else if (x > width / 2){
+						} else if (x > (width / 2)-1)
+						{
 							fieldSide = Team.TeamNumber.TeamTwo;
 						}
 						if(x==width/2&&z==length/2)
@@ -174,6 +179,11 @@ public class Grid_Setup : MonoBehaviour
 			return cells2D[row,col];
 		}
 		return null; 
+	}
+	public bool IsShotOnGoal(int tNum, Vector3 spot)
+	{
+		return Teams[tNum].IsVectorInGoal (spot);
+		
 	}
 
 	public void HighlightAdjacent(bool set, Vector3 index, int distance)

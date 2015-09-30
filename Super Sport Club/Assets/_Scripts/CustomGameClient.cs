@@ -3,6 +3,7 @@ using ExitGames.Client.Photon;
 using ExitGames.Client.Photon.LoadBalancing;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Random = UnityEngine.Random;
 
@@ -41,7 +42,6 @@ public class CustomGameClient : LoadBalancingClient
 	byte actionCount = 0;
 	Hashtable oppHT;
 
-	
 	public CustomGameClient()
 	{
 		myActions = new PlayerAction[MaxActions];
@@ -57,11 +57,11 @@ public class CustomGameClient : LoadBalancingClient
 			this.loadBalancingPeer.OpRaiseEvent(EndTurn, null, true, null);
 			if(BothPlayersHaveSubmitted())
 			{
-				turnNumber++;
+				
 				CalcMoves();
 				Debug.Log("Go and get yourself a good fucking");
 			}
-			ExecuteMoves(content);
+			//ExecuteMoves(content);
 		}else{
 			P2Submitted=true;
 			this.loadBalancingPeer.OpRaiseEvent(EndTurn, content, true, null);
@@ -82,6 +82,7 @@ public class CustomGameClient : LoadBalancingClient
 		this.loadBalancingPeer.OpRaiseEvent(SubmitTeam, TeamHT, true, null);
 			
 	}
+
 	bool IsPlayerOne()
 	{
 		return this.LocalPlayer.IsMasterClient;
@@ -217,7 +218,6 @@ public class CustomGameClient : LoadBalancingClient
 					oppActions = LoadActionsFromProps(turnClick);
 					if(BothPlayersHaveSubmitted())
 					{
-						turnNumber++;
 						CalcMoves();
 						Debug.Log("Go and get yourself a good fucking");
 					}
@@ -474,6 +474,7 @@ public class CustomGameClient : LoadBalancingClient
 			c.StartCoroutine("ExecuteActions");
 		}
 		ClearActions();
+		turnNumber++;
 		P1Submitted = false;
 		P2Submitted = false;
 	}

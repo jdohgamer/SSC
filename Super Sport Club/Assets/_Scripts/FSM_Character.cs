@@ -8,6 +8,7 @@ public class FSM_Character : FSM_Base
 {
 	public int id, actionCount, targetCount, maxActions = 2;
 	public Team.TeamNumber team;
+	public bool AmTeamOne{get{return (int)team == 0;}}
 	public Vector3 newLocation = Vector3.zero;
 	public CharacterData charData; // contains Name, Id, and stats
 	public bool hasTarget, hasBall;
@@ -118,7 +119,6 @@ public class FSM_Character : FSM_Base
 		ht["Speed"] = charData.Speed;
 		ht["Defense"] = charData.Defense;
 		ht["Team"] = (int)team;
-		
 		return ht;
 	}
 
@@ -177,6 +177,19 @@ public class FSM_Character : FSM_Base
 							ht["Cell"] = actions[i].cTo.id;
 							ht["EaseType"] = ballEase.ToString();
 							ball.StartCoroutine("MoveTo",ht);
+						}
+						break;
+					}
+					case PlayerAction.Actions.Shoot:
+					{
+						if(hasBall)
+						{
+							Hashtable ht = new Hashtable();
+							ht["Speed"] = (float)charData.Strength;
+							ht["Cell"] = actions[i].cTo.id;
+							ht["EaseType"] = ballEase.ToString();
+							ball.StartCoroutine("MoveTo",ht);
+							UnityEventManager.TriggerEvent("ShotFired");
 						}
 						break;
 					}

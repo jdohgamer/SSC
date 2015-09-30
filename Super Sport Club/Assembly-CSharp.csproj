@@ -103,6 +103,7 @@
      <Compile Include="Assets\_Scripts\UI Scripts\UIMainMenu.cs" />
      <Compile Include="Assets\_Scripts\UI Scripts\UISetPiece.cs" />
      <Compile Include="Assets\_Scripts\UI Scripts\UIShotState.cs" />
+     <Compile Include="Assets\_Scripts\UnityEventManager.cs" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\VisualSensorRingShader.shader" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\AspectSphereShader.shader" />
      <None Include="Assets\Plugins\RAIN\Editor\ScriptTemplates\BehaviorTreeTemplate.xml" />
@@ -116,12 +117,6 @@
      <None Include="Assets\Plugins\Pixelplacement\iTween\ReadMe!\ReadMe!.txt" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\AspectRingShader.shader" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\WaypointShader.shader" />
- <Reference Include="Assembly-Boo-firstpass">
- <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Library/ScriptAssemblies/Assembly-Boo-firstpass.dll</HintPath>
- </Reference>
- <Reference Include="Assembly-UnityScript-firstpass">
- <HintPath>C:/Users/BoB/Documents/Projects/Sport Club/Super Sport Club/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>
- </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
@@ -147,6 +142,10 @@
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
       <Project>{F1A87E70-1BC2-C068-91A3-2EB23381E594}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
+    <ProjectReference Include="Assembly-Boo-firstpass.booproj">
+      <Project>{35552552-D2B6-41AA-227E-075D9B90CFC3}</Project>      <Name>Assembly-Boo-firstpass</Name>    </ProjectReference>
+    <ProjectReference Include="Assembly-UnityScript-firstpass.unityproj">
+      <Project>{5C5F8F40-0605-9F30-5B85-66824307629A}</Project>      <Name>Assembly-UnityScript-firstpass</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

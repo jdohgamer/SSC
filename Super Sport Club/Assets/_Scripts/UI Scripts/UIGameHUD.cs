@@ -17,7 +17,7 @@ public class UIGameHUD : IUIState
 	private Vector3 idealPassDir, simpleDir, offsetDir;
 	private Grid_Setup board;
 	private int currentID = -1;
-	private bool isPassing, isMoving, shotFired;
+	private bool isPassing, isMoving, isShooting, shotFired;
 
 	public UIGameHUD(GUIController GUI, CustomGameClient GameClient)
 	{
@@ -27,6 +27,7 @@ public class UIGameHUD : IUIState
 	}
 	public void EnterState ()
 	{
+		UnityEventManager.StartListening("ShotFired", ShotOnGoal);
 		gui.EnableHUD (true);
 	}
 
@@ -36,15 +37,12 @@ public class UIGameHUD : IUIState
 		{
 			ToMainMenu ();
 		}
-		if((board.BallLocation.x<6||board.BallLocation.x>16)&&!shotFired)
-		{
-			shotFired = true;
-			ToShotState ();
-		}
 	}
 	public void ExitState()
 	{
+		UnityEventManager.StopListening("ShotFired",ShotOnGoal);
 		gui.EnableHUD (false);
+		Debug.Log ("Leaving game State");
 		DeselectCharacter ();
 	}
 	public void ToMainMenu ()
@@ -54,6 +52,13 @@ public class UIGameHUD : IUIState
 	public void ToSetPiece ()
 	{
 		gui.UIState = gui.UISP;
+	}
+	void ShotOnGoal()
+	{
+		if(Grid_Setup.Instance.IsShotOnGoal((int)GameClientInstance.team, BallScript.TargetLocation))
+		{
+			ToShotState();
+		}
 	}
 	public void ToShotState ()
 	{
@@ -87,10 +92,13 @@ public class UIGameHUD : IUIState
 			Cell cell = board.GetCellByLocation(hit);
 			if(isPassing)
 			{
-				CreatePlayerMeter(cell.Location);
+				CreatePlayerMeter(cell.Location, PlayerAction.Actions.Pass);
 			}else if(isMoving)
 			{
 				MovementClick(cell);
+			}else if(isShooting)
+			{
+				CreatePlayerMeter(cell.Location, PlayerAction.Actions.Shoot);
 			}
 		}
 	}
@@ -130,17 +138,17 @@ public class UIGameHUD : IUIState
 		} 
 	}	
 
-	void PassClick(Cell tCell)
+	void KickClick(Cell tCell, PlayerAction.Actions act)
 	{
 		if (CurrentSelectedChar.maxActions -CurrentSelectedChar.actionCount > 0) 
 		{
-			GameClientInstance.SetPlayerAction(PlayerAction.PassAction (CurrentSelectedChar,tCell));
+			GameClientInstance.SetPlayerAction(new PlayerAction (act, CurrentSelectedChar,tCell));
 			board.TurnOffHiglightedAdjacent();
 			isPassing = false;
 		}
 	}
 
-	void CreatePlayerMeter(Vector3 location)
+	void CreatePlayerMeter(Vector3 location, PlayerAction.Actions act)
 	{
 		Debug.Log(location);
 		Vector3 CharacterPosition = CurrentSelectedChar.Location;
@@ -189,9 +197,8 @@ public class UIGameHUD : IUIState
 		pc.AddButton("Kick", false).onClick.AddListener (() => 
 			{ 
 				Vector3 kick = meter.GetComponent<Gauge>().StopBounce();
-				Debug.Log(location);
 				Vector3 cellPos = CharacterPosition + kick.normalized * idealPassDir.magnitude;
-				PassClick(board.GetCellByLocation(cellPos));			
+				KickClick(board.GetCellByLocation(cellPos),act);			
 				GameObject.Destroy(meter.gameObject);
 				GameObject.Destroy(panel.gameObject);
 			});
@@ -240,6 +247,15 @@ public class UIGameHUD : IUIState
 					pc.AddButton("Pass", false).onClick.AddListener (() => 
 					{ 
 						isPassing = true;
+						isShooting = false;
+						isMoving = false;
+						board.HighlightAdjacent (true, cellLocation, (int)CurrentSelectedChar.charData.Strength);
+						GameObject.Destroy (panel.gameObject);
+					});	
+					pc.AddButton("Shoot", false).onClick.AddListener (() => 
+					                                                 { 
+						isShooting = true;
+						isPassing = false;
 						isMoving = false;
 						board.HighlightAdjacent (true, cellLocation, (int)CurrentSelectedChar.charData.Strength);
 						GameObject.Destroy (panel.gameObject);
