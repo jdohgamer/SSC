@@ -17,7 +17,7 @@ public class UIShotState : IUIState
 	{
 		//animate to goal
 		int pan = (int)GameClientInstance.team>0 ? 1:-1 ;
-		camAnim.SetInteger("PanDir", pan);
+		camAnim.SetInteger("SwirlDir", pan);
 
 		gui.EnableHUD (true);
 	}
@@ -28,7 +28,7 @@ public class UIShotState : IUIState
 	public void ExitState ()
 	{
 		//move camera back
-		camAnim.SetInteger("PanDir", 0);
+		camAnim.SetInteger("SwirlDir", 0);
 		//maybe don't move if going to menu screen?
 	}
 	public void ToMainMenu ()
@@ -52,6 +52,7 @@ public class UIShotState : IUIState
 	public void EndTurnButton()
 	{
 		//send result
+		iTween.Resume ();
 		ToGameHUD();
 	}
 	public void ClickOnPlayer(int id)

@@ -55,6 +55,7 @@ public class UIGameHUD : IUIState
 	}
 	void ShotOnGoal()
 	{
+		iTween.Pause ();
 		if(Grid_Setup.Instance.IsShotOnGoal((int)GameClientInstance.team, BallScript.TargetLocation))
 		{
 			ToShotState();
@@ -243,7 +244,8 @@ public class UIGameHUD : IUIState
 					GameObject.Destroy (panel.gameObject);
 				});
 
-				if (CurrentSelectedChar.hasBall) {
+				if (CurrentSelectedChar.hasBall || CurrentSelectedChar.LastTargetCell.IsVectorInCell(board.BallLocation)) 
+				{
 					pc.AddButton("Pass", false).onClick.AddListener (() => 
 					{ 
 						isPassing = true;

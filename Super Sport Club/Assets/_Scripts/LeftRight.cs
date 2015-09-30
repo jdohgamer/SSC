@@ -5,6 +5,7 @@ public class LeftRight : MonoBehaviour {
 
 	public float speed;
 	Animator anim;
+	int old=0;
 	// Use this for initialization
 	void Start () 
 	{
@@ -15,7 +16,11 @@ public class LeftRight : MonoBehaviour {
 	void Update () 
 	{
 		float h = Input.GetAxisRaw ("Horizontal");
-		anim.SetInteger("PanDir",(int) h);
+		if (old != h) 
+		{
+			old = (int)h;
+			anim.SetInteger ("PanDir", old);
+		}
 //		if (h != 0) 
 //		{
 //			Vector3 targetDir = new Vector3 (speed * h, 0, 0);

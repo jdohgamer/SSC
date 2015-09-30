@@ -61,7 +61,7 @@ public class CustomGameClient : LoadBalancingClient
 				CalcMoves();
 				Debug.Log("Go and get yourself a good fucking");
 			}
-			//ExecuteMoves(content);
+			ExecuteMoves(content);
 		}else{
 			P2Submitted=true;
 			this.loadBalancingPeer.OpRaiseEvent(EndTurn, content, true, null);

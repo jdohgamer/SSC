@@ -124,7 +124,7 @@ public class Grid_Setup : MonoBehaviour
 			cellCount = length*width;
 			cells2D = new Cell[width,length];
 			GameObject high;
-			Vector3 loc = Vector3.zero, size = new Vector3 (1,0,1);
+			Vector3 loc = Vector3.zero, size = new Vector3 (1,1,1);
 			Team.TeamNumber fieldSide = Team.TeamNumber.NONE;
 			int type = 0;
 			int i = 0;

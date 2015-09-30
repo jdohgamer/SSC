@@ -18,7 +18,7 @@ public class UIMainMenu : IUIState
 	public void EnterState ()
 	{
 		gui.EnableMainMenu (true);
-		if(GameClientInstance.CurrentRoom==null)
+		//if(GameClientInstance.CurrentRoom==null)
 		connectInProcess = GameClientInstance.ConnectToRegionMaster("us");  // can return false for errors
 	}
 	public void Update ()
@@ -54,6 +54,8 @@ public class UIMainMenu : IUIState
 		{
 			this.GameClientInstance.OpJoinRandomRoom (null, 0);
 			ToSetPiece ();
+		} else {
+			Debug.Log ("I Can't Even");
 		}
 	}
 	public void DeselectCharacter()

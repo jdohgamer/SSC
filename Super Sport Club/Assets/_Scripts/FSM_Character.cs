@@ -21,7 +21,12 @@ public class FSM_Character : FSM_Base
 	}
 	public Cell LastTargetCell
 	{
-		get{return lastCell;}
+		get{
+			if (lastCell != null)
+				return lastCell;
+			else
+				return OccupiedCell;
+		}
 	}
 	public Vector3 Location
 	{
@@ -47,7 +52,8 @@ public class FSM_Character : FSM_Base
 	BallScript ball;
 	GameObject[] targetPins;
 	GameObject passTargetPin;//this could be put with targetPins[] and just given a different color
-	PlayerAction[] actions;
+	//PlayerAction[] actions;
+	Queue<PlayerAction> ActionQueue;
 	Cell lastCell;
 	MeshRenderer currentMesh;
 	//Animator anim;
@@ -74,7 +80,8 @@ public class FSM_Character : FSM_Base
 		tran = transform;
 		currentMesh = GetComponentInChildren<MeshRenderer>();
 		//anim = GetComponentInChildren<Animator>();
-		actions = new PlayerAction[maxActions];
+		//actions = new PlayerAction[maxActions];
+		ActionQueue = new Queue<PlayerAction> (maxActions);
 		targetPins = new GameObject[maxActions];
 		passTargetPin = Instantiate(destPin,Vector3.zero,Quaternion.identity) as GameObject;
 		passTargetPin.SetActive(false);
@@ -86,9 +93,11 @@ public class FSM_Character : FSM_Base
 
 	public void SetPlayerAction(PlayerAction act)
 	{
+		
 		if(actionCount<maxActions)
 		{
-			actions[actionCount] = act;
+//			actions[actionCount] = act;
+			ActionQueue.Enqueue (act);
 			actionCount += 1;
 		}
 	}
@@ -124,10 +133,10 @@ public class FSM_Character : FSM_Base
 
 	public void ClearActions()
 	{
-		for(int c= 0;c<actions.Length;c++)
-		{
-			actions[c] = null;
-		}
+//		for(int c= 0;c<actions.Length;c++)
+//		{
+//			actions[c] = null;
+//		}
 		actionCount = 0;
 		for(int t= 0;t<targetPins.Length;t++)
 		{
@@ -137,19 +146,22 @@ public class FSM_Character : FSM_Base
 		targetCount = 0;
 		passTargetPin.SetActive(false);
 		lastCell = null;
+		ActionQueue.Clear ();
 	}
 
 	public IEnumerator ExecuteActions()
 	{
-		for (int i = 0;i<actions.Length;i++)
+		while(ActionQueue.Count>0)
+		//for (int i = 0;i<actions.Length;i++)
 		{
-			if(actions[i]!=null)
+			PlayerAction act = ActionQueue.Dequeue ();
+			if(act!=null)
 			{
-				switch(actions[i].action)
+				switch(act.action)
 				{
 					case PlayerAction.Actions.Move:
 					{
-						Vector3 target = actions[i].cTo.Location;
+						Vector3 target = act.cTo.Location;
 						target += offset;
 						RotateTowards(target);
 					
@@ -159,7 +171,7 @@ public class FSM_Character : FSM_Base
 						{
 							dir = target - (OccupiedCell.Location + offset);
 							nextCell = (OccupiedCell.Location + offset) + dir.normalized;
-							if(CanMove(actions[i].cTo))
+							if(CanMove(act.cTo))
 							{
 								iTween.MoveTo(gameObject, iTween.Hash("position", nextCell, "easeType", easeType, "loopType", "none", "speed", charData.Speed));
 
@@ -174,7 +186,7 @@ public class FSM_Character : FSM_Base
 						{
 							Hashtable ht = new Hashtable();
 							ht["Speed"] = (float)charData.Strength;
-							ht["Cell"] = actions[i].cTo.id;
+							ht["Cell"] = act.cTo.id;
 							ht["EaseType"] = ballEase.ToString();
 							ball.StartCoroutine("MoveTo",ht);
 						}
@@ -186,7 +198,7 @@ public class FSM_Character : FSM_Base
 						{
 							Hashtable ht = new Hashtable();
 							ht["Speed"] = (float)charData.Strength;
-							ht["Cell"] = actions[i].cTo.id;
+							ht["Cell"] = act.cTo.id;
 							ht["EaseType"] = ballEase.ToString();
 							ball.StartCoroutine("MoveTo",ht);
 							UnityEventManager.TriggerEvent("ShotFired");
