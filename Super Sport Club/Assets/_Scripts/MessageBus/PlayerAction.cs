@@ -7,7 +7,7 @@ public class PlayerAction
 {
 	public FSM_Character iCh,tCh;
 	public Cell cFrom, cTo;
-	public enum Actions{Move, Kick, Juke, Pass, Shoot, Cross}
+	public enum Actions{Move, Block, Tackle, Juke, Pass, Shoot, Cross}
 	public Actions action; 
 
 	public PlayerAction()
@@ -50,7 +50,4 @@ public class PlayerAction
 		Cell cell =	Grid_Setup.Instance.GetCellByID((int)ht["tCell"]);
 		return new PlayerAction(act,Grid_Setup.Instance.GetCharacter(iChTeam,iChId),cell);
 	}
-
-
-	
 }

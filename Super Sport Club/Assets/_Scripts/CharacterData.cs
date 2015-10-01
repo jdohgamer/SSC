@@ -7,7 +7,7 @@ public class CharacterData: ScriptableObject
 {
 	
 	public string Name;
-	public int ID;
+	public int ID, MoveDist, Sprints;
 	public float Strength, Speed, Defense;
 	
 	public CharacterData()

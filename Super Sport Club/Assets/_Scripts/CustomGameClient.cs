@@ -27,14 +27,14 @@ public class CustomGameClient : LoadBalancingClient
 	public const byte SubmitTeam = 3;
 	public const string PropTurn = "turn";
 	public const string PropNames = "names";
-	public int TurnNumber{get{ return turnNumber;}}
+	public int TurnNumber{get{return turnNumber;}}
+	public byte ActionsLeft{get{return (byte)(MaxActions - actionCount);}}
 	public Grid_Setup board;
 	public byte MaxActions = 5;
 	public bool bTurnDone;
 	public GUIController gui;
 	public FSM_Character[] oppCharacers;
 	public Team.TeamNumber team;
-	public byte ActionsLeft{get{return (byte)(MaxActions - actionCount);}}
 	Team myTeam;
 	PlayerAction[] myActions, oppActions;
 	bool P1Submitted, P2Submitted;
@@ -110,7 +110,7 @@ public class CustomGameClient : LoadBalancingClient
 			{
 				act.iCh.SetMoveTarget(act.cTo);
 			}
-			if(act.action == PlayerAction.Actions.Pass)
+			if(act.action == PlayerAction.Actions.Pass || act.action == PlayerAction.Actions.Shoot || act.action == PlayerAction.Actions.Cross)
 			{
 				act.iCh.SetPassTarget(act.cTo);
 			}
@@ -474,6 +474,7 @@ public class CustomGameClient : LoadBalancingClient
 			c.StartCoroutine("ExecuteActions");
 		}
 		ClearActions();
+		UnityEventManager.TriggerEvent ("NextTurn");
 		turnNumber++;
 		P1Submitted = false;
 		P2Submitted = false;

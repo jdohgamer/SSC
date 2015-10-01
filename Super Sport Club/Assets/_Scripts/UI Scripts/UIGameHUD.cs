@@ -90,16 +90,19 @@ public class UIGameHUD : IUIState
 	{
 		if(isCharacterSelected)
 		{
-			Cell cell = board.GetCellByLocation(hit);
-			if(isPassing)
+			Cell cell = board.GetCellByLocation (hit);
+			if (board.IsInsideHighlighted (cell.Location)) 
 			{
-				CreatePlayerMeter(cell.Location, PlayerAction.Actions.Pass);
-			}else if(isMoving)
-			{
-				MovementClick(cell);
-			}else if(isShooting)
-			{
-				CreatePlayerMeter(cell.Location, PlayerAction.Actions.Shoot);
+				if (isPassing) 
+				{
+					CreatePlayerMeter (cell.Location, PlayerAction.Actions.Pass);
+				} else if (isMoving) 
+				{
+					MovementClick (cell);
+				} else if (isShooting) 
+				{
+					CreatePlayerMeter (cell.Location, PlayerAction.Actions.Shoot);
+				}
 			}
 		}
 	}
@@ -124,19 +127,16 @@ public class UIGameHUD : IUIState
 	}
 	void MovementClick(Cell tCell)
 	{
-		int actsLeft = CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount;
-		if (actsLeft > 0) 
+		GameClientInstance.SetPlayerAction(new PlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, tCell));
+		if ((CurrentSelectedChar.targetCount == 1 && CurrentSelectedChar.IsSprinting))  
 		{
-			GameClientInstance.SetPlayerAction(new PlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, tCell));
-			actsLeft--;
-			if (actsLeft <= 0) 
-			{
-				board.TurnOffHiglightedAdjacent();
-				isMoving = false;
-			}else{
-				board.HighlightAdjacent (true, tCell.Location, actsLeft);
-			}
-		} 
+			board.HighlightAdjacent (true, tCell.Location, CurrentSelectedChar.MoveDistance);
+
+		}
+		else {
+			board.TurnOffHiglightedAdjacent();
+			isMoving = false;
+		}
 	}	
 
 	void KickClick(Cell tCell, PlayerAction.Actions act)
@@ -221,28 +221,35 @@ public class UIGameHUD : IUIState
 		if(CurrentSelectedChar.actionCount > 0|| CurrentSelectedChar.targetCount > 0) 
 		{
 			pc.AddButton("Clear", false).onClick.AddListener (() => 
-				{ 
-					CurrentSelectedChar.ClearActions();
-					board.TurnOffHiglightedAdjacent();
-					GameObject.Destroy (panel.gameObject);
-				});
+			{ 
+				CurrentSelectedChar.ClearActions();
+				board.TurnOffHiglightedAdjacent();
+				GameObject.Destroy (panel.gameObject);
+			});
 		}
 		if (GameClientInstance.ActionsLeft > 0) 
 		{
 			if ((CurrentSelectedChar.maxActions - CurrentSelectedChar.actionCount > 0))
 			{
-				pc.AddButton("Move", false).onClick.AddListener (() => 
-				{ 
-					isMoving = true;
-					isPassing = false;
-					if (CurrentSelectedChar.targetCount > 0) 
-					{
-						board.HighlightAdjacent (true, CurrentSelectedChar.LastTargetCell.Location, CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount);
-					} else
-						board.HighlightAdjacent (true, cellLocation, CurrentSelectedChar.maxActions - CurrentSelectedChar.targetCount);
-
-					GameObject.Destroy (panel.gameObject);
-				});
+				if(CurrentSelectedChar.targetCount <2 && CurrentSelectedChar.CanSprint)
+				{
+					pc.AddButton ("Sprint", false).onClick.AddListener (() => 
+						{ 
+							CurrentSelectedChar.StartSprinting();
+							GameObject.Destroy (panel.gameObject);
+						});
+				}
+				if (CurrentSelectedChar.targetCount == 0 || (CurrentSelectedChar.targetCount == 1 && CurrentSelectedChar.IsSprinting)) 
+				{
+					pc.AddButton ("Move", false).onClick.AddListener (() => 
+					{ 
+						isMoving = true;
+						isShooting = false;
+						isPassing = false;
+						board.HighlightAdjacent (true, CurrentSelectedChar.LastTargetCell.Location, CurrentSelectedChar.MoveDistance);
+						GameObject.Destroy (panel.gameObject);
+					});
+				}
 
 				if (CurrentSelectedChar.hasBall || CurrentSelectedChar.LastTargetCell.IsVectorInCell(board.BallLocation)) 
 				{

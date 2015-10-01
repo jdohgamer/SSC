@@ -98,6 +98,13 @@ public class Grid_Setup : MonoBehaviour
 			this.SetCharacter(team, i, loc);
 		}
 	}
+	public bool IsInsideHighlighted(Vector3 spot)
+	{
+		if (isHighlighted)
+			return adjacent.neighbors.Contains (spot);
+		else
+			return false;
+	}
 	public void Generate (int w, int l) 
 	{
 		if(!isCreated)
@@ -137,7 +144,7 @@ public class Grid_Setup : MonoBehaviour
 						type = 0;
 					}else{
 						type = 3;
-						if (x < (width / 2)+1) 
+						if (x < (width / 2)-1) 
 						{
 							fieldSide = Team.TeamNumber.TeamOne;
 						} else if (x > (width / 2)-1)

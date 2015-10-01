@@ -9,9 +9,10 @@ public class FSM_Character : FSM_Base
 	public int id, actionCount, targetCount, maxActions = 2;
 	public Team.TeamNumber team;
 	public bool AmTeamOne{get{return (int)team == 0;}}
-	public Vector3 newLocation = Vector3.zero;
 	public CharacterData charData; // contains Name, Id, and stats
 	public bool hasTarget, hasBall;
+	public int MoveDistance{get{return  charData.MoveDist;}}
+	public bool CanSprint{get{return (turnNumber-sprintTurn)>=2;}}
 	public Cell OccupiedCell
 	{
 		get
@@ -32,6 +33,7 @@ public class FSM_Character : FSM_Base
 	{
 		get{return tran.position;}
 	}
+	public bool IsSprinting{get{return bSprinting;}}
 	public enum Stance
 	{
 		Neutral,
@@ -49,10 +51,11 @@ public class FSM_Character : FSM_Base
 	[SerializeField] GameObject destPin;
 	[SerializeField] Color teamColor;
 	[SerializeField] float rayLength = 1.5f;
+	private int moveDist,turnNumber =0, sprintTurn= -2;
+	bool bSprinting;
 	BallScript ball;
 	GameObject[] targetPins;
 	GameObject passTargetPin;//this could be put with targetPins[] and just given a different color
-	//PlayerAction[] actions;
 	Queue<PlayerAction> ActionQueue;
 	Cell lastCell;
 	MeshRenderer currentMesh;
@@ -71,32 +74,47 @@ public class FSM_Character : FSM_Base
 		cd.Defense = (float)ht["Defense"];
 		this.charData = cd;
 		this.team = (Team.TeamNumber)ht["Team"];
-		this.newLocation = (Vector3)ht["Location"];
 	}
 
 	void Awake()
 	{
+		moveDist = charData.MoveDist;
 		CurrentState = Stance.Neutral;
 		tran = transform;
 		currentMesh = GetComponentInChildren<MeshRenderer>();
 		//anim = GetComponentInChildren<Animator>();
-		//actions = new PlayerAction[maxActions];
 		ActionQueue = new Queue<PlayerAction> (maxActions);
 		targetPins = new GameObject[maxActions];
+		for (int i = 0; i < maxActions; i++) 
+		{
+			targetPins[i] = Instantiate(destPin,Vector3.zero,Quaternion.identity) as GameObject;
+			targetPins [i].SetActive (false);
+		}
+
 		passTargetPin = Instantiate(destPin,Vector3.zero,Quaternion.identity) as GameObject;
+		passTargetPin.GetComponent<Renderer> ().material.color = Color.blue;
 		passTargetPin.SetActive(false);
+	}
+	void OnEnable()
+	{
+		UnityEventManager.StartListening ("NextTurn",UpdateTurn);
+	}
+	void OnDisable()
+	{
+		UnityEventManager.StopListening ("NextTurn",UpdateTurn);
 	}
 	void Update()
 	{
 		Debug.DrawRay(tran.position,tran.forward);
 	}
-
+	void UpdateTurn()
+	{
+		turnNumber++;
+	}
 	public void SetPlayerAction(PlayerAction act)
 	{
-		
 		if(actionCount<maxActions)
 		{
-//			actions[actionCount] = act;
 			ActionQueue.Enqueue (act);
 			actionCount += 1;
 		}
@@ -104,19 +122,26 @@ public class FSM_Character : FSM_Base
 
 	public void SetMoveTarget(Cell target)
 	{
-		targetPins[targetCount] = Instantiate(destPin, target.Location, Quaternion.identity) as GameObject;
+		targetPins [targetCount].SetActive(true);
+		targetPins [targetCount].transform.position = target.Location;
 		targetCount++;
 		lastCell = target;
-	}
-	public void MoveTransform(Vector3 newLoc)
-	{
-		tran.position = newLoc;
 	}
 	public void SetPassTarget(Cell target)
 	{
 		passTargetPin.SetActive(true);
 		passTargetPin.transform.position = target.Location;
 	}
+	public void MoveTransform(Vector3 newLoc)
+	{
+		tran.position = newLoc;
+	}
+	public void StartSprinting()
+	{
+		sprintTurn = turnNumber;
+		bSprinting = true;
+	}
+
 
 	public Hashtable GetCharacterAsProp()
 	{
@@ -133,18 +158,15 @@ public class FSM_Character : FSM_Base
 
 	public void ClearActions()
 	{
-//		for(int c= 0;c<actions.Length;c++)
-//		{
-//			actions[c] = null;
-//		}
 		actionCount = 0;
 		for(int t= 0;t<targetPins.Length;t++)
 		{
-			if(targetPins[t]!=null)
-			Destroy(targetPins[t]);
+			targetPins [t].SetActive (false);
 		}
 		targetCount = 0;
-		passTargetPin.SetActive(false);
+		if(sprintTurn!=turnNumber)
+		bSprinting = false;
+		//passTargetPin.SetActive(false);
 		lastCell = null;
 		ActionQueue.Clear ();
 	}
@@ -203,6 +225,18 @@ public class FSM_Character : FSM_Base
 							ball.StartCoroutine("MoveTo",ht);
 							UnityEventManager.TriggerEvent("ShotFired");
 						}
+						break;
+					}
+					case PlayerAction.Actions.Juke:
+					{
+						break;
+					}
+					case PlayerAction.Actions.Tackle:
+					{
+						break;
+					}
+					case PlayerAction.Actions.Block:
+					{
 						break;
 					}
 				}
@@ -315,6 +349,7 @@ public class FSM_Character : FSM_Base
 				other.transform.SetParent(transform);
 				other.transform.position = transform.TransformPoint(0,0,1);
 				ball = other.GetComponent<BallScript>();
+				ball.StopMe ();
 				break;
 			}
 		}
