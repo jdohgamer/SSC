@@ -37,6 +37,10 @@ public class UIGameHUD : IUIState
 		{
 			ToMainMenu ();
 		}
+		if (Input.GetKeyDown (KeyCode.Space)) 
+		{
+			ToShotState ();
+		}
 	}
 	public void ExitState()
 	{
@@ -64,6 +68,9 @@ public class UIGameHUD : IUIState
 	public void ToShotState ()
 	{
 		gui.UIState = gui.UISOG;
+	}
+	void ScorePoint ()
+	{
 	}
 	public void ToGameHUD ()
 	{

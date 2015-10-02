@@ -20,6 +20,7 @@ using Random = UnityEngine.Random;
 //		return string.Format("\"{0}\"[{1}] {2} ({3})", RoomName, MyPlayerId, MyTurn, SupportClass.DictionaryToString(AvailableProperties));
 //	}
 //}
+
 public class CustomGameClient : LoadBalancingClient 
 {
 	public const byte EndTurn = 1;
@@ -35,6 +36,7 @@ public class CustomGameClient : LoadBalancingClient
 	public GUIController gui;
 	public FSM_Character[] oppCharacers;
 	public Team.TeamNumber team;
+	int[] score;
 	Team myTeam;
 	PlayerAction[] myActions, oppActions;
 	bool P1Submitted, P2Submitted;
@@ -46,6 +48,7 @@ public class CustomGameClient : LoadBalancingClient
 	{
 		myActions = new PlayerAction[MaxActions];
 		oppCharacers = new FSM_Character[teamSize];
+		score = new int[2];
 	}
 	
 	public void EndTurnEvent()
@@ -81,6 +84,22 @@ public class CustomGameClient : LoadBalancingClient
 	
 		this.loadBalancingPeer.OpRaiseEvent(SubmitTeam, TeamHT, true, null);
 			
+	}
+	public int TeamScore(int team)
+	{
+		if (team > 1 || team<0) 
+		{
+			return -1;
+		}
+		return score [team];
+	}
+	public void ScorePoint(int team)
+	{
+		if (team > 1 || team<0) 
+		{
+			return;
+		}
+		score [team] += 1;
 	}
 
 	bool IsPlayerOne()
@@ -401,43 +420,12 @@ public class CustomGameClient : LoadBalancingClient
 	{
 		Hashtable MoveSet = new Hashtable();
 
-//		for (int i = 0; i<myActions.Length; i++) 
-//		{
-//			if(myActions[i]!=null)
-//			{
-//				for (int j = 0; j<oppActions.Length; j++) 
-//				{
-//					if(oppActions[j]!=null)
-//					{
-//						if(myActions[i].cTo==oppActions[j].cTo)
-//						{
-//							if(myActions[i].action == PlayerAction.Actions.Move && oppActions[j].action== PlayerAction.Actions.Move)
-//							{
-//								float m = Random.Range(0,5), o = Random.Range(0,5);
-//								Debug.Log(m+", "+o);
-//								if(m>o)
-//								{
-//									MoveSet[(i).ToString()] = myActions[i].GetActionProp();
-//								}else 
-//								{
-//									MoveSet[(i+myActions.Length).ToString()] = oppActions[i].GetActionProp();
-//								}
-//							}
-//						}else{	
-//						}
-//						MoveSet[(i+myActions.Length).ToString()] = oppActions[i].GetActionProp();
-//					}
-//				}
-//				MoveSet[(i).ToString()] = myActions[i].GetActionProp();
-//			}
-//		}
 		for (int i = 0; i<oppActions.Length; i++) 
 		{
 			if(oppActions[i]!=null)
 			{
 				MoveSet[(i).ToString()] = oppActions[i].GetActionProp();
 			}
-			
 		}
 		for (int i = 0; i<myActions.Length; i++) 
 		{
@@ -445,13 +433,11 @@ public class CustomGameClient : LoadBalancingClient
 			{
 				MoveSet[(i+oppActions.Length).ToString()] = myActions[i].GetActionProp();
 			}
-
 		}
 		ExecuteMoves(MoveSet);
 
 		this.loadBalancingPeer.OpRaiseEvent(Execute, MoveSet, true, null);
 		//new RaiseEventOptions{Receivers = ReceiverGroup.All }
-	
 	}
 	void ExecuteMoves(Hashtable moves)
 	{

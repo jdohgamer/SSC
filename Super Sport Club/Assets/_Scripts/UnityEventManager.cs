@@ -3,9 +3,14 @@ using UnityEngine.Events;
 using System.Collections;
 using System.Collections.Generic;
 
-public class UnityEventManager : MonoBehaviour {
+public class IntEvent: UnityEvent<int>
+{
+}
+public class UnityEventManager : MonoBehaviour 
+{
 
 	private Dictionary <string, UnityEvent> eventDictionary;
+	private Dictionary <string, IntEvent> IntEventDictionary;
 
 	private static UnityEventManager eventManager;
 
@@ -36,12 +41,14 @@ public class UnityEventManager : MonoBehaviour {
 		if (eventDictionary == null)
 		{
 			eventDictionary = new Dictionary<string, UnityEvent>();
+			IntEventDictionary = new Dictionary<string, IntEvent>();
 		}
 	}
 
 	public static void StartListening (string eventName, UnityAction listener)
 	{
 		UnityEvent thisEvent = null;
+		UnityEvent thisIntEvent = null;
 		if (instance.eventDictionary.TryGetValue (eventName, out thisEvent))
 		{
 			thisEvent.AddListener (listener);
@@ -51,6 +58,20 @@ public class UnityEventManager : MonoBehaviour {
 			thisEvent = new UnityEvent ();
 			thisEvent.AddListener (listener);
 			instance.eventDictionary.Add (eventName, thisEvent);
+		}
+	}
+	public static void StartListeningInt (string eventName, UnityAction<int> listener)
+	{
+		IntEvent thisIntEvent = null;
+		if (instance.IntEventDictionary.TryGetValue (eventName, out thisIntEvent))
+		{
+			thisIntEvent.AddListener (listener);
+		} 
+		else
+		{
+			thisIntEvent = new IntEvent ();
+			thisIntEvent.AddListener (listener);
+			instance.IntEventDictionary.Add (eventName, thisIntEvent);
 		}
 	}
 
@@ -63,6 +84,15 @@ public class UnityEventManager : MonoBehaviour {
 			thisEvent.RemoveListener (listener);
 		}
 	}
+	public static void StopListeningInt (string eventName, UnityAction<int> listener)
+	{
+		if (eventManager == null) return;
+		IntEvent thisEvent = null;
+		if (instance.IntEventDictionary.TryGetValue (eventName, out thisEvent))
+		{
+			thisEvent.RemoveListener (listener);
+		}
+	}
 
 	public static void TriggerEvent (string eventName)
 	{
@@ -70,6 +100,14 @@ public class UnityEventManager : MonoBehaviour {
 		if (instance.eventDictionary.TryGetValue (eventName, out thisEvent))
 		{
 			thisEvent.Invoke ();
+		}
+	}
+	public static void TriggerEventInt (string eventName, int i)
+	{
+		IntEvent thisEvent = null;
+		if (instance.IntEventDictionary.TryGetValue (eventName, out thisEvent))
+		{
+			thisEvent.Invoke (i);
 		}
 	}
 

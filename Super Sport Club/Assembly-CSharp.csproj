@@ -95,6 +95,7 @@
      <Compile Include="Assets\_Scripts\RightClickSell.cs" />
      <Compile Include="Assets\_Scripts\SSB_Player.cs" />
      <Compile Include="Assets\_Scripts\Team.cs" />
+     <Compile Include="Assets\_Scripts\TriggerGoal.cs" />
      <Compile Include="Assets\_Scripts\TurnButton.cs" />
      <Compile Include="Assets\_Scripts\TweenBy.cs" />
      <Compile Include="Assets\_Scripts\UI Scripts\GUIController.cs" />

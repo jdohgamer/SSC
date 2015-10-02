@@ -58,7 +58,17 @@ public class GUIController: MonoBehaviour
 		UISOG = new UIShotState(this, GameClientInstance);
 		UIState = UIMM;
 	}
-	
+	void OnEnable()
+	{
+		UnityEventManager.StartListeningInt("ScoreGoal", GameClientInstance.ScorePoint);
+
+	}
+	void OnDisable()
+	{
+		UnityEventManager.StopListeningInt("ScoreGoal", GameClientInstance.ScorePoint);
+
+	}
+
 	void Update()
 	{
 		timeSinceService += Time.deltaTime;
@@ -79,6 +89,7 @@ public class GUIController: MonoBehaviour
 			infoText.text = string.Format(" Turn: {2}\n team: {0}. \n You're on the: {1} side. \n", (int)GameClientInstance.team , side, GameClientInstance.TurnNumber);
 			infoText.text += string.Format (" You have {0} moves left \n", GameClientInstance.ActionsLeft);
 			infoText.text += string.Format(" Opponenent ready: {0}\n", GameClientInstance.HasOppSubmitted());
+			infoText.text += string.Format(" Score: {0} : {1}\n", GameClientInstance.TeamScore(0), GameClientInstance.TeamScore(1));
 			yield return new WaitForSeconds (1f);
 		}
 		yield return null;

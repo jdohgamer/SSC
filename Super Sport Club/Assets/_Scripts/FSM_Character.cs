@@ -142,7 +142,6 @@ public class FSM_Character : FSM_Base
 		bSprinting = true;
 	}
 
-
 	public Hashtable GetCharacterAsProp()
 	{
 		Hashtable ht = new Hashtable();
@@ -164,7 +163,7 @@ public class FSM_Character : FSM_Base
 			targetPins [t].SetActive (false);
 		}
 		targetCount = 0;
-		if(sprintTurn!=turnNumber)
+		if(sprintTurn==turnNumber)
 		bSprinting = false;
 		//passTargetPin.SetActive(false);
 		lastCell = null;

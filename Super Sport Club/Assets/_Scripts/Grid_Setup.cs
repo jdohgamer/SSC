@@ -52,15 +52,14 @@ public class Grid_Setup : MonoBehaviour
 	[SerializeField] Vector3 TeamOneGoal, TeamTwoGoal, GoalSize;
 	private static Cell highlightSingle;
 	private Cell[,] cells2D;
-	private GameObject field;
-	private Transform fieldTran;
+	private Transform fieldTran, TeamOneTran, TeamTwoTran;
 	private AdjacentIndexes adjacent;
 	public bool isHighlighted, isCreated;
 	private int length, width, cellCount;
 
 	void Awake()
 	{
-		field = new GameObject("Field");
+		GameObject field = new GameObject("Field");
 		fieldTran = field.transform;
 	}
 
