@@ -11,6 +11,7 @@ public class Team
 	public FSM_Character[] mates;
 	public Bounds GoalArea;
 	int characterCount = 0, teamSize = 5;
+	Quaternion face;
 
 	public Team(TeamNumber num, Color TeamColor, int Size, Vector3 goalCenter, Vector3 goalSize)
 	{
@@ -18,6 +19,7 @@ public class Team
 		teamColor = TeamColor;
 		mates = new FSM_Character[Size];
 		GoalArea = new Bounds (goalCenter, goalSize);
+		face = num==0 ? Quaternion.LookRotation(Vector3.right):Quaternion.LookRotation(-Vector3.right) ;
 	}
 
 	public void AddMate(FSM_Character newGuy)
@@ -25,10 +27,19 @@ public class Team
 		if(this.characterCount<this.teamSize)
 		{
 			this.mates [characterCount] = newGuy;
+			this.mates [characterCount].transform.rotation = face;
 			this.mates [characterCount].id = characterCount;
 			this.mates [characterCount].team = teamNum;
 			this.mates [characterCount].SetColor (teamColor);
 			this.characterCount++;
+		}
+	}
+	public void Sleep()
+	{
+		for (int t = 0; t < teamSize; t++) 
+		{
+			mates [t].transform.rotation = face;
+			mates [t].gameObject.SetActive (false);
 		}
 	}
 	public Hashtable GetTeamAsProps()

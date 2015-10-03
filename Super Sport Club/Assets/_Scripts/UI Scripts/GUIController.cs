@@ -60,13 +60,17 @@ public class GUIController: MonoBehaviour
 	}
 	void OnEnable()
 	{
-		UnityEventManager.StartListeningInt("ScoreGoal", GameClientInstance.ScorePoint);
-
+		UnityEventManager.StartListeningInt("ScoreGoal", GoalScored);
 	}
 	void OnDisable()
 	{
-		UnityEventManager.StopListeningInt("ScoreGoal", GameClientInstance.ScorePoint);
-
+		UnityEventManager.StopListeningInt("ScoreGoal", GoalScored);
+	}
+	void GoalScored(int p)
+	{
+		board.ResetBoard ();
+		GameClientInstance.ScorePoint (p);
+		UIState = UISP;
 	}
 
 	void Update()

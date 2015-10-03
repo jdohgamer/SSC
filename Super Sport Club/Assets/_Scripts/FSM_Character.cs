@@ -12,7 +12,7 @@ public class FSM_Character : FSM_Base
 	public CharacterData charData; // contains Name, Id, and stats
 	public bool hasTarget, hasBall;
 	public int MoveDistance{get{return  charData.MoveDist;}}
-	public bool CanSprint{get{return (turnNumber-sprintTurn)>=2;}}
+	public bool CanSprint{get{return (turnsSinceSprint>=2);}}
 	public Cell OccupiedCell
 	{
 		get
@@ -51,7 +51,7 @@ public class FSM_Character : FSM_Base
 	[SerializeField] GameObject destPin;
 	[SerializeField] Color teamColor;
 	[SerializeField] float rayLength = 1.5f;
-	private int moveDist,turnNumber =0, sprintTurn= -2;
+	private int moveDist, turnsSinceSprint= 2;
 	bool bSprinting;
 	BallScript ball;
 	GameObject[] targetPins;
@@ -88,6 +88,7 @@ public class FSM_Character : FSM_Base
 		for (int i = 0; i < maxActions; i++) 
 		{
 			targetPins[i] = Instantiate(destPin,Vector3.zero,Quaternion.identity) as GameObject;
+
 			targetPins [i].SetActive (false);
 		}
 
@@ -109,7 +110,7 @@ public class FSM_Character : FSM_Base
 	}
 	void UpdateTurn()
 	{
-		turnNumber++;
+		turnsSinceSprint++;
 	}
 	public void SetPlayerAction(PlayerAction act)
 	{
@@ -138,7 +139,6 @@ public class FSM_Character : FSM_Base
 	}
 	public void StartSprinting()
 	{
-		sprintTurn = turnNumber;
 		bSprinting = true;
 	}
 
@@ -163,9 +163,8 @@ public class FSM_Character : FSM_Base
 			targetPins [t].SetActive (false);
 		}
 		targetCount = 0;
-		if(sprintTurn==turnNumber)
 		bSprinting = false;
-		//passTargetPin.SetActive(false);
+		passTargetPin.SetActive(false);
 		lastCell = null;
 		ActionQueue.Clear ();
 	}
@@ -182,6 +181,10 @@ public class FSM_Character : FSM_Base
 				{
 					case PlayerAction.Actions.Move:
 					{
+						if (bSprinting) 
+						{
+							turnsSinceSprint = 0;
+						}
 						Vector3 target = act.cTo.Location;
 						target += offset;
 						RotateTowards(target);

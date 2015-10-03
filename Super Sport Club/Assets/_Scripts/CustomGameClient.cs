@@ -30,11 +30,24 @@ public class CustomGameClient : LoadBalancingClient
 	public const string PropNames = "names";
 	public int TurnNumber{get{return turnNumber;}}
 	public byte ActionsLeft{get{return (byte)(MaxActions - actionCount);}}
+	public bool GameWasAbandoned
+	{
+		get { return this.CurrentRoom != null && this.CurrentRoom.Players.Count < 2 && this.CurrentRoom.CustomProperties.ContainsKey("t#"); }
+	}
+	public Player Opponent
+	{
+		get
+		{
+			Player opp = this.LocalPlayer.GetNext();
+			//Debug.Log("you: " + this.LocalPlayer.ToString() + " other: " + opp.ToString());
+			return opp;
+		}
+	}
 	public Grid_Setup board;
 	public byte MaxActions = 5;
 	public bool bTurnDone;
 	public GUIController gui;
-	public FSM_Character[] oppCharacers;
+	//public FSM_Character[] oppCharacers;
 	public Team.TeamNumber team;
 	int[] score;
 	Team myTeam;
@@ -47,7 +60,7 @@ public class CustomGameClient : LoadBalancingClient
 	public CustomGameClient()
 	{
 		myActions = new PlayerAction[MaxActions];
-		oppCharacers = new FSM_Character[teamSize];
+		//oppCharacers = new FSM_Character[teamSize];
 		score = new int[2];
 	}
 	
@@ -156,10 +169,6 @@ public class CustomGameClient : LoadBalancingClient
 			if(ht[i.ToString()]!=null)
 			{
 				Hashtable ion = ht[i.ToString()]as Hashtable;
-//				PlayerAction.Actions act = (PlayerAction.Actions)ion["Act"];
-//				int iChId = (int)ion["iCharacter"];
-//				int iChTeam = (int)ion["iCharacterTeam"];
-//				Cell cell =	Grid_Setup.Instance.GetCellByID((int)ion["tCell"]);
 				actions[i] = PlayerAction.GetActionFromProps(ion);
 			}
 		}
@@ -185,18 +194,18 @@ public class CustomGameClient : LoadBalancingClient
 		
 		switch (operationResponse.OperationCode)
 		{
-		case (byte)OperationCode.WebRpc:
-			if (operationResponse.ReturnCode == 0)
-			{
-				//this.OnWebRpcResponse(new WebRpcResponse(operationResponse));
-			}
-			break;
-		case (byte)OperationCode.JoinGame:
-		case (byte)OperationCode.CreateGame:
-			if (operationResponse.ReturnCode != 0)
-			{
-				Debug.Log(string.Format("Join or Create failed for: '{2}' Code: {0} Msg: {1}", operationResponse.ReturnCode, operationResponse.DebugMessage, this.CurrentRoom));
-			}
+			case (byte)OperationCode.WebRpc:
+				if (operationResponse.ReturnCode == 0)
+				{
+					//this.OnWebRpcResponse(new WebRpcResponse(operationResponse));
+				}
+				break;
+			case (byte)OperationCode.JoinGame:
+			case (byte)OperationCode.CreateGame:
+				if (operationResponse.ReturnCode != 0)
+				{
+					Debug.Log(string.Format("Join or Create failed for: '{2}' Code: {0} Msg: {1}", operationResponse.ReturnCode, operationResponse.DebugMessage, this.CurrentRoom));
+				}
 			if (this.Server == ServerConnection.GameServer)
 			{
 				if (operationResponse.ReturnCode == 0)
@@ -209,13 +218,13 @@ public class CustomGameClient : LoadBalancingClient
 				}
 			}
 			break;
-		case (byte)OperationCode.JoinRandomGame:
-			if (operationResponse.ReturnCode == ErrorCode.NoRandomMatchFound)
-			{
-				// no room found: we create one!
-				this.CreateTurnbasedRoom();
-				Debug.Log("New room created");
-			}
+			case (byte)OperationCode.JoinRandomGame:
+				if (operationResponse.ReturnCode == ErrorCode.NoRandomMatchFound)
+				{
+					// no room found: we create one!
+					this.CreateTurnbasedRoom();
+					Debug.Log("New room created");
+				}
 			break;
 		}
 	}
@@ -287,14 +296,6 @@ public class CustomGameClient : LoadBalancingClient
 		}
 		Debug.Log(photonEvent.Code.ToString());
 	}
-//	IEnumerator WaitForBothPlayers()
-//	{
-//		while(!(P1Submitted && P2Submitted))
-//		{
-//			
-//			yield return new WaitForSeconds(0.2f);
-//		}
-//	}
 
 	public void LoadBoardFromProperties(bool calledByEvent)
 	{	
@@ -403,19 +404,7 @@ public class CustomGameClient : LoadBalancingClient
 		boardProps[PropNames] = string.Format("{0};{1}", this.LocalPlayer.NickName, this.Opponent.NickName);
 		this.OpSetCustomPropertiesOfRoom(boardProps, false);
 	}
-	public bool GameWasAbandoned
-	{
-		get { return this.CurrentRoom != null && this.CurrentRoom.Players.Count < 2 && this.CurrentRoom.CustomProperties.ContainsKey("t#"); }
-	}
-	public Player Opponent
-	{
-		get
-		{
-			Player opp = this.LocalPlayer.GetNext();
-			//Debug.Log("you: " + this.LocalPlayer.ToString() + " other: " + opp.ToString());
-			return opp;
-		}
-	}
+
 	public void CalcMoves()
 	{
 		Hashtable MoveSet = new Hashtable();

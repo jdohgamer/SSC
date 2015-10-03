@@ -238,7 +238,7 @@ public class UIGameHUD : IUIState
 		{
 			if ((CurrentSelectedChar.maxActions - CurrentSelectedChar.actionCount > 0))
 			{
-				if(CurrentSelectedChar.targetCount <2 && CurrentSelectedChar.CanSprint)
+				if(CurrentSelectedChar.targetCount <2 && CurrentSelectedChar.CanSprint  && !CurrentSelectedChar.IsSprinting)
 				{
 					pc.AddButton ("Sprint", false).onClick.AddListener (() => 
 						{ 

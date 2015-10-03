@@ -55,6 +55,8 @@ public class UIMainMenu : IUIState
 			this.GameClientInstance.OpJoinRandomRoom (null, 0);
 			ToSetPiece ();
 		} else {
+			GameClientInstance.Disconnect ();
+			connectInProcess = GameClientInstance.ConnectToRegionMaster("us"); 
 			Debug.Log ("I Can't Even");
 		}
 	}

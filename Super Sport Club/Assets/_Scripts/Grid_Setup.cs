@@ -38,13 +38,12 @@ struct AdjacentIndexes
 public class Grid_Setup : MonoBehaviour 
 {
 	public static GameObject Ball;
-	public Vector3 BallLocation{get{return Ball.transform.position;}}
-	public Vector3 BallTarget{get{return Ball.transform.position;}}
 	public static Grid_Setup Instance;//not technically a singleton
 	public Team[] Teams;
+	public Vector3 BallLocation{get{return Ball.transform.position;}}
 	public int Length{get{return length;}}
 	public int Width{get{return width;}}
-	public int TeamSize{ get { return teamSize;}}
+	public int TeamSize{ get{return teamSize;}}
 	[SerializeField] GameObject highlightFab, ballFab, charFab;
 	[SerializeField] CharacterData[] positionData;
 	[SerializeField] Color[] TeamColors =  {Color.black, Color.white};
@@ -97,6 +96,14 @@ public class Grid_Setup : MonoBehaviour
 			this.SetCharacter(team, i, loc);
 		}
 	}
+	public void ResetBoard ()
+	{
+		Ball.GetComponent<BallScript>().StopMe();
+		Ball.transform.SetParent (null);
+		Ball.transform.position = new Vector3 (11,0.1f,6);
+		Teams [0].Sleep ();
+		Teams [1].Sleep ();
+	}
 	public bool IsInsideHighlighted(Vector3 spot)
 	{
 		if (isHighlighted)
@@ -111,13 +118,13 @@ public class Grid_Setup : MonoBehaviour
 			Teams = new Team[2];
 			for(int t = 0; t<2 ; t++)
 			{
-				bool teamOne = t == 0;
-				Vector3 goal = teamOne ? TeamOneGoal : TeamTwoGoal;
+				//bool teamOne = t == 0;
+				Vector3 goal = t == 0 ? TeamOneGoal : TeamTwoGoal;
 				Teams [t] = new Team ((Team.TeamNumber)t, TeamColors[t], teamSize, goal, GoalSize);
-				Quaternion face = teamOne ? Quaternion.LookRotation(Vector3.right):Quaternion.LookRotation(-Vector3.right) ;
+				//Quaternion face = teamOne ? Quaternion.LookRotation(Vector3.right):Quaternion.LookRotation(-Vector3.right) ;
 				for(int c = 0; c <teamSize; c++)
 				{
-					GameObject newGuy = Instantiate(charFab,Vector3.zero + new Vector3((float)t,0.2f,(float)c),face) as GameObject;
+					GameObject newGuy = Instantiate(charFab,Vector3.zero + new Vector3((float)t,0.2f,(float)c),Quaternion.identity) as GameObject;
 					Teams [t].AddMate(newGuy.GetComponent<FSM_Character>());
 					Teams [t].mates [c].charData = positionData [c];
 					newGuy.SetActive (false);

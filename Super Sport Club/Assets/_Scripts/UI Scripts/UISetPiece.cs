@@ -131,6 +131,7 @@ public class UISetPiece : IUIState
 	}
 	public void ResetCharacterPanel()
 	{
+		gui.EnableHUD (true);
 		gui.EnableCharacterPanel(true);
 		for (int c = 0; c < dragPortraits.Length; c++) 
 		{

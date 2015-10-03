@@ -12,7 +12,8 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 	public int index;
 	//[SerializeField] GUIController GUI;
 	public UISetPiece gui;
-	public string PlayerPosition{
+	public string PlayerPosition
+	{
 		get{return playerPosition;}
 		set{playerPosition = value; text.text = playerPosition;}
 	}
