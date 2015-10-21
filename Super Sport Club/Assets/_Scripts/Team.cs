@@ -6,10 +6,10 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 public class Team 
 {
 	public enum TeamNumber{TeamOne=0,TeamTwo=1, NONE = -1}
-	public TeamNumber teamNum;
-	public Color teamColor;
 	public FSM_Character[] mates;
-	public Bounds GoalArea;
+	TeamNumber teamNum = TeamNumber.NONE;
+	Color teamColor;
+	Bounds goalArea;
 	int characterCount = 0, teamSize = 5;
 	Quaternion face;
 
@@ -18,7 +18,7 @@ public class Team
 		teamNum = num;
 		teamColor = TeamColor;
 		mates = new FSM_Character[Size];
-		GoalArea = new Bounds (goalCenter, goalSize);
+		goalArea = new Bounds (goalCenter, goalSize);
 		face = num==0 ? Quaternion.LookRotation(Vector3.right):Quaternion.LookRotation(-Vector3.right) ;
 	}
 
@@ -56,6 +56,6 @@ public class Team
 	}
 	public bool IsVectorInGoal(Vector3 spot)
 	{
-		return GoalArea.Contains(spot);
+		return goalArea.Contains(spot);
 	}
 }

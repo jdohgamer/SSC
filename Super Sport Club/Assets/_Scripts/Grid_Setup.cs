@@ -83,7 +83,7 @@ public class Grid_Setup : MonoBehaviour
 		if(team<Teams.Length && index<teamSize)
 		{
 			Teams[team].mates[index].gameObject.SetActive(true);
-			Teams[team].mates[index].MoveTransform(GetCellByLocation(location).Location + new Vector3(0,0.2f,0));
+			Teams[team].mates[index].MoveTransform(GetCellByLocation(location).Location);
 		}
 	}
 	public void LoadCharactersFromProps(Hashtable ht)
@@ -144,16 +144,17 @@ public class Grid_Setup : MonoBehaviour
 			for (int x = 0; x<width; x++)
 			{
 				for (int z = 0; z<length; z++)
-				{					
+				{	
+					fieldSide = Team.TeamNumber.NONE;
 					if(x==0||x==width-1||z==0||z==length-1)//Border
 					{
 						type = 0;
 					}else{
 						type = 3;
-						if (x < (width / 2)-1) 
+						if (x < (width / 2)) 
 						{
 							fieldSide = Team.TeamNumber.TeamOne;
-						} else if (x > (width / 2)-1)
+						} else if (x > (width / 2))
 						{
 							fieldSide = Team.TeamNumber.TeamTwo;
 						}

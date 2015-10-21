@@ -18,6 +18,7 @@ public class UIGameHUD : IUIState
 	private Grid_Setup board;
 	private int currentID = -1;
 	private bool isPassing, isMoving, isShooting, shotFired;
+	//LayerMask mask = (1<<LayerMask.NameToLayer("Ground") | 1<<LayerMask.NameToLayer("Characters"));
 
 	public UIGameHUD(GUIController GUI, CustomGameClient GameClient)
 	{
@@ -159,7 +160,7 @@ public class UIGameHUD : IUIState
 	void CreatePlayerMeter(Vector3 location, PlayerAction.Actions act)
 	{
 		Debug.Log(location);
-		Vector3 CharacterPosition = CurrentSelectedChar.Location;
+		Vector3 CharacterPosition = CurrentSelectedChar.LastTargetCell.Location;
 		idealPassDir = location - CharacterPosition;
 		idealPassDir.y = 0;
 
@@ -203,13 +204,13 @@ public class UIGameHUD : IUIState
 		PanelController pc = panel.GetComponent<PanelController> ();
 
 		pc.AddButton("Kick", false).onClick.AddListener (() => 
-			{ 
-				Vector3 kick = meter.GetComponent<Gauge>().StopBounce();
-				Vector3 cellPos = CharacterPosition + kick.normalized * idealPassDir.magnitude;
-				KickClick(board.GetCellByLocation(cellPos),act);			
-				GameObject.Destroy(meter.gameObject);
-				GameObject.Destroy(panel.gameObject);
-			});
+		{ 
+			Vector3 kick = meter.GetComponent<Gauge>().StopBounce();
+			Vector3 cellPos = CharacterPosition + kick.normalized * idealPassDir.magnitude;
+			KickClick(board.GetCellByLocation(cellPos),act);			
+			GameObject.Destroy(meter.gameObject);
+			GameObject.Destroy(panel.gameObject);
+		});
 	}
 
 	void CreateButtonPanel(Vector3 cellLocation)
@@ -224,6 +225,7 @@ public class UIGameHUD : IUIState
 		panel.transform.SetParent(gui.UIcan.transform,false);
 		panel.transform.SetAsLastSibling();
 		PanelController pc = panel.GetComponent<PanelController> ();
+		Vector3 CharacterPosition = CurrentSelectedChar.LastTargetCell.Location;
 
 		if(CurrentSelectedChar.actionCount > 0|| CurrentSelectedChar.targetCount > 0) 
 		{
@@ -253,7 +255,7 @@ public class UIGameHUD : IUIState
 						isMoving = true;
 						isShooting = false;
 						isPassing = false;
-						board.HighlightAdjacent (true, CurrentSelectedChar.LastTargetCell.Location, CurrentSelectedChar.MoveDistance);
+						board.HighlightAdjacent (true, CharacterPosition, CurrentSelectedChar.MoveDistance);
 						GameObject.Destroy (panel.gameObject);
 					});
 				}
@@ -265,15 +267,15 @@ public class UIGameHUD : IUIState
 						isPassing = true;
 						isShooting = false;
 						isMoving = false;
-						board.HighlightAdjacent (true, cellLocation, (int)CurrentSelectedChar.charData.Strength);
+						board.HighlightAdjacent (true,  CharacterPosition, (int)CurrentSelectedChar.charData.Strength);
 						GameObject.Destroy (panel.gameObject);
 					});	
 					pc.AddButton("Shoot", false).onClick.AddListener (() => 
-					                                                 { 
+					{ 
 						isShooting = true;
 						isPassing = false;
 						isMoving = false;
-						board.HighlightAdjacent (true, cellLocation, (int)CurrentSelectedChar.charData.Strength);
+						board.HighlightAdjacent (true,  CharacterPosition, (int)CurrentSelectedChar.charData.Strength);
 						GameObject.Destroy (panel.gameObject);
 					});	
 				}

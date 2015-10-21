@@ -82,6 +82,42 @@ public class GUIController: MonoBehaviour
 			timeSinceService = 0;
 		}
 		UIState.Update ();
+
+		if(GameClientInstance.CurrentRoom!=null)
+		{
+			if (!bUpdatingInfo) 
+			{
+				StartCoroutine ("UpdateInfo");
+			}
+			if (Input.GetMouseButtonDown (0)) 
+			{
+				RaycastHit hit;
+				Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+
+				if (!EventSystem.current.IsPointerOverGameObject () && Physics.Raycast (ray, out hit, 100f, mask)) 
+				{
+					switch (hit.transform.tag) 
+					{
+					case "Player":
+						{
+							int id = hit.transform.gameObject.GetComponent<FSM_Character> ().id;
+							UIState.ClickOnPlayer (id);
+							break;
+
+						}
+					case "Field":
+						{
+							UIState.ClickOnField (hit.point);
+							break;
+						}
+					}
+				}	
+			}
+			if (Input.GetMouseButtonDown (1)) 
+			{
+				UIState.DeselectCharacter();
+			}
+		}
 	}
 
 	public IEnumerator UpdateInfo ()
@@ -97,45 +133,6 @@ public class GUIController: MonoBehaviour
 			yield return new WaitForSeconds (1f);
 		}
 		yield return null;
-	}
-
-	void FixedUpdate() 
-	{
-		if(GameClientInstance.CurrentRoom!=null)
-		{
-			if (!bUpdatingInfo) 
-			{
-				StartCoroutine ("UpdateInfo");
-			}
-			if (Input.GetMouseButtonUp (0)) 
-			{
-				RaycastHit hit;
-				Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
-				
-				if (!EventSystem.current.IsPointerOverGameObject () && Physics.Raycast (ray, out hit, 100f, mask)) 
-				{
-					switch (hit.transform.tag) 
-					{
-						case "Player":
-						{
-							int id = hit.transform.gameObject.GetComponent<FSM_Character> ().id;
-							UIState.ClickOnPlayer (id);
-							break;
-						
-						}
-						case "Field":
-						{
-							UIState.ClickOnField (hit.point);
-							break;
-						}
-					}
-				}	
-			}
-			if (Input.GetMouseButtonUp (1)) 
-			{
-				UIState.DeselectCharacter();
-			}
-		}
 	}
 
 	public void EnableHUD(bool set)

@@ -5,12 +5,15 @@ using System.Collections;
 public class Cell
 {
 	public FSM_Character character;
-	public bool bHighlighted, hasBall, bOccupied;
+	public bool bHighlighted;
 	public int id;
 	public CellType type;
 	public enum CellType{OutOfBounds, Corner, BoundLine, Field, InsideBox}
 	public Vector3 Location{get{return location;}}
+	public bool HasBall{get{return IsVectorInCell(Grid_Setup.Instance.BallLocation);}}
+	public bool bOccupied{get{return Physics.CheckSphere(Location, 0.5f, characterLayer);}}
 	public Team.TeamNumber team;
+	LayerMask characterLayer = 1<<LayerMask.NameToLayer("Characters");
 	Vector3 location;
 	Bounds bounds;
 	GameObject highlighter= null;

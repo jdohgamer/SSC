@@ -100,9 +100,10 @@ public class UISetPiece : IUIState
 	{
 		return !(activeCards > 0);
 	}
-	public bool PlaceCharacter(Vector3 potential)
+	public bool CanPlaceCharacter(Vector3 potential)
 	{
-		if (Grid_Setup.Instance.GetCellByLocation (potential).team == GameClientInstance.team) 
+		Cell potent = Grid_Setup.Instance.GetCellByLocation (potential);
+		if (potent.team == GameClientInstance.team && !potent.bOccupied) 
 		{
 			activeCards--;
 			return true;

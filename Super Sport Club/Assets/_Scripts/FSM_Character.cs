@@ -4,11 +4,10 @@ using System.Collections.Generic;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 
-public class FSM_Character : FSM_Base 
+public class FSM_Character : MonoBehaviour
 {
 	public int id, actionCount, targetCount, maxActions = 2;
 	public Team.TeamNumber team;
-	public bool AmTeamOne{get{return (int)team == 0;}}
 	public CharacterData charData; // contains Name, Id, and stats
 	public bool hasTarget, hasBall;
 	public int MoveDistance{get{return  charData.MoveDist;}}
@@ -23,8 +22,8 @@ public class FSM_Character : FSM_Base
 	public Cell LastTargetCell
 	{
 		get{
-			if (lastCell != null)
-				return lastCell;
+			if (lastTargetedCell != null)
+				return lastTargetedCell;
 			else
 				return OccupiedCell;
 		}
@@ -46,40 +45,42 @@ public class FSM_Character : FSM_Base
 		Cover_Ball
 	};
 	protected string easeType;
-	[SerializeField] protected iTween.EaseType ease, ballEase;
+	[SerializeField] Vector3 offset = new Vector3(0,0.2f,0);
+	[SerializeField] protected iTween.EaseType ease;
 	[SerializeField] LayerMask characterLayer;
 	[SerializeField] GameObject destPin;
 	[SerializeField] Color teamColor;
-	[SerializeField] float rayLength = 1.5f;
+	[SerializeField] float rayLength = 1.5f, refactory = 0f;
 	private int moveDist, turnsSinceSprint= 2;
 	bool bSprinting;
 	BallScript ball;
 	GameObject[] targetPins;
 	GameObject passTargetPin;//this could be put with targetPins[] and just given a different color
 	Queue<PlayerAction> ActionQueue;
-	Cell lastCell;
+	Cell lastTargetedCell;
 	MeshRenderer currentMesh;
 	//Animator anim;
 	Transform tran;
 	FSM_Character opp;
-	Vector3 offset = new Vector3(0,0.2f,0);
+	NavMeshAgent navAgent;
 
-	public void ReturnCharacter(Hashtable ht)
-	{
-		CharacterData cd = ScriptableObject.CreateInstance<CharacterData>();
-		this.id = (int)ht["ID"];
-		cd.name = (string)ht["Name"];
-		cd.Strength = (float)ht["Strength"];
-		cd.Speed = (float)ht["Speed"];
-		cd.Defense = (float)ht["Defense"];
-		this.charData = cd;
-		this.team = (Team.TeamNumber)ht["Team"];
-	}
+//	public void ReturnCharacter(Hashtable ht)
+//	{
+//		CharacterData cd = ScriptableObject.CreateInstance<CharacterData>();
+//		this.id = (int)ht["ID"];
+//		cd.name = (string)ht["Name"];
+//		cd.Strength = (float)ht["Strength"];
+//		cd.Speed = (float)ht["Speed"];
+//		cd.Defense = (float)ht["Defense"];
+//		this.charData = cd;
+//		this.team = (Team.TeamNumber)ht["Team"];
+//	}
 
 	void Awake()
 	{
+		navAgent = GetComponent<NavMeshAgent> ();
 		moveDist = charData.MoveDist;
-		CurrentState = Stance.Neutral;
+		//CurrentState = Stance.Neutral;
 		tran = transform;
 		currentMesh = GetComponentInChildren<MeshRenderer>();
 		//anim = GetComponentInChildren<Animator>();
@@ -110,7 +111,12 @@ public class FSM_Character : FSM_Base
 	}
 	void UpdateTurn()
 	{
+		if (bSprinting) 
+		{
+			turnsSinceSprint = 0;
+		}
 		turnsSinceSprint++;
+		refactory += 1;
 	}
 	public void SetPlayerAction(PlayerAction act)
 	{
@@ -120,13 +126,12 @@ public class FSM_Character : FSM_Base
 			actionCount += 1;
 		}
 	}
-
 	public void SetMoveTarget(Cell target)
 	{
 		targetPins [targetCount].SetActive(true);
 		targetPins [targetCount].transform.position = target.Location;
 		targetCount++;
-		lastCell = target;
+		lastTargetedCell = target;
 	}
 	public void SetPassTarget(Cell target)
 	{
@@ -135,6 +140,7 @@ public class FSM_Character : FSM_Base
 	}
 	public void MoveTransform(Vector3 newLoc)
 	{
+		newLoc += offset;
 		tran.position = newLoc;
 	}
 	public void StartSprinting()
@@ -147,11 +153,11 @@ public class FSM_Character : FSM_Base
 		Hashtable ht = new Hashtable();
 		ht["Location"] = Location;
 		ht["Name"] = charData.name;
-		ht["ID"] = id;
+		ht["ID"] = id; //We Identify characters by their Team number and 0-teamSize id
+		ht["Team"] = (int)team; //^^^^
 		ht["Strength"] = charData.Strength;
 		ht["Speed"] = charData.Speed;
 		ht["Defense"] = charData.Defense;
-		ht["Team"] = (int)team;
 		return ht;
 	}
 
@@ -164,15 +170,14 @@ public class FSM_Character : FSM_Base
 		}
 		targetCount = 0;
 		bSprinting = false;
-		passTargetPin.SetActive(false);
-		lastCell = null;
-		ActionQueue.Clear ();
+		passTargetPin.SetActive(false);//if we make this apart of targetPins[], then the loop above will take care of it.
+		lastTargetedCell = null;
+		ActionQueue.Clear ();//This "should" be unnecessary as it's not set until Execution starts, and it empties during execution
 	}
 
 	public IEnumerator ExecuteActions()
 	{
 		while(ActionQueue.Count>0)
-		//for (int i = 0;i<actions.Length;i++)
 		{
 			PlayerAction act = ActionQueue.Dequeue ();
 			if(act!=null)
@@ -181,38 +186,37 @@ public class FSM_Character : FSM_Base
 				{
 					case PlayerAction.Actions.Move:
 					{
-						if (bSprinting) 
-						{
-							turnsSinceSprint = 0;
-						}
 						Vector3 target = act.cTo.Location;
 						target += offset;
 						RotateTowards(target);
-					
-						easeType = ease.ToString();
-						Vector3 dir, nextCell;
-						while (Vector3.Distance(tran.position,target)>.1f) 
-						{
-							dir = target - (OccupiedCell.Location + offset);
-							nextCell = (OccupiedCell.Location + offset) + dir.normalized;
-							if(CanMove(act.cTo))
-							{
-								iTween.MoveTo(gameObject, iTween.Hash("position", nextCell, "easeType", easeType, "loopType", "none", "speed", charData.Speed));
+						yield return StartCoroutine (MoveTo (target));
 
-								yield return new WaitForSeconds(0.2f);
-							}else break;
-						}
+//						easeType = ease.ToString();
+//						Vector3 dir, nextCell;
+//						while(Vector3.Distance(tran.position,target)>0.1f) 
+//						{
+//							dir = target - (OccupiedCell.Location + offset);
+//							nextCell = (OccupiedCell.Location + offset) + dir.normalized;
+//							if(CanMove(act.cTo))
+//							{
+//								iTween.MoveTo(gameObject, iTween.Hash("position", nextCell, "easeType", easeType, "loopType", "none", "speed", charData.Speed));
+//								yield return new WaitForSeconds(0.2f);
+//							}else break;
+//						}
 						break;
 					}
 					case PlayerAction.Actions.Pass:
 					{
 						if(hasBall)
 						{
-							Hashtable ht = new Hashtable();
-							ht["Speed"] = (float)charData.Strength;
-							ht["Cell"] = act.cTo.id;
-							ht["EaseType"] = ballEase.ToString();
-							ball.StartCoroutine("MoveTo",ht);
+//							Hashtable ht = new Hashtable();
+//							ht["Speed"] = (float)charData.Strength;
+//							ht["Cell"] = act.cTo.id;
+//							ht["EaseType"] = ballEase.ToString();
+							RotateTowards(act.cTo.Location+offset);
+							ball.BallisticVelocity(act.cTo.Location, 40);
+							LetGoOfBall();
+							//ball.SetTarget(act.cTo.Location, charData.Strength);
 						}
 						break;
 					}
@@ -220,11 +224,15 @@ public class FSM_Character : FSM_Base
 					{
 						if(hasBall)
 						{
-							Hashtable ht = new Hashtable();
-							ht["Speed"] = (float)charData.Strength;
-							ht["Cell"] = act.cTo.id;
-							ht["EaseType"] = ballEase.ToString();
-							ball.StartCoroutine("MoveTo",ht);
+							//Hashtable ht = new Hashtable();
+							//ht["Speed"] = (float)charData.Strength;
+							//ht["Cell"] = act.cTo.id;
+							//ht["EaseType"] = ballEase.ToString();
+							RotateTowards(act.cTo.Location+offset);
+							ball.BallisticVelocity(act.cTo.Location, 20);
+							LetGoOfBall();
+							//ball.SetTarget(act.cTo.Location, charData.Strength);
+							//ball.StartCoroutine("MoveTo",ht);
 							UnityEventManager.TriggerEvent("ShotFired");
 						}
 						break;
@@ -247,6 +255,22 @@ public class FSM_Character : FSM_Base
 		ClearActions();	
 		yield return null;
 	}
+	IEnumerator MoveTo(Vector3 target)
+	{
+		Vector3 dir, nextCell;
+		easeType = ease.ToString();
+		while(Vector3.Distance(tran.position,target)>0.1f) 
+		{
+			dir = target - (OccupiedCell.Location + offset);
+			nextCell = (OccupiedCell.Location + offset) + dir.normalized;
+			//if(CanMove(target))
+			{
+				iTween.MoveTo(gameObject, iTween.Hash("position", nextCell, "easeType", easeType, "loopType", "none", "speed", charData.Speed));
+				yield return new WaitForSeconds(0.2f);
+			}//else break;
+		}
+		//StopCoroutine("MoveTo");
+	}
 	void RotateTowards(Vector3 target)// this is really a SetRotation function
 	{
 		Vector3 dir = target - tran.position;
@@ -267,6 +291,9 @@ public class FSM_Character : FSM_Base
 		}
 		return null;
 	}
+//	IEnumerator CanMove()
+//	{
+//	}
 	bool CanMove(Cell targetCell)
 	{
 		bool canMove;
@@ -274,7 +301,7 @@ public class FSM_Character : FSM_Base
 		if(opp!=null)
 		{
 			Debug.Log("Player ID: "+opp.id);
-			if(targetCell.Location== opp.transform.position)
+			if(targetCell.Location== opp.Location)
 			{
 				if(targetCell==opp.LastTargetCell)
 				{
@@ -284,7 +311,7 @@ public class FSM_Character : FSM_Base
 				}
 			}else{
 				float dotFace = Vector3.Dot(tran.forward,opp.transform.forward);
-				if(dotFace<0)
+				if(dotFace<0)//facing each other
 				{
 					Debug.Log("Oh, just kiss already");
 					canMove = false;
@@ -293,8 +320,7 @@ public class FSM_Character : FSM_Base
 				}
 			}
 		}else canMove = true;
-		return canMove;//(!Physics.CheckSphere(Location+tran.forward, 1, characterLayer));
-		 
+		return canMove;
 	}
 
 	public void Highlight(bool set)
@@ -323,48 +349,55 @@ public class FSM_Character : FSM_Base
 			}
 		}
 	}
-
-//	public void Move(Vector3 target)
-//	{
-//		StopCoroutine("MoveTo");
-//		StartCoroutine("MoveTo",target);
-//	}
-//	IEnumerator MoveTo(Vector3 target)
-//	{
-//		easeType = ease.ToString();
-//		while (Vector3.Distance(transform.position,target)>.1f) 
-//		{
-//			iTween.MoveTo(gameObject, iTween.Hash("position", target, "easeType", easeType, "loopType", "none", "speed", moveSpeed));
-//			//transform.position = Vector3.MoveTowards (transform.position, target, deltaSpeed);
-//			yield return new WaitForSeconds(1f);
-//		}
-//		StopCoroutine("MoveTo");
-//	}
-
+		
+	void LetGoOfBall()
+	{
+		refactory = 0f;
+		Debug.Log ("ball has left");
+		hasBall = false;
+		ball.transform.SetParent(null);
+		ball = null;
+	}
 	void OnTriggerEnter(Collider other)
 	{
 		switch(other.tag)
 		{
 			case "Ball":
 			{
-				hasBall = true;
-				other.transform.SetParent(transform);
-				other.transform.position = transform.TransformPoint(0,0,1);
-				ball = other.GetComponent<BallScript>();
-				ball.StopMe ();
+				if (refactory > 1f) 
+				{
+					Debug.Log ("I gots da ball");
+					hasBall = true;
+					other.transform.SetParent (transform);
+					other.transform.position = transform.TransformPoint (0, 0, 1);
+					ball = other.GetComponent<BallScript> ();
+
+					ball.StopMe ();
+				}
 				break;
 			}
 		}
 	}
+	void OnTriggerStay(Collider other)
+	{
+		switch(other.tag)
+		{
+			case "Ball":
+			{
+				if(hasBall)
+				other.transform.position = transform.TransformPoint (0, 0, 1);
+			}
+			break;
+		}
+	}
+
 	void OnTriggerExit(Collider other)
 	{
 		switch(other.tag)
 		{
 			case "Ball":
 			{
-				hasBall = false;
-				other.transform.SetParent(null);
-				ball = null;
+				//LetGoOfBall ();
 				break;
 			}
 		}

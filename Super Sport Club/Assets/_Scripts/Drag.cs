@@ -111,7 +111,7 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 			StopCoroutine("GetHigh");
 			if (Physics.Raycast (ray, out hit, 100f, mask) && hit.transform.tag == "Field") 
 			{
-				if (gui.PlaceCharacter (hit.point)) 
+				if (gui.CanPlaceCharacter (hit.point)) 
 				{
 					Grid_Setup.Instance.SetCharacter ((int)gameClient.team, index, hit.point);
 					DisableMe ();

@@ -370,10 +370,8 @@ public class CustomGameClient : LoadBalancingClient
 	{
 		if(BothPlayersHaveSubmitted())
 		{
-			turnNumber++;
 			board.LoadCharactersFromProps(HT);
-			P1Submitted = false;
-			P2Submitted = false;
+			NextTurn ();
 		}
 	}
 	
@@ -405,14 +403,16 @@ public class CustomGameClient : LoadBalancingClient
 		this.OpSetCustomPropertiesOfRoom(boardProps, false);
 	}
 
-	public void CalcMoves()
+	void CalcMoves()
 	{
 		Hashtable MoveSet = new Hashtable();
+		//List<Cell> targetedCells = new List<Cell> ();
 
 		for (int i = 0; i<oppActions.Length; i++) 
 		{
 			if(oppActions[i]!=null)
 			{
+				//targetedCells.Add (oppActions[i]);
 				MoveSet[(i).ToString()] = oppActions[i].GetActionProp();
 			}
 		}
@@ -420,6 +420,7 @@ public class CustomGameClient : LoadBalancingClient
 		{
 			if(myActions[i]!=null)
 			{
+				//int conflict = targetedCells.BinarySearch(myActions[i].cTo);
 				MoveSet[(i+oppActions.Length).ToString()] = myActions[i].GetActionProp();
 			}
 		}
@@ -427,6 +428,14 @@ public class CustomGameClient : LoadBalancingClient
 
 		this.loadBalancingPeer.OpRaiseEvent(Execute, MoveSet, true, null);
 		//new RaiseEventOptions{Receivers = ReceiverGroup.All }
+	}
+	void NextTurn()
+	{
+		ClearActions();
+		UnityEventManager.TriggerEvent ("NextTurn");
+		turnNumber++;
+		P1Submitted = false;
+		P2Submitted = false;
 	}
 	void ExecuteMoves(Hashtable moves)
 	{
@@ -448,10 +457,7 @@ public class CustomGameClient : LoadBalancingClient
 		{
 			c.StartCoroutine("ExecuteActions");
 		}
-		ClearActions();
-		UnityEventManager.TriggerEvent ("NextTurn");
-		turnNumber++;
-		P1Submitted = false;
-		P2Submitted = false;
+
+		NextTurn ();
 	}
 }
