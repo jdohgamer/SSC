@@ -1,20 +1,31 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\_Scripts\BallScript.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\_Scripts\UnitController.cs">
     <Files>
-      <File FileName="Assets\_Scripts\FSM_Character.cs" Line="216" Column="45" />
-      <File FileName="Assets\_Scripts\BallScript.cs" Line="25" Column="46" />
-      <File FileName="Assets\_Scripts\CustomGameClient.cs" Line="400" Column="30" />
-      <File FileName="Assets\_Scripts\Team.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\MessageBus\PlayerAction.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\Grid_Setup.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\Cell.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\Drag.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\UI Scripts\UIGameHUD.cs" Line="108" Column="6" />
-      <File FileName="Assets\_Scripts\UI Scripts\GUIController.cs" Line="148" Column="3" />
-      <File FileName="Assets\_Scripts\UI Scripts\UISetPiece.cs" Line="9" Column="20" />
-      <File FileName="Assets\_Scripts\TriggerGoal.cs" Line="1" Column="1" />
+      <File FileName="Assets\_Scripts\UI Scripts\GUIController.cs" Line="162" Column="17" />
+      <File FileName="Assets\_Scripts\CustomGameClient.cs" Line="346" Column="4" />
+      <File FileName="Assets\_Scripts\UnityEventManager.cs" Line="1" Column="1" />
+      <File FileName="Assets\_Scripts\UnitController.cs" Line="14" Column="59" />
+      <File FileName="Assets\_Scripts\Grid_Setup.cs" Line="116" Column="16" />
+      <File FileName="Assets\_Scripts\UI Scripts\Gauge.cs" Line="1" Column="1" />
+      <File FileName="Assets\_Scripts\CharacterData.cs" Line="1" Column="1" />
+      <File FileName="Assets\_Scripts\UI Scripts\UIMainMenu.cs" Line="57" Column="14" />
+      <File FileName="Assets\_Scripts\UI Scripts\UISetPiece.cs" Line="133" Column="3" />
     </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="Super Sport Club" expanded="True">
+            <Node name="Assembly-CSharp" expanded="True">
+              <Node name="_Scripts" expanded="True">
+                <Node name="UI Scripts" expanded="True" />
+                <Node name="UnitController.cs" selected="True" />
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>

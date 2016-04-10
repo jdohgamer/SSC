@@ -100,6 +100,7 @@ public class UISetPiece : IUIState
 	{
 		return !(activeCards > 0);
 	}
+
 	public bool CanPlaceCharacter(Vector3 potential)
 	{
 		Cell potent = Grid_Setup.Instance.GetCellByLocation (potential);

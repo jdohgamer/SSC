@@ -53,7 +53,7 @@ public class CustomGameClient : LoadBalancingClient
 	Team myTeam;
 	PlayerAction[] myActions, oppActions;
 	bool P1Submitted, P2Submitted;
-	int turnNumber, teamSize = 5;
+	int turnNumber;//, teamSize = 5;
 	byte actionCount = 0;
 	Hashtable oppHT;
 
@@ -297,60 +297,6 @@ public class CustomGameClient : LoadBalancingClient
 		Debug.Log(photonEvent.Code.ToString());
 	}
 
-	public void LoadBoardFromProperties(bool calledByEvent)
-	{	
-		Hashtable roomProps = this.CurrentRoom.CustomProperties;
-		Debug.Log(string.Format("Board Properties: {0}", SupportClass.DictionaryToString(roomProps)));
-
-		if (roomProps.Count == 0)
-		{
-			// we are in a fresh room with no saved board.
-			board.Generate(21,11);
-			//gui.UIState = gui.UISP;
-			this.SaveBoardToProperties();
-			Debug.Log(string.Format("Board Properties: {0}", SupportClass.DictionaryToString(roomProps)));
-		}
-		
-		// we are in a game that has props (a board). read those (as update or as init, depending on calledByEvent)
-		bool success = board.SetBoardByCustomProperties(roomProps, calledByEvent);
-		if (!success)
-		{
-			Debug.LogError("Not loaded board from props?");
-		}
-		this.myTeam = Grid_Setup.Instance.Teams [(int)team];
-
-		// we set properties "pt" (player turn) and "t#" (turn number). those props might have changed
-		// it's easier to use a variable in gui, so read the latter property now
-		if (this.CurrentRoom.CustomProperties.ContainsKey("t#"))
-		{
-			this.turnNumber = (int) this.CurrentRoom.CustomProperties["t#"];
-		}
-		else
-		{
-			this.turnNumber = 1;
-		}
-		/*
-		if (this.CurrentRoom.CustomProperties.ContainsKey("pt"))
-		{
-			this.PlayerIdToMakeThisTurn = (int) this.CurrentRoom.CustomProperties["pt"];
-			//Debug.Log("This turn was played by player.ID: " + this.PlayerIdToMakeThisTurn);
-		}
-		else
-		{
-			this.PlayerIdToMakeThisTurn = 0;
-		}
-		
-		// if the game didn't save a player's turn yet (it is 0): use master
-		if (this.PlayerIdToMakeThisTurn == 0)
-		{
-			this.PlayerIdToMakeThisTurn = this.CurrentRoom.MasterClientId;
-		}
-		
-		this.MyPoints = GetPlayerPointsFromProps(this.LocalPlayer);
-		this.OthersPoints = GetPlayerPointsFromProps(this.Opponent);
-		*/
-	}
-
 	public void CreateTurnbasedRoom()
 	{
 		string newRoomName = string.Format("{0}-{1}", this.NickName, Random.Range(0,1000).ToString("D4"));    // for int, Random.Range is max-exclusive!
@@ -389,6 +335,44 @@ public class CustomGameClient : LoadBalancingClient
 		//Debug.Log(string.Format("saved board to room-props {0}", SupportClass.DictionaryToString(boardProps)));
 		this.OpSetCustomPropertiesOfRoom(boardProps, webForwardToPush);
 	}
+	public void LoadBoardFromProperties(bool calledByEvent)
+	{	
+		Hashtable roomProps = this.CurrentRoom.CustomProperties;
+		Debug.Log(string.Format("Board Properties: {0}", SupportClass.DictionaryToString(roomProps)));
+
+		if (roomProps.Count == 0)
+		{
+			// we are in a fresh room with no saved board.
+			board.Generate(21,11);
+			//gui.UIState = gui.UISP;
+			this.SaveBoardToProperties();
+			Debug.Log(string.Format("Board Properties: {0}", SupportClass.DictionaryToString(roomProps)));
+		}
+
+		// we are in a game that has props (a board). read those (as update or as init, depending on calledByEvent)
+		bool success = board.SetBoardByCustomProperties(roomProps, calledByEvent);
+		if (!success)
+		{
+			Debug.LogError("Not loaded board from props?");
+		}
+		this.myTeam = Grid_Setup.Instance.Teams [(int)team];
+
+		// we set properties "pt" (player turn) and "t#" (turn number). those props might have changed
+		// it's easier to use a variable in gui, so read the latter property now
+		if (this.CurrentRoom.CustomProperties.ContainsKey("t#"))
+		{
+			this.turnNumber = (int) this.CurrentRoom.CustomProperties["t#"];
+		}
+		else
+		{
+			this.turnNumber = 1;
+		}
+		/*
+		this.MyPoints = GetPlayerPointsFromProps(this.LocalPlayer);
+		this.OthersPoints = GetPlayerPointsFromProps(this.Opponent);
+		*/
+	}
+
 	public void SavePlayersInProps()
 	{
 		if (this.CurrentRoom == null || this.CurrentRoom.CustomProperties == null || this.CurrentRoom.CustomProperties.ContainsKey(PropNames))
@@ -402,6 +386,12 @@ public class CustomGameClient : LoadBalancingClient
 		boardProps[PropNames] = string.Format("{0};{1}", this.LocalPlayer.NickName, this.Opponent.NickName);
 		this.OpSetCustomPropertiesOfRoom(boardProps, false);
 	}
+//	void DetermineWinner(PlayerAction One, PlayerAction Two)
+//	{
+//		PlayerAction A = One;
+//		PlayerAction B = Two;
+//
+//	}
 
 	void CalcMoves()
 	{
@@ -440,7 +430,7 @@ public class CustomGameClient : LoadBalancingClient
 	void ExecuteMoves(Hashtable moves)
 	{
 		PlayerAction[] acts = LoadActionsFromProps (moves);
-		List<FSM_Character> affectedChars = new List<FSM_Character>();
+		List<UnitController> affectedChars = new List<UnitController>();
 		for (int h = 0; h < acts.Length; h++) 
 		{
 			if(acts[h]!=null)
@@ -450,10 +440,10 @@ public class CustomGameClient : LoadBalancingClient
 				{
 					affectedChars.Add(acts[h].iCh);
 				}
-				acts[h].iCh.SetPlayerAction(acts[h]);
+				affectedChars[h].SetPlayerAction(acts[h]);
 			}
 		}
-		foreach(FSM_Character c in affectedChars)
+		foreach(UnitController c in affectedChars)
 		{
 			c.StartCoroutine("ExecuteActions");
 		}

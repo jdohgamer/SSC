@@ -45,7 +45,7 @@ public class BallScript : MonoBehaviour
 	{
 		TargetLocation = target;
 		moveDirection = target - transform.position;
-		float height = moveDirection.y; // height difference
+		//float height = moveDirection.y; // height difference
 		moveDirection.y = 0; // keep only horizontal information
 		float dist = moveDirection.magnitude;// horizontal distance
 		float a = angle * Mathf.Deg2Rad;
@@ -57,26 +57,4 @@ public class BallScript : MonoBehaviour
 		bKicked = true;
 		rigid.velocity =  velocity * moveDirection.normalized;
 	}
-//	public IEnumerator MoveTo(Hashtable ht)
-//	{
-//		canMove = true;
-//		targetCell = Grid_Setup.Instance.GetCellByID((int)ht["Cell"]);
-//		moveSpeed = ((float)ht["Speed"])*5;
-//		easeType = (string)ht["EaseType"];
-//		targetLocation = targetCell.Location;
-//		Vector3 dir = targetLocation - transform.position+offset;
-//		dir = dir.normalized;
-//		while (moveSpeed > 0.1f) 
-//		{
-//			rigid.MovePosition (transform.position + (dir * moveSpeed * Time.deltaTime));
-//			moveSpeed = Mathf.Lerp (moveSpeed, 0, 0.1f);
-//			yield return new WaitForSeconds(0.1f);
-//		}
-//		while (Vector3.Distance(transform.position,TargetLocation)>.1f && canMove) 
-//		{
-//			iTween.MoveAdd(gameObject, iTween.Hash("amount", dir, "easeType", easeType, "loopType", "none", "speed", moveSpeed));
-//			yield return new WaitForSeconds(1f);
-//		}
-		//StopCoroutine("MoveTo");
-	//}
 }

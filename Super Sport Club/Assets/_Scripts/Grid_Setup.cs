@@ -44,11 +44,11 @@ public class Grid_Setup : MonoBehaviour
 	public int Length{get{return length;}}
 	public int Width{get{return width;}}
 	public int TeamSize{ get{return teamSize;}}
-	[SerializeField] GameObject highlightFab, ballFab, charFab;
+	[SerializeField] GameObject highlightFab, ballFab = null, charFab = null;
 	[SerializeField] CharacterData[] positionData;
 	[SerializeField] Color[] TeamColors =  {Color.black, Color.white};
 	[SerializeField] int teamSize = 5;
-	[SerializeField] Vector3 TeamOneGoal, TeamTwoGoal, GoalSize;
+	[SerializeField] Vector3 TeamOneGoal = Vector3.zero, TeamTwoGoal = Vector3.one, GoalSize = Vector3.one;
 	private static Cell highlightSingle;
 	private Cell[,] cells2D;
 	private Transform fieldTran, TeamOneTran, TeamTwoTran;
@@ -73,7 +73,7 @@ public class Grid_Setup : MonoBehaviour
 		}
 		Destroy (Ball);
 	}
-	public FSM_Character GetCharacter(int Team, int index)
+	public UnitController GetCharacter(int Team, int index)
 	{
 		return Teams [Team].mates [index];
 	}
@@ -125,7 +125,7 @@ public class Grid_Setup : MonoBehaviour
 				for(int c = 0; c <teamSize; c++)
 				{
 					GameObject newGuy = Instantiate(charFab,Vector3.zero + new Vector3((float)t,0.2f,(float)c),Quaternion.identity) as GameObject;
-					Teams [t].AddMate(newGuy.GetComponent<FSM_Character>());
+					Teams [t].AddMate(newGuy.GetComponent<UnitController>());
 					Teams [t].mates [c].charData = positionData [c];
 					newGuy.SetActive (false);
 				}

@@ -48,7 +48,6 @@ public class UnityEventManager : MonoBehaviour
 	public static void StartListening (string eventName, UnityAction listener)
 	{
 		UnityEvent thisEvent = null;
-		UnityEvent thisIntEvent = null;
 		if (instance.eventDictionary.TryGetValue (eventName, out thisEvent))
 		{
 			thisEvent.AddListener (listener);

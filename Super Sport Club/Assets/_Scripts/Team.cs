@@ -6,7 +6,7 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 public class Team 
 {
 	public enum TeamNumber{TeamOne=0,TeamTwo=1, NONE = -1}
-	public FSM_Character[] mates;
+	public UnitController[] mates;
 	TeamNumber teamNum = TeamNumber.NONE;
 	Color teamColor;
 	Bounds goalArea;
@@ -17,12 +17,12 @@ public class Team
 	{
 		teamNum = num;
 		teamColor = TeamColor;
-		mates = new FSM_Character[Size];
+		mates = new UnitController[Size];
 		goalArea = new Bounds (goalCenter, goalSize);
 		face = num==0 ? Quaternion.LookRotation(Vector3.right):Quaternion.LookRotation(-Vector3.right) ;
 	}
 
-	public void AddMate(FSM_Character newGuy)
+	public void AddMate(UnitController newGuy)
 	{
 		if(this.characterCount<this.teamSize)
 		{

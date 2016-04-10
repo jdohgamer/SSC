@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 public class UIGameHUD : IUIState 
 {
 	static GameObject panel, meter;
-	public FSM_Character CurrentSelectedChar
+	public UnitController CurrentSelectedChar
 	{
 		get{return board.GetCharacter((int)GameClientInstance.team,currentID);}
 	}

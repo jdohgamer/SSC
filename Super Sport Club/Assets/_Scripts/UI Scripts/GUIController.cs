@@ -31,7 +31,7 @@ public class GUIController: MonoBehaviour
 	public Button buttFab;
 	public Canvas UIcan;
 	public RectTransform CharacterPanel;
-	[SerializeField] RectTransform MainMenu, MainMenuPanel,  InGameHUD;
+	[SerializeField] RectTransform MainMenu, MainMenuPanel,  InGameHUD = null;
 	[SerializeField] string AppId;// set in inspector. this is called when the client loaded and is ready to start
 	[SerializeField] float serviceInterval = 1;
 	[SerializeField] LayerMask mask;
@@ -100,7 +100,7 @@ public class GUIController: MonoBehaviour
 					{
 					case "Player":
 						{
-							int id = hit.transform.gameObject.GetComponent<FSM_Character> ().id;
+							int id = hit.transform.gameObject.GetComponent<UnitController> ().id;
 							UIState.ClickOnPlayer (id);
 							break;
 
@@ -155,6 +155,13 @@ public class GUIController: MonoBehaviour
 	{
 		UIMM.NewGameButt ();
 	}
+
+	public void NewDevGameButton()
+	{
+		UIMM.NewDevGameButt ();
+		board.Generate(21,11);
+	}
+
 	public void QuitGameButton()
 	{
 		Application.Quit();
@@ -162,7 +169,7 @@ public class GUIController: MonoBehaviour
 	public void ClearButton()
 	{
 		this.GameClientInstance.ClearActions();
-		foreach(FSM_Character c in board.Teams[(int)GameClientInstance.team].mates)
+		foreach(UnitController c in board.Teams[(int)GameClientInstance.team].mates)
 		{
 			c.ClearActions();
 		}

@@ -48,6 +48,12 @@ public class UIMainMenu : IUIState
 	{
 		gui.UIState = gui.UISOG;
 	}
+
+	public void NewDevGameButt ()
+	{
+		ToSetPiece ();
+	}
+
 	public void NewGameButt ()
 	{
 		if (connectInProcess) 
