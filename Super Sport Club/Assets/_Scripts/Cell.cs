@@ -12,7 +12,7 @@ public class Cell
 	public Vector3 Location{get{return location;}}
 	//public bool HasBall{get{return IsVectorInCell(Grid_Setup.Instance.BallLocation);}}
 	public bool bOccupied{get{return Physics.CheckSphere(Location, 0.5f, characterLayer);}}
-	public Team.TeamNumber team;
+	public int team;
 	LayerMask characterLayer = 1<<LayerMask.NameToLayer("Characters");
 	Vector3 location;
 	Bounds bounds;
@@ -29,7 +29,7 @@ public class Cell
 		location = loc;
 		bounds = new Bounds(loc,size);
 	}
-	public Cell(int newID, int newType, Team.TeamNumber Team, Vector3 loc, Vector3 size)
+	public Cell(int newID, int newType, int Team, Vector3 loc, Vector3 size)
 	{
 		id = newID;
 		type = (CellType)newType;

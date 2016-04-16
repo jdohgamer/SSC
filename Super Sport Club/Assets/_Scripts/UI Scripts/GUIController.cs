@@ -31,31 +31,32 @@ public class GUIController: MonoBehaviour
 	public Button buttFab;
 	public Canvas UIcan;
 	public RectTransform CharacterPanel;
-	[SerializeField] RectTransform MainMenu, MainMenuPanel,  InGameHUD = null;
+	[SerializeField] RectTransform MainMenu, InGameHUD = null;
 	[SerializeField] string AppId;// set in inspector. this is called when the client loaded and is ready to start
 	[SerializeField] float serviceInterval = 1;
 	[SerializeField] LayerMask mask;
 	[SerializeField] Text infoText;
 	private IUIState uiState;
-	private CustomGameClient GameClientInstance;
+	//private CustomGameClient CustomGameClient.ClientInstance;
+	private MainGame mainGame;
 	private Grid_Setup board;
 	private bool bUpdatingInfo;
 
 	void Awake()
 	{
-		this.board = GetComponent<Grid_Setup>();
-		Grid_Setup.Instance = this.board;
-		this.GameClientInstance  = new CustomGameClient();
-		this.GameClientInstance.AppId = AppId;  // edit this!
-		this.GameClientInstance.board = board;
-		this.GameClientInstance.gui = this;
-
+		//this.board = GetComponent<Grid_Setup>();
+		//Grid_Setup.Instance = this.board;
+		//this.GameClientInstance  = new CustomGameClient();
+		//this.GameClientInstance.AppId = AppId;  // edit this!
+		//this.GameClientInstance.board = board;
+		//this.GameClientInstance.gui = this;
+		mainGame = MainGame.Instance;
 		Application.runInBackground = true;
 		CustomTypes.Register();
-		UIMM = new UIMainMenu(this, GameClientInstance);
-		UISP = new UISetPiece (this, GameClientInstance);
-		UIHUD = new UIGameHUD(this, GameClientInstance);
-		UISOG = new UIShotState(this, GameClientInstance);
+		UIMM = new UIMainMenu(this, mainGame);
+		UISP = new UISetPiece (this, mainGame);
+		UIHUD = new UIGameHUD(this, mainGame);
+		UISOG = new UIShotState(this, mainGame);
 		UIState = UIMM;
 	}
 	void OnEnable()
@@ -68,22 +69,22 @@ public class GUIController: MonoBehaviour
 	}
 	void GoalScored(int p)
 	{
-		board.ResetBoard ();
-		GameClientInstance.ScorePoint (p);
+		//board.ResetBoard ();
+		CustomGameClient.ClientInstance.ScorePoint (p);
 		UIState = UISP;
 	}
 
 	void Update()
 	{
-		timeSinceService += Time.deltaTime;
-		if (timeSinceService > serviceInterval)
-		{
-			this.GameClientInstance.Service();
-			timeSinceService = 0;
-		}
+//		timeSinceService += Time.deltaTime;
+//		if (timeSinceService > serviceInterval)
+//		{
+//			this.GameClientInstance.Service();
+//			timeSinceService = 0;
+//		}
 		UIState.Update ();
 
-		if(GameClientInstance.CurrentRoom!=null)
+		if(CustomGameClient.ClientInstance.CurrentRoom!=null)
 		{
 			if (!bUpdatingInfo) 
 			{
@@ -123,13 +124,13 @@ public class GUIController: MonoBehaviour
 	public IEnumerator UpdateInfo ()
 	{
 		bUpdatingInfo = true;
-		while (GameClientInstance.CurrentRoom!=null) 
+		while (CustomGameClient.ClientInstance.CurrentRoom!=null) 
 		{
-			string side =  (int)GameClientInstance.team>0 ? "Right":"Left" ;
-			infoText.text = string.Format(" Turn: {2}\n team: {0}. \n You're on the: {1} side. \n", (int)GameClientInstance.team , side, GameClientInstance.TurnNumber);
-			infoText.text += string.Format (" You have {0} moves left \n", GameClientInstance.ActionsLeft);
-			infoText.text += string.Format(" Opponenent ready: {0}\n", GameClientInstance.HasOppSubmitted());
-			infoText.text += string.Format(" Score: {0} : {1}\n", GameClientInstance.TeamScore(0), GameClientInstance.TeamScore(1));
+			string side =  (int)CustomGameClient.ClientInstance.team>0 ? "Right":"Left" ;
+			infoText.text = string.Format(" Turn: {2}\n team: {0}. \n You're on the: {1} side. \n", (int)CustomGameClient.ClientInstance.team , side, CustomGameClient.ClientInstance.TurnNumber);
+			infoText.text += string.Format (" You have {0} moves left \n", CustomGameClient.ClientInstance.ActionsLeft);
+			infoText.text += string.Format(" Opponenent ready: {0}\n", CustomGameClient.ClientInstance.HasOppSubmitted());
+			infoText.text += string.Format(" Score: {0} : {1}\n", CustomGameClient.ClientInstance.TeamScore(0), CustomGameClient.ClientInstance.TeamScore(1));
 			yield return new WaitForSeconds (1f);
 		}
 		yield return null;
@@ -143,23 +144,26 @@ public class GUIController: MonoBehaviour
 	{
 		MainMenu.gameObject.SetActive (set);
 	}
-	public void EnableCharacterPanel(bool set)
+	public void EnableCharacterSelection(bool set)
 	{
 		CharacterPanel.gameObject.SetActive (set);
 	}
 	void OnApplicationQuit()
 	{
-		GameClientInstance.Disconnect();
+		CustomGameClient.ClientInstance.Disconnect();
 	}
 	public void NewGameButton()
 	{
-		UIMM.NewGameButt ();
+		mainGame.Connect();
+		mainGame.NewOnlineGame();
+		UIState.ToSetPiece();
 	}
 
 	public void NewDevGameButton()
 	{
-		UIMM.NewDevGameButt ();
-		board.Generate(21,11);
+		mainGame.NewLocalGame();
+		UIState.ToSetPiece();
+		//board.Generate();
 	}
 
 	public void QuitGameButton()
@@ -168,16 +172,19 @@ public class GUIController: MonoBehaviour
 	}
 	public void ClearButton()
 	{
-		this.GameClientInstance.ClearActions();
-		foreach(UnitController c in board.Teams[(int)GameClientInstance.team].mates)
-		{
-			c.ClearActions();
-		}
+		mainGame.ClearActions();
+//		this.GameClientInstance.ClearActions();
+//		foreach(UnitController c in board.Teams[(int)GameClientInstance.team].mates)
+//		{
+//			c.ClearActions();
+//		}
 	}
 	public void EndTurnButton()
 	{
 		UIState.DeselectCharacter ();
-		UIState.EndTurnButton ();
+		mainGame.EndTurn();
 	}
-		
+	public void SubmitTeam()
+	{	
+	}
 }

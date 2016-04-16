@@ -7,7 +7,7 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 public class UnitController : MonoBehaviour
 {
 	public int id, actionCount, targetCount, maxActions = 2;
-	public Team.TeamNumber team;
+	public int team;
 	public CharacterData charData; // contains Name, Id, and stats
 	public bool hasTarget, hasBall;
 	public int MoveDistance{get{return  charData.MoveDist;}}
@@ -55,7 +55,7 @@ public class UnitController : MonoBehaviour
 	bool bSprinting;
 	BallScript ball;
 	GameObject[] targetPins;
-	GameObject passTargetPin;//this could be put with targetPins[] and just given a different color
+	GameObject passTargetPin;//this could be put with targetPins[] and just given a different color at runtime
 	Queue<PlayerAction> ActionQueue;
 	Cell lastTargetedCell;
 	MeshRenderer currentMesh;
@@ -153,7 +153,7 @@ public class UnitController : MonoBehaviour
 		ht["Location"] = Location;
 		ht["Name"] = charData.name;
 		ht["ID"] = id; //We Identify characters by their Team number and 0-teamSize id
-		ht["Team"] = (int)team; //^^^^
+		ht["Team"] = team; //^^^^
 		ht["Strength"] = charData.Strength;
 		ht["Speed"] = charData.Speed;
 		ht["Defense"] = charData.Defense;

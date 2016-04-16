@@ -5,16 +5,16 @@ using System.Collections;
 
 public class UISetPiece : IUIState 
 {
-	CustomGameClient GameClientInstance;
+	MainGame MainGameInstance;
 	GUIController gui;
 	Drag[] dragPortraits;
 	int activeCards = 0;
 	bool bSetup;
 
-	public UISetPiece(GUIController GUI, CustomGameClient GameClient)
+	public UISetPiece(GUIController GUI, MainGame GameClient)
 	{
 		this.gui = GUI;
-		GameClientInstance = GameClient;
+		MainGameInstance = GameClient;
 		dragPortraits = new Drag[Grid_Setup.Instance.TeamSize];
 
 	}
@@ -42,7 +42,7 @@ public class UISetPiece : IUIState
 	public void ExitState()
 	{
 		Debug.Log ("Exiting SetPiece");
-		gui.EnableCharacterPanel(false);
+		gui.EnableCharacterSelection(false);
 
 			for (int c = 0; c < dragPortraits.Length; c++)
 			{
@@ -72,7 +72,7 @@ public class UISetPiece : IUIState
 	{
 		if (OutOfCards ()) 
 		{
-			this.GameClientInstance.SubmitTeamEvent ();
+			this.MainGameInstance.SubmitTeam ();
 			ToGameHUD ();
 		} else {
 			Debug.Log ("You still have players to place");
@@ -104,7 +104,7 @@ public class UISetPiece : IUIState
 	public bool CanPlaceCharacter(Vector3 potential)
 	{
 		Cell potent = Grid_Setup.Instance.GetCellByLocation (potential);
-		if (potent.team == GameClientInstance.team && !potent.bOccupied) 
+		if (potent.team == MainGameInstance.team && !potent.bOccupied) 
 		{
 			activeCards--;
 			return true;
@@ -116,16 +116,16 @@ public class UISetPiece : IUIState
 	public void SetupCharacterPanel()
 	{
 		gui.EnableHUD (true);
-		gui.EnableCharacterPanel(true);
+		gui.EnableCharacterSelection(true);
 
 		for (int c = 0; c < dragPortraits.Length; c++) 
 		{
 			Image charObject = GameObject.Instantiate (gui.characterCardFab, Vector3.zero, Quaternion.identity) as Image;
 			charObject.transform.SetParent (gui.CharacterPanel);
 			dragPortraits [c] = charObject.GetComponent<Drag> ();
-			dragPortraits [c].PlayerPosition = Grid_Setup.Instance.GetCharacter ((int)GameClientInstance.team, c).charData.Name;
+			dragPortraits [c].PlayerPosition = MainGame.Instance.GetCharacter ((int)MainGameInstance.team, c).charData.Name;
 			dragPortraits [c].index = c;
-			dragPortraits [c].gameClient = GameClientInstance;
+			dragPortraits [c].mainGame = MainGameInstance;
 			dragPortraits [c].gui = this;
 			activeCards++;
 		}
@@ -134,7 +134,7 @@ public class UISetPiece : IUIState
 	public void ResetCharacterPanel()
 	{
 		gui.EnableHUD (true);
-		gui.EnableCharacterPanel(true);
+		gui.EnableCharacterSelection(true);
 		for (int c = 0; c < dragPortraits.Length; c++) 
 		{
 			dragPortraits [c].EnableMe();

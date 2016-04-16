@@ -5,21 +5,21 @@ using UnityEngine.EventSystems;
 
 public class UIMainMenu : IUIState 
 {
-	CustomGameClient GameClientInstance;
+	MainGame MainGameInstance;
 	GUIController gui;
 
 	bool connectInProcess;
 
-	public UIMainMenu(GUIController GUI, CustomGameClient GameClient)
+	public UIMainMenu(GUIController GUI, MainGame mg)
 	{
 		this.gui = GUI;
-		GameClientInstance = GameClient;
+		MainGameInstance = mg;
 	}
 	public void EnterState ()
 	{
 		gui.EnableMainMenu (true);
 		//if(GameClientInstance.CurrentRoom==null)
-		connectInProcess = GameClientInstance.ConnectToRegionMaster("us");  // can return false for errors
+		//connectInProcess = CustomGameClient.ConnectToRegionMaster("us");  // can return false for errors
 	}
 	public void Update ()
 	{
@@ -49,23 +49,6 @@ public class UIMainMenu : IUIState
 		gui.UIState = gui.UISOG;
 	}
 
-	public void NewDevGameButt ()
-	{
-		ToSetPiece ();
-	}
-
-	public void NewGameButt ()
-	{
-		if (connectInProcess) 
-		{
-			this.GameClientInstance.OpJoinRandomRoom (null, 0);
-			ToSetPiece ();
-		} else {
-			GameClientInstance.Disconnect ();
-			connectInProcess = GameClientInstance.ConnectToRegionMaster("us"); 
-			Debug.Log ("I Can't Even");
-		}
-	}
 	public void DeselectCharacter()
 	{
 		Debug.Log ("That really doesn't apply here");

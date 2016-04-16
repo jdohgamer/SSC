@@ -40,21 +40,19 @@ public class Grid_Setup : MonoBehaviour
 	public static GameObject Ball;
 	public static Grid_Setup Instance;//not technically a singleton
 	public Team[] Teams;
+	public bool isHighlighted, isCreated;
 	public Vector3 BallLocation{get{return Ball.transform.position;}}
-	public int Length{get{return length;}}
-	public int Width{get{return width;}}
 	public int TeamSize{ get{return teamSize;}}
-	[SerializeField] GameObject highlightFab, ballFab = null, charFab = null;
-	[SerializeField] CharacterData[] positionData;
-	[SerializeField] Color[] TeamColors =  {Color.black, Color.white};
-	[SerializeField] int teamSize = 5;
-	[SerializeField] Vector3 TeamOneGoal = Vector3.zero, TeamTwoGoal = Vector3.one, GoalSize = Vector3.one;
+	[SerializeField] public Vector3 TeamOneGoal = Vector3.zero, TeamTwoGoal = Vector3.one, GoalSize = Vector3.one;
+	[SerializeField] private GameObject highlightFab, ballFab = null, charFab = null;
+	[SerializeField] private CharacterData[] positionData;
+	[SerializeField] private Color[] TeamColors =  {Color.black, Color.white};
+	[SerializeField] private int teamSize = 5, length = 13 , width = 23;
 	private static Cell highlightSingle;
 	private Cell[,] cells2D;
-	private Transform fieldTran, TeamOneTran, TeamTwoTran;
+	private Transform fieldTran;
 	private AdjacentIndexes adjacent;
-	public bool isHighlighted, isCreated;
-	private int length, width, cellCount;
+	private int cellCount, fieldSide;
 
 	void Awake()
 	{
@@ -73,36 +71,36 @@ public class Grid_Setup : MonoBehaviour
 		}
 		Destroy (Ball);
 	}
-	public UnitController GetCharacter(int Team, int index)
-	{
-		return Teams [Team].mates [index];
-	}
-
-	public void SetCharacter(int team,int index, Vector3 location)
-	{
-		if(team<Teams.Length && index<teamSize)
-		{
-			Teams[team].mates[index].gameObject.SetActive(true);
-			Teams[team].mates[index].MoveTransform(GetCellByLocation(location).Location);
-		}
-	}
-	public void LoadCharactersFromProps(Hashtable ht)
-	{
-		for(int i = 0;i<ht.Count;i++)
-		{
-			Hashtable hash = ht[i.ToString()]as Hashtable;
-			int team = (int)hash["Team"];
-			Vector3 loc = (Vector3)hash["Location"];
-			this.SetCharacter(team, i, loc);
-		}
-	}
+//	public UnitController GetCharacter(int Team, int index)
+//	{
+//		return Teams [Team].mates [index];
+//	}
+//
+//	public void SetCharacter(int team,int index, Vector3 location)
+//	{
+//		if(team<Teams.Length && index<teamSize)
+//		{
+//			Teams[team].mates[index].gameObject.SetActive(true);
+//			Teams[team].mates[index].MoveTransform(GetCellByLocation(location).Location);
+//		}
+//	}
+//	public void LoadCharactersFromProps(Hashtable ht)
+//	{
+//		for(int i = 0;i<ht.Count;i++)
+//		{
+//			Hashtable hash = ht[i.ToString()]as Hashtable;
+//			int team = (int)hash["Team"];
+//			Vector3 loc = (Vector3)hash["Location"];
+//			this.SetCharacter(team, i, loc);
+//		}
+//	}
 	public void ResetBoard ()
 	{
 		Ball.GetComponent<BallScript>().StopMe();
 		Ball.transform.SetParent (null);
 		Ball.transform.position = new Vector3 (11,0.1f,6);
-		Teams [0].Sleep ();
-		Teams [1].Sleep ();
+		//Teams [0].Sleep ();
+		//Teams [1].Sleep ();
 	}
 	public bool IsInsideHighlighted(Vector3 spot)
 	{
@@ -111,41 +109,39 @@ public class Grid_Setup : MonoBehaviour
 		else
 			return false;
 	}
-	public void Generate (int w, int l) 
+	public void Generate () 
 	{
 		if(!isCreated)
 		{
-			Teams = new Team[2];
-			for(int t = 0; t<2 ; t++)
-			{
-				//bool teamOne = t == 0;
-				Vector3 goal = t == 0 ? TeamOneGoal : TeamTwoGoal;
-				Teams [t] = new Team ((Team.TeamNumber)t, TeamColors[t], teamSize, goal, GoalSize);
-				//Quaternion face = teamOne ? Quaternion.LookRotation(Vector3.right):Quaternion.LookRotation(-Vector3.right) ;
-				for(int c = 0; c <teamSize; c++)
-				{
-					GameObject newGuy = Instantiate(charFab,Vector3.zero + new Vector3((float)t,0.2f,(float)c),Quaternion.identity) as GameObject;
-					Teams [t].AddMate(newGuy.GetComponent<UnitController>());
-					Teams [t].mates [c].charData = positionData [c];
-					newGuy.SetActive (false);
-				}
-			}
+//			Teams = new Team[2];
+//			for(int t = 0; t<2 ; t++)
+//			{
+//				//bool teamOne = t == 0;
+//				Vector3 goal = t == 0 ? TeamOneGoal : TeamTwoGoal;
+//				Teams [t] = new Team (t, TeamColors[t], teamSize, goal, GoalSize);
+//				//Quaternion face = teamOne ? Quaternion.LookRotation(Vector3.right):Quaternion.LookRotation(-Vector3.right) ;
+//				for(int c = 0; c <teamSize; c++)
+//				{
+//					GameObject newGuy = Instantiate(charFab,Vector3.zero + new Vector3((float)t,0.2f,(float)c),Quaternion.identity) as GameObject;
+//					Teams [t].AddMate(newGuy.GetComponent<UnitController>());
+//					Teams [t].mates [c].charData = positionData [c];
+//					newGuy.SetActive (false);
+//				}
+//			}
 
 			isCreated = true;
-			width = w+2;
-			length = l+2;
 			cellCount = length*width;
 			cells2D = new Cell[width,length];
 			GameObject high;
 			Vector3 loc = Vector3.zero, size = new Vector3 (1,1,1);
-			Team.TeamNumber fieldSide = Team.TeamNumber.NONE;
+			fieldSide = -1;
 			int type = 0;
 			int i = 0;
 			for (int x = 0; x<width; x++)
 			{
 				for (int z = 0; z<length; z++)
 				{	
-					fieldSide = Team.TeamNumber.NONE;
+					fieldSide = -1;
 					if(x==0||x==width-1||z==0||z==length-1)//Border
 					{
 						type = 0;
@@ -153,10 +149,10 @@ public class Grid_Setup : MonoBehaviour
 						type = 3;
 						if (x < (width / 2)) 
 						{
-							fieldSide = Team.TeamNumber.TeamOne;
+							fieldSide = 0;
 						} else if (x > (width / 2))
 						{
-							fieldSide = Team.TeamNumber.TeamTwo;
+							fieldSide = 1;
 						}
 						if(x==width/2&&z==length/2)
 						{
@@ -267,14 +263,12 @@ public class Grid_Setup : MonoBehaviour
 	{ 
 		if (!calledByEvent)
 		{
-			int tempWidth = 21;    
-			int tempLength = 11;
 			if (customProps.ContainsKey("tx#"))
 			{
 				width = (int)customProps["tx#"];
 				length = (int)customProps["tz#"];
 			}
-			this.Generate(tempWidth, tempLength);
+			this.Generate();
 		}
 
 		int readTiles = 0;

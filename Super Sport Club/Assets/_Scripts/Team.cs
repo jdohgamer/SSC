@@ -5,17 +5,17 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 [System.Serializable]
 public class Team 
 {
-	public enum TeamNumber{TeamOne=0,TeamTwo=1, NONE = -1}
+	//public enum TeamNumber{TeamOne=0,TeamTwo=1, NONE = -1}
 	public UnitController[] mates;
-	TeamNumber teamNum = TeamNumber.NONE;
+	//TeamNumber teamNum = TeamNumber.NONE;
 	Color teamColor;
 	Bounds goalArea;
 	int characterCount = 0, teamSize = 5;
 	Quaternion face;
 
-	public Team(TeamNumber num, Color TeamColor, int Size, Vector3 goalCenter, Vector3 goalSize)
+	public Team(int num, Color TeamColor, int Size, Vector3 goalCenter, Vector3 goalSize)
 	{
-		teamNum = num;
+		//teamNum = num;
 		teamColor = TeamColor;
 		mates = new UnitController[Size];
 		goalArea = new Bounds (goalCenter, goalSize);
@@ -29,7 +29,7 @@ public class Team
 			this.mates [characterCount] = newGuy;
 			this.mates [characterCount].transform.rotation = face;
 			this.mates [characterCount].id = characterCount;
-			this.mates [characterCount].team = teamNum;
+			//this.mates [characterCount].team = teamNum;
 			this.mates [characterCount].SetColor (teamColor);
 			this.characterCount++;
 		}

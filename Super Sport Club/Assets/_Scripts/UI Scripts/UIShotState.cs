@@ -3,11 +3,11 @@ using System.Collections;
 
 public class UIShotState : IUIState 
 {
-	CustomGameClient GameClientInstance;
+	MainGame GameClientInstance;
 	GUIController gui;
 	Animator camAnim;
 
-	public UIShotState(GUIController GUI, CustomGameClient GameClient)
+	public UIShotState(GUIController GUI, MainGame GameClient)
 	{
 		this.gui = GUI;
 		GameClientInstance = GameClient;

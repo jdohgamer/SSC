@@ -7,7 +7,7 @@ using System.Collections;
 public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
 	public static bool bDragging;
-	public CustomGameClient gameClient;
+	public MainGame mainGame;
 	public bool dragOnSurfaces = true;	
 	public int index;
 	//[SerializeField] GUIController GUI;
@@ -33,7 +33,7 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 		text.text = PlayerPosition;
 		image = GetComponent<Image>();
 		mask = 1<<LayerMask.NameToLayer("Ground");
-		gameClient = new CustomGameClient();
+	
 	}
 	public void OnBeginDrag(PointerEventData eventData)
 	{
@@ -113,7 +113,7 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 			{
 				if (gui.CanPlaceCharacter (hit.point)) 
 				{
-					Grid_Setup.Instance.SetCharacter ((int)gameClient.team, index, hit.point);
+					mainGame.SetCharacter (mainGame.team, index, hit.point);
 					DisableMe ();
 				} else {
 					EnableMe ();

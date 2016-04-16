@@ -58,7 +58,6 @@
      <None Include="Assets\Plugins\RAIN\ReleaseNotes.txt" />
      <None Include="Assets\Editor\Todo\README.txt" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\NavMeshContourShader.shader" />
-     <None Include="Assets\_Assets\Graphics\game-icons\icons-readme.txt" />
      <None Include="Assets\Plugins\Pixelplacement\iTween\ReadMe!\ReadMe!.txt" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\AspectRingShader.shader" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\WaypointShader.shader" />

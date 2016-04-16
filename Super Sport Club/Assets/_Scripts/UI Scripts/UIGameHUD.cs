@@ -8,9 +8,9 @@ public class UIGameHUD : IUIState
 	static GameObject panel, meter;
 	public UnitController CurrentSelectedChar
 	{
-		get{return board.GetCharacter((int)GameClientInstance.team,currentID);}
+		get{return MainGameInstance.GetCharacter((int)MainGameInstance.team,currentID);}
 	}
-	CustomGameClient GameClientInstance;
+	MainGame MainGameInstance;
 	GUIController gui;
 	float offsetX = -50,offsetY =0;
 	bool isCharacterSelected;
@@ -20,10 +20,10 @@ public class UIGameHUD : IUIState
 	private bool isPassing, isMoving, isShooting, shotFired;
 	//LayerMask mask = (1<<LayerMask.NameToLayer("Ground") | 1<<LayerMask.NameToLayer("Characters"));
 
-	public UIGameHUD(GUIController GUI, CustomGameClient GameClient)
+	public UIGameHUD(GUIController GUI, MainGame mg)
 	{
 		this.gui = GUI;
-		GameClientInstance = GameClient;
+		MainGameInstance = mg;
 		board = Grid_Setup.Instance;
 	}
 	public void EnterState ()
@@ -61,7 +61,7 @@ public class UIGameHUD : IUIState
 	void ShotOnGoal()
 	{
 		iTween.Pause ();
-		if(Grid_Setup.Instance.IsShotOnGoal((int)GameClientInstance.team, BallScript.TargetLocation))
+		if(Grid_Setup.Instance.IsShotOnGoal(MainGameInstance.team, BallScript.TargetLocation))
 		{
 			ToShotState();
 		}
@@ -70,9 +70,7 @@ public class UIGameHUD : IUIState
 	{
 		gui.UIState = gui.UISOG;
 	}
-	void ScorePoint ()
-	{
-	}
+
 	public void ToGameHUD ()
 	{
 		Debug.Log ("Already in Game HUD State.");
@@ -81,7 +79,7 @@ public class UIGameHUD : IUIState
 	public void EndTurnButton()
 	{
 		//DeselectCharacter();
-		this.GameClientInstance.EndTurnEvent();
+
 	}
 	public void ClickOnPlayer(int index)
 	{
@@ -135,7 +133,7 @@ public class UIGameHUD : IUIState
 	}
 	void MovementClick(Cell tCell)
 	{
-		GameClientInstance.SetPlayerAction(new PlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, tCell));
+		MainGameInstance.SetPlayerAction(new PlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, tCell));
 		if ((CurrentSelectedChar.targetCount == 1 && CurrentSelectedChar.IsSprinting))  
 		{
 			board.HighlightAdjacent (true, tCell.Location, CurrentSelectedChar.MoveDistance);
@@ -151,7 +149,7 @@ public class UIGameHUD : IUIState
 	{
 		if (CurrentSelectedChar.maxActions -CurrentSelectedChar.actionCount > 0) 
 		{
-			GameClientInstance.SetPlayerAction(new PlayerAction (act, CurrentSelectedChar,tCell));
+			MainGameInstance.SetPlayerAction(new PlayerAction (act, CurrentSelectedChar,tCell));
 			board.TurnOffHiglightedAdjacent();
 			isPassing = false;
 		}
@@ -221,7 +219,7 @@ public class UIGameHUD : IUIState
 		}
 		Vector3 loc = Camera.main.WorldToScreenPoint(cellLocation);
 		loc += new Vector3(offsetX,offsetY,0f);
-		panel = GameObject.Instantiate(gui.panelFab.gameObject, loc, Quaternion.identity)as GameObject;
+		panel = GameObject.Instantiate(gui.panelFab.gameObject, loc, Quaternion.identity)as GameObject;//prefab with PanelController script attached
 		panel.transform.SetParent(gui.UIcan.transform,false);
 		panel.transform.SetAsLastSibling();
 		PanelController pc = panel.GetComponent<PanelController> ();
@@ -236,7 +234,7 @@ public class UIGameHUD : IUIState
 				GameObject.Destroy (panel.gameObject);
 			});
 		}
-		if (GameClientInstance.ActionsLeft > 0) 
+		if (MainGameInstance.ActionsLeft > 0) 
 		{
 			if ((CurrentSelectedChar.maxActions - CurrentSelectedChar.actionCount > 0))
 			{

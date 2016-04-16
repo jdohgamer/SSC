@@ -1,31 +1,20 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\_Scripts\UnitController.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\_Scripts\UI Scripts\UIMainMenu.cs">
     <Files>
-      <File FileName="Assets\_Scripts\UI Scripts\GUIController.cs" Line="162" Column="17" />
-      <File FileName="Assets\_Scripts\CustomGameClient.cs" Line="346" Column="4" />
-      <File FileName="Assets\_Scripts\UnityEventManager.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\UnitController.cs" Line="14" Column="59" />
-      <File FileName="Assets\_Scripts\Grid_Setup.cs" Line="116" Column="16" />
-      <File FileName="Assets\_Scripts\UI Scripts\Gauge.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\CharacterData.cs" Line="1" Column="1" />
-      <File FileName="Assets\_Scripts\UI Scripts\UIMainMenu.cs" Line="57" Column="14" />
-      <File FileName="Assets\_Scripts\UI Scripts\UISetPiece.cs" Line="133" Column="3" />
+      <File FileName="Assets\_Scripts\MainGame.cs" Line="88" Column="41" />
+      <File FileName="Assets\_Scripts\UI Scripts\GUIController.cs" Line="185" Column="11" NotebookId="1" />
+      <File FileName="Assets\_Scripts\CustomGameClient.cs" Line="65" Column="3" NotebookId="1" />
+      <File FileName="Assets\_Scripts\UnitController.cs" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Assets\_Scripts\Grid_Setup.cs" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Assets\_Scripts\Cell.cs" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Assets\_Scripts\UI Scripts\UIGameHUD.cs" Line="155" Column="4" NotebookId="1" />
+      <File FileName="Assets\_Scripts\UI Scripts\UIMainMenu.cs" Line="8" Column="27" NotebookId="1" />
+      <File FileName="Assets\_Scripts\PlayerAction.cs" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Assets\_Scripts\UI Scripts\UISetPiece.cs" Line="10" Column="4" NotebookId="1" />
+      <File FileName="Assets\_Scripts\UI Scripts\IUIState.cs" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Assets\_Scripts\UI Scripts\Drag.cs" Line="103" Column="2" NotebookId="1" />
     </Files>
-    <Pads>
-      <Pad Id="ProjectPad">
-        <State name="__root__">
-          <Node name="Super Sport Club" expanded="True">
-            <Node name="Assembly-CSharp" expanded="True">
-              <Node name="_Scripts" expanded="True">
-                <Node name="UI Scripts" expanded="True" />
-                <Node name="UnitController.cs" selected="True" />
-              </Node>
-            </Node>
-          </Node>
-        </State>
-      </Pad>
-    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
