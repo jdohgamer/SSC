@@ -28,15 +28,28 @@ public class MainGame : MonoBehaviour
 			return instance;
 		}
 	}
-	public bool bOnline;
+	public bool bOnline, bDev;
 	public float timeSinceService;
 	public byte MaxActions = 5;
-	public int teamNum;
 	public Team[] Teams;
 	public int TeamSize{ get{return teamSize;}}
 	public int TurnNumber{get{return turnNumber;}}
 	public byte ActionsLeft{get{return (byte)(MaxActions - actionCount);}}
 	public Team CurrentTeam{get{return Teams[currentTeam];}}
+	public int CurrentTeamNum{
+		get
+		{
+			if(bDev)
+			return currentTeam;
+			else return teamNum;
+		}
+		set
+		{
+			if(bDev)
+			currentTeam = value;
+			else teamNum = value;
+		}
+	}
 	public PlayerAction[] CurrentActionSet{get{return characterActions[currentTeam];}}
 	[SerializeField] private int teamSize = 5, currentTeam;
 	[SerializeField] string AppId;// set in inspector. this is called when the client loaded and is ready to start
@@ -46,8 +59,9 @@ public class MainGame : MonoBehaviour
 	[SerializeField] private Color[] TeamColors =  {Color.black, Color.white};
 	int[] score;
 	PlayerAction[][] characterActions;
+
 	bool P1Submitted, P2Submitted, connectInProgress;
-	int turnNumber;//, teamSize = 5;
+	int turnNumber, teamNum;//, teamSize = 5;
 	byte actionCount = 0;
 	private CustomGameClient GameClientInstance;
 	private GUIController gui;
@@ -63,7 +77,6 @@ public class MainGame : MonoBehaviour
 		this.GameClientInstance  = new CustomGameClient();
 		CustomGameClient.ClientInstance = this.GameClientInstance;
 		this.GameClientInstance.AppId = AppId;  // edit this!
-		this.GameClientInstance.board = board;
 		this.GameClientInstance.mainGame = this;
 		Application.runInBackground = true;
 		CustomTypes.Register();
@@ -100,10 +113,63 @@ public class MainGame : MonoBehaviour
 		}
 	}
 
+	public void SetOtherTeamActions(Hashtable ht)
+	{
+		characterActions[(currentTeam+1)%2] = LoadActionsFromProps(ht);
+	}
+
+	PlayerAction[] LoadActionsFromProps(Hashtable ht)
+	{
+		PlayerAction[] actions = new PlayerAction[ht.Count];
+		for(int i = 0;i<ht.Count;i++)
+		{
+			if(ht[i.ToString()]!=null)
+			{
+				Hashtable ion = ht[i.ToString()]as Hashtable;
+				actions[i] = PlayerAction.GetActionFromProps(ion);
+			}
+		}
+		return actions;
+	}
+
+	public void ClearActions()
+	{
+		for(int c= 0;c<CurrentActionSet.Length;c++)
+		{
+			if(CurrentActionSet[c]!=null)
+			{
+				CurrentActionSet[c] = null;
+			}
+		}
+		board.TurnOffHiglightedAdjacent ();
+		actionCount = 0;
+//		foreach(UnitController c in CurrentTeam.mates)
+//		{
+//			c.ClearActions();
+//		}
+	}
+
 	public bool IsShotOnGoal(int tNum, Vector3 spot)
 	{
 		return Teams[tNum].IsVectorInGoal (spot);
 		
+	}
+
+		public int TeamScore(int team)
+	{
+		if (team > 1 || team<0) 
+		{
+			return -1;
+		}
+		return score [team];
+	}
+	public void ScorePoint(int team)
+	{
+		if (team > 1 || team<0) 
+		{
+			return;
+		}
+		score [team] += 1;
 	}
 
 	void CreateTeams()
@@ -119,6 +185,7 @@ public class MainGame : MonoBehaviour
 				{
 					GameObject newGuy = Instantiate(charFab,Vector3.zero + new Vector3((float)t,0.2f,(float)c),Quaternion.identity) as GameObject;
 					Teams [t].AddMate(newGuy.GetComponent<UnitController>());
+					Teams [t].mates [c].team = t;
 					Teams [t].mates [c].charData = positionData [c];
 					newGuy.SetActive (false);
 				}
@@ -155,19 +222,6 @@ public class MainGame : MonoBehaviour
 		}
 	}
 
-//	Vector3[] CreateVectorArray(Team squad)
-//	{
-//		if(squad!=null)
-//		{
-//			Vector3[] pos = new Vector3[teamSize];
-//			for(int i = 0; i<pos.Length;i++)
-//			{
-//				pos[i] = squad.mates[i].Location;
-//			}
-//			return pos;
-//		}else return null;
-//	}
-
 	public void LoadCharactersFromProps(Hashtable ht)
 	{
 		for(int i = 0;i<ht.Count;i++)
@@ -179,42 +233,10 @@ public class MainGame : MonoBehaviour
 		}
 	}
 
-	PlayerAction[] LoadActionsFromProps(Hashtable ht)
-	{
-		PlayerAction[] actions = new PlayerAction[ht.Count];
-		for(int i = 0;i<ht.Count;i++)
-		{
-			if(ht[i.ToString()]!=null)
-			{
-				Hashtable ion = ht[i.ToString()]as Hashtable;
-				actions[i] = PlayerAction.GetActionFromProps(ion);
-			}
-		}
-		return actions;
-	}
-
-	public void ClearActions()
-	{
-		for(int c= 0;c<CurrentActionSet.Length;c++)
-		{
-			if(CurrentActionSet[c]!=null)
-			{
-				CurrentActionSet[c] = null;
-			}
-		}
-		board.TurnOffHiglightedAdjacent ();
-		actionCount = 0;
-//		foreach(UnitController c in CurrentTeam.mates)
-//		{
-//			c.ClearActions();
-//		}
-	}
-
 	public void Connect()
 	{
 		connectInProgress = GameClientInstance.ConnectToRegionMaster("us");  // can return false for errors
-		StartCoroutine("NewOnlineGame");
-		bOnline = true;
+		//StartCoroutine("NewOnlineGame");
 	}
 
 	public IEnumerator NewOnlineGame()
@@ -224,6 +246,7 @@ public class MainGame : MonoBehaviour
 			if (connectInProgress) 
 			{
 				GameClientInstance.OpJoinRandomRoom (null, 0);
+				bOnline = true;
 
 			} else {
 				connectInProgress = GameClientInstance.ConnectToRegionMaster("us"); 
@@ -245,8 +268,17 @@ public class MainGame : MonoBehaviour
 			if(bOnline)
 			this.GameClientInstance.SubmitTeamEvent(CurrentTeam);
 
-			gui.UIState.ToGameHUD();
-			NextTurn();
+			if(bDev&&!(TeamActive(Teams[0])&&TeamActive(Teams[1])))
+			{
+				currentTeam = (currentTeam+1)%2;
+				gui.UIState.ToGameHUD();
+				gui.UIState.ToSetPiece();
+			}else{
+				gui.UIState.ToGameHUD();
+				NextTurn();
+			}
+
+
 		}else {
 			Debug.Log ("You still have players to place");
 		}
@@ -282,7 +314,7 @@ public class MainGame : MonoBehaviour
 				if(characterActions[j][i]!=null)
 				{
 					//targetedCells.Add (oppActions[i]);
-					MoveSet[(i).ToString()] = CurrentActionSet[i].GetActionProp();
+					MoveSet[(i).ToString()] = characterActions[j][i].GetActionProp();
 				}
 			}
 		}

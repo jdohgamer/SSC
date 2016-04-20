@@ -29,8 +29,6 @@ public class CustomGameClient : LoadBalancingClient
 	public const byte SubmitTeam = 3;
 	public const string PropTurn = "turn";
 	public const string PropNames = "names";
-	public int TurnNumber{get{return turnNumber;}}
-	public byte ActionsLeft{get{return (byte)(MaxActions - actionCount);}}
 	public bool GameWasAbandoned
 	{
 		get { return this.CurrentRoom != null && this.CurrentRoom.Players.Count < 2 && this.CurrentRoom.CustomProperties.ContainsKey("t#"); }
@@ -44,26 +42,18 @@ public class CustomGameClient : LoadBalancingClient
 			return opp;
 		}
 	}
-	public Grid_Setup board;
+
 	public MainGame mainGame;
 	public byte MaxActions = 5;
 	public bool bTurnDone;
-	//public GUIController gui;
-	//public FSM_Character[] oppCharacers;
 	public int team;
-	int[] score;
-	Team myTeam;
-	PlayerAction[] myActions, oppActions;
 	bool P1Submitted, P2Submitted;
-	int turnNumber;//, teamSize = 5;
-	byte actionCount = 0;
+	int turnNumber;
 	Hashtable oppHT;
 
 	public CustomGameClient()
 	{
-		myActions = new PlayerAction[MaxActions];
-		//oppCharacers = new FSM_Character[teamSize];
-		score = new int[2];
+
 	}
 	
 	public void EndTurnEvent(PlayerAction[] actions)
@@ -99,22 +89,6 @@ public class CustomGameClient : LoadBalancingClient
 		this.loadBalancingPeer.OpRaiseEvent(SubmitTeam, TeamHT, true, null);
 			
 	}
-	public int TeamScore(int team)
-	{
-		if (team > 1 || team<0) 
-		{
-			return -1;
-		}
-		return score [team];
-	}
-	public void ScorePoint(int team)
-	{
-		if (team > 1 || team<0) 
-		{
-			return;
-		}
-		score [team] += 1;
-	}
 
 	bool IsPlayerOne()
 	{
@@ -133,22 +107,6 @@ public class CustomGameClient : LoadBalancingClient
 		return P1Submitted && P2Submitted;
 	}
 		
-//	public void SetPlayerAction(PlayerAction act)
-//	{
-//		if(actionCount<MaxActions&&act.iCh.actionCount<act.iCh.maxActions)
-//		{
-//			myActions[actionCount] = act;
-//			actionCount += 1;
-//			if(act.action == PlayerAction.Actions.Move)// preview waypoints
-//			{
-//				act.iCh.SetMoveTarget(act.cTo);
-//			}
-//			if(act.action == PlayerAction.Actions.Pass || act.action == PlayerAction.Actions.Shoot || act.action == PlayerAction.Actions.Cross)
-//			{
-//				act.iCh.SetPassTarget(act.cTo);
-//			}
-//		}
-//	}
 	Hashtable GetActionsAsProps(PlayerAction[] actions)
 	{
 		Hashtable MoveSet = new Hashtable ();
@@ -176,18 +134,6 @@ public class CustomGameClient : LoadBalancingClient
 		return actions;
 	}
 
-	public void ClearActions()
-	{
-		for(int c= 0;c<myActions.Length;c++)
-		{
-			if(myActions[c]!=null)
-			{
-				myActions[c] = null;
-			}
-		}
-		board.TurnOffHiglightedAdjacent ();
-		actionCount = 0;
-	}
 
 	public override void OnOperationResponse(OperationResponse operationResponse)
 	{
@@ -201,6 +147,9 @@ public class CustomGameClient : LoadBalancingClient
 					//this.OnWebRpcResponse(new WebRpcResponse(operationResponse));
 				}
 				break;
+			case (byte)OperationCode.Authenticate:
+			mainGame.StartCoroutine("NewOnlineGame");
+			break;
 			case (byte)OperationCode.JoinGame:
 			case (byte)OperationCode.CreateGame:
 				if (operationResponse.ReturnCode != 0)
@@ -214,8 +163,9 @@ public class CustomGameClient : LoadBalancingClient
 					if(IsPlayerOne())
 					{
 						team = 0;
+						mainGame.NewGame();
 					}else team = 1;
-					this.LoadBoardFromProperties(false);
+					//this.LoadBoardFromProperties(false);
 				}
 			}
 			break;
@@ -228,6 +178,7 @@ public class CustomGameClient : LoadBalancingClient
 				}
 			break;
 		}
+		Debug.Log(operationResponse.OperationCode.ToString());
 	}
 	
 	
@@ -244,7 +195,7 @@ public class CustomGameClient : LoadBalancingClient
 					P2Submitted = true;
 					object content = photonEvent.Parameters[ParameterCode.CustomEventContent];
 					Hashtable turnClick = content as Hashtable;
-					oppActions = LoadActionsFromProps(turnClick);
+					mainGame.SetOtherTeamActions(turnClick);
 					if(BothPlayersHaveSubmitted())
 					{
 						//CalcMoves();
@@ -318,17 +269,13 @@ public class CustomGameClient : LoadBalancingClient
 		if(BothPlayersHaveSubmitted())
 		{
 			mainGame.LoadCharactersFromProps(HT);
-			NextTurn ();
 		}
 	}
 	
 	public void SaveBoardToProperties()
 	{
-		Hashtable boardProps = board.GetBoardAsCustomProperties();
-		//boardProps.Add("pt", this.PlayerIdToMakeThisTurn);  // "pt" is for "player turn" and contains the ID/actorNumber of the player who's turn it is
-		boardProps.Add("t#", this.TurnNumber);
-		//boardProps.Add("tx#", board.Width);
-		//boardProps.Add("tz#", board.Length);
+		Hashtable boardProps = Grid_Setup.Instance.GetBoardAsCustomProperties();
+
 		
 		//boardProps.Add(GetPlayerPointsPropKey(this.LocalPlayer.ID), this.MyPoints); // we always only save "our" points. this will not affect the opponent's score.
 		bool webForwardToPush = false;
@@ -352,7 +299,7 @@ public class CustomGameClient : LoadBalancingClient
 		}
 
 		// we are in a game that has props (a board). read those (as update or as init, depending on calledByEvent)
-		bool success = board.SetBoardByCustomProperties(roomProps, calledByEvent);
+		bool success = Grid_Setup.Instance.SetBoardByCustomProperties(roomProps, calledByEvent);
 		if (!success)
 		{
 			Debug.LogError("Not loaded board from props?");
@@ -388,68 +335,5 @@ public class CustomGameClient : LoadBalancingClient
 		boardProps[PropNames] = string.Format("{0};{1}", this.LocalPlayer.NickName, this.Opponent.NickName);
 		this.OpSetCustomPropertiesOfRoom(boardProps, false);
 	}
-//	void DetermineWinner(PlayerAction One, PlayerAction Two)
-//	{
-//		PlayerAction A = One;
-//		PlayerAction B = Two;
-//
-//	}
 
-//	void CalcMoves()
-//	{
-//		Hashtable MoveSet = new Hashtable();
-//		//List<Cell> targetedCells = new List<Cell> ();
-//
-//		for (int i = 0; i<oppActions.Length; i++) 
-//		{
-//			if(oppActions[i]!=null)
-//			{
-//				//targetedCells.Add (oppActions[i]);
-//				MoveSet[(i).ToString()] = oppActions[i].GetActionProp();
-//			}
-//		}
-//		for (int i = 0; i<myActions.Length; i++) 
-//		{
-//			if(myActions[i]!=null)
-//			{
-//				//int conflict = targetedCells.BinarySearch(myActions[i].cTo);
-//				MoveSet[(i+oppActions.Length).ToString()] = myActions[i].GetActionProp();
-//			}
-//		}
-//		ExecuteMoves(MoveSet);
-//
-//		this.loadBalancingPeer.OpRaiseEvent(Execute, MoveSet, true, null);
-//		//new RaiseEventOptions{Receivers = ReceiverGroup.All }
-//	}
-	void NextTurn()
-	{
-		ClearActions();
-		UnityEventManager.TriggerEvent ("NextTurn");
-		turnNumber++;
-		P1Submitted = false;
-		P2Submitted = false;
-	}
-//	void ExecuteMoves(Hashtable moves)
-//	{
-//		PlayerAction[] acts = LoadActionsFromProps (moves);
-//		List<UnitController> affectedChars = new List<UnitController>();
-//		for (int h = 0; h < acts.Length; h++) 
-//		{
-//			if(acts[h]!=null)
-//			{
-//				Debug.Log(acts[h].action.ToString());
-//				if(!affectedChars.Contains(acts[h].iCh))
-//				{
-//					affectedChars.Add(acts[h].iCh);
-//				}
-//				affectedChars[h].SetPlayerAction(acts[h]);
-//			}
-//		}
-//		foreach(UnitController c in affectedChars)
-//		{
-//			c.StartCoroutine("ExecuteActions");
-//		}
-//
-//		NextTurn ();
-//	}
 }

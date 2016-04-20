@@ -6,14 +6,13 @@ using System.Collections;
 public class UISetPiece : IUIState 
 {
 	GUIController gui;
-	Drag[] dragPortraits;
-	int activeCards = 0;
+	Drag[,] dragPortraits;
 	bool bSetup;
 
 	public UISetPiece(GUIController GUI)
 	{
 		this.gui = GUI;
-		dragPortraits = new Drag[MainGame.Instance.TeamSize];
+		dragPortraits = new Drag[2, MainGame.Instance.TeamSize];
 
 	}
 	public void EnterState ()
@@ -21,7 +20,10 @@ public class UISetPiece : IUIState
 		if (Grid_Setup.Instance.isCreated) 
 		{
 			if (!bSetup)
+			{
 				SetupCharacterPanel ();
+				ResetCharacterPanel();
+			}
 			else
 				ResetCharacterPanel ();
 		}
@@ -41,14 +43,13 @@ public class UISetPiece : IUIState
 	{
 		Debug.Log ("Exiting SetPiece");
 		gui.EnableCharacterSelection(false);
-
-			for (int c = 0; c < dragPortraits.Length; c++)
+		for (int c = 0; c < MainGame.Instance.TeamSize; c++)
+		{
+			if (dragPortraits[MainGame.Instance.CurrentTeamNum,c] != null) 
 			{
-				if (dragPortraits[c] != null) 
-				{
-					dragPortraits [c].DisableMe ();
-				}
+				dragPortraits [MainGame.Instance.CurrentTeamNum,c].DisableMe ();
 			}
+		}
 	}
 	public void ToMainMenu ()
 	{
@@ -68,13 +69,13 @@ public class UISetPiece : IUIState
 	}
 	public void EndTurnButton()
 	{
-		if (OutOfCards ()) 
-		{
-			MainGame.Instance.SubmitTeam ();
-			ToGameHUD ();
-		} else {
-			Debug.Log ("You still have players to place");
-		}
+//		if (OutOfCards ()) 
+//		{
+//			MainGame.Instance.SubmitTeam ();
+//			ToGameHUD ();
+//		} else {
+//			Debug.Log ("You still have players to place");
+//		}
 
 	}
 
@@ -88,23 +89,23 @@ public class UISetPiece : IUIState
 	}
 	public void ClickOnField(Vector3 hit)
 	{
+		//add dragging ability for characters
 	}
 	public void MoveCharacter()
 	{
 		//add dragging ability for characters
 	}
 
-	bool OutOfCards()
-	{
-		return !(activeCards > 0);
-	}
+//	bool OutOfCards()
+//	{
+//		return !(activeCards > 0);
+//	}
 
 	public bool CanPlaceCharacter(Vector3 potential)
 	{
 		Cell potent = Grid_Setup.Instance.GetCellByLocation (potential);
-		if (potent.team == MainGame.Instance.teamNum && !potent.bOccupied) 
+		if (potent.team == MainGame.Instance.CurrentTeamNum && !potent.bOccupied) 
 		{
-			activeCards--;
 			return true;
 		} else {
 			return false;
@@ -116,15 +117,18 @@ public class UISetPiece : IUIState
 		gui.EnableHUD (true);
 		gui.EnableCharacterSelection(true);
 
-		for (int c = 0; c < dragPortraits.Length; c++) 
+		for(int b = 0; b<2; b++)
 		{
-			Image charObject = GameObject.Instantiate (gui.characterCardFab, Vector3.zero, Quaternion.identity) as Image;
-			charObject.transform.SetParent (gui.CharacterPanel);
-			dragPortraits [c] = charObject.GetComponent<Drag> ();
-			dragPortraits [c].PlayerPosition = MainGame.Instance.GetCharacter (MainGame.Instance.teamNum, c).charData.Name;
-			dragPortraits [c].index = c;
-			dragPortraits [c].gui = this;
-			activeCards++;
+			for (int c = 0; c < MainGame.Instance.TeamSize; c++) 
+			{
+				Image charObject = GameObject.Instantiate (gui.characterCardFab, Vector3.zero, Quaternion.identity) as Image;
+				charObject.transform.SetParent (gui.CharacterPanel);
+				dragPortraits [b,c] = charObject.GetComponent<Drag> ();
+				dragPortraits [b,c].PlayerPosition = MainGame.Instance.GetCharacter (b, c).charData.Name;
+				dragPortraits [b,c].index = c;
+				dragPortraits [b,c].gui = this;
+				dragPortraits[b,c].DisableMe();
+			}
 		}
 		bSetup = true;
 	}
@@ -132,10 +136,13 @@ public class UISetPiece : IUIState
 	{
 		gui.EnableHUD (true);
 		gui.EnableCharacterSelection(true);
-		for (int c = 0; c < dragPortraits.Length; c++) 
+		for (int c = 0; c < MainGame.Instance.TeamSize; c++)
 		{
-			dragPortraits [c].EnableMe();
-			activeCards++;
+			if (dragPortraits[MainGame.Instance.CurrentTeamNum,c] != null) 
+			{
+				dragPortraits [MainGame.Instance.CurrentTeamNum,c].EnableMe();
+			}
 		}
+		
 	}
 }

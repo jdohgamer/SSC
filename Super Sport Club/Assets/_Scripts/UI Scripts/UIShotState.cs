@@ -14,7 +14,7 @@ public class UIShotState : IUIState
 	public void EnterState ()
 	{
 		//animate to goal
-		int pan = MainGame.Instance.teamNum>0 ? 1:-1 ;
+		int pan = MainGame.Instance.CurrentTeamNum>0 ? 1:-1 ;
 		camAnim.SetInteger("SwirlDir", pan);
 
 		gui.EnableHUD (true);

@@ -59,7 +59,7 @@ public class GUIController: MonoBehaviour
 	void GoalScored(int p)
 	{
 		//board.ResetBoard ();
-		CustomGameClient.ClientInstance.ScorePoint (p);
+		mainGame.ScorePoint (p);
 		UIState = UISP;
 	}
 
@@ -116,10 +116,10 @@ public class GUIController: MonoBehaviour
 		while (CustomGameClient.ClientInstance.CurrentRoom!=null) 
 		{
 			string side =  (int)CustomGameClient.ClientInstance.team>0 ? "Right":"Left" ;
-			infoText.text = string.Format(" Turn: {2}\n team: {0}. \n You're on the: {1} side. \n", (int)CustomGameClient.ClientInstance.team , side, CustomGameClient.ClientInstance.TurnNumber);
-			infoText.text += string.Format (" You have {0} moves left \n", CustomGameClient.ClientInstance.ActionsLeft);
+			infoText.text = string.Format(" Turn: {2}\n team: {0}. \n You're on the: {1} side. \n", mainGame.CurrentTeamNum , side, mainGame.TurnNumber);
+			infoText.text += string.Format (" You have {0} moves left \n", mainGame.ActionsLeft);
 			infoText.text += string.Format(" Opponenent ready: {0}\n", CustomGameClient.ClientInstance.HasOppSubmitted());
-			infoText.text += string.Format(" Score: {0} : {1}\n", CustomGameClient.ClientInstance.TeamScore(0), CustomGameClient.ClientInstance.TeamScore(1));
+			infoText.text += string.Format(" Score: {0} : {1}\n", mainGame.TeamScore(0), mainGame.TeamScore(1));
 			yield return new WaitForSeconds (1f);
 		}
 		yield return null;

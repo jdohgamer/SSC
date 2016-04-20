@@ -112,7 +112,7 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 			{
 				if (gui.CanPlaceCharacter (hit.point)) 
 				{
-					MainGame.Instance.SetCharacterPosition (MainGame.Instance.teamNum, index, hit.point);
+					MainGame.Instance.SetCharacterPosition (MainGame.Instance.CurrentTeamNum, index, hit.point);
 					DisableMe ();
 				} else {
 					EnableMe ();
