@@ -34,8 +34,8 @@ public class MainGame : MonoBehaviour
 	public Team[] Teams;
 	public int TeamSize{ get{return teamSize;}}
 	public int TurnNumber{get{return turnNumber;}}
-	public byte ActionsLeft{get{return (byte)(MaxActions - actionCount);}}
-	public Team CurrentTeam{get{return Teams[currentTeam];}}
+	public byte ActionsLeft{get{return (byte)(MaxActions - actionCount[CurrentTeamNum]);}}
+	public Team CurrentTeam{get{return Teams[CurrentTeamNum];}}
 	public int CurrentTeamNum{
 		get
 		{
@@ -50,19 +50,19 @@ public class MainGame : MonoBehaviour
 			else teamNum = value;
 		}
 	}
-	public PlayerAction[] CurrentActionSet{get{return characterActions[currentTeam];}}
+	public PlayerAction[] CurrentActionSet{get{return characterActions[CurrentTeamNum];}}
 	[SerializeField] private int teamSize = 5, currentTeam;
 	[SerializeField] string AppId;// set in inspector. this is called when the client loaded and is ready to start
 	[SerializeField] float serviceInterval = 1;
 	[SerializeField] private CharacterData[] positionData;
 	[SerializeField] private GameObject charFab = null;
 	[SerializeField] private Color[] TeamColors =  {Color.black, Color.white};
+	[SerializeField] Vector3[] devPositions;
 	int[] score;
 	PlayerAction[][] characterActions;
-
 	bool P1Submitted, P2Submitted, connectInProgress;
 	int turnNumber, teamNum;//, teamSize = 5;
-	byte actionCount = 0;
+	byte[] actionCount = new byte[2];
 	private CustomGameClient GameClientInstance;
 	private GUIController gui;
 	private Grid_Setup board;
@@ -98,10 +98,10 @@ public class MainGame : MonoBehaviour
 
 	public void SetPlayerAction(PlayerAction act)
 	{
-		if(actionCount<MaxActions&&act.iCh.actionCount<act.iCh.maxActions)
+		if(actionCount[CurrentTeamNum]<MaxActions&&act.iCh.actionCount<act.iCh.maxActions)
 		{
-			CurrentActionSet[actionCount] = act;
-			actionCount += 1;
+			CurrentActionSet[actionCount[CurrentTeamNum]] = act;
+			actionCount[CurrentTeamNum] += 1;
 			if(act.action == PlayerAction.Actions.Move)// preview waypoints
 			{
 				act.iCh.SetMoveTarget(act.cTo);
@@ -115,7 +115,7 @@ public class MainGame : MonoBehaviour
 
 	public void SetOtherTeamActions(Hashtable ht)
 	{
-		characterActions[(currentTeam+1)%2] = LoadActionsFromProps(ht);
+		characterActions[(CurrentTeamNum+1)%2] = LoadActionsFromProps(ht);
 	}
 
 	PlayerAction[] LoadActionsFromProps(Hashtable ht)
@@ -134,15 +134,19 @@ public class MainGame : MonoBehaviour
 
 	public void ClearActions()
 	{
-		for(int c= 0;c<CurrentActionSet.Length;c++)
+		for(int b=0; b<characterActions.Length; b++)
 		{
-			if(CurrentActionSet[c]!=null)
+			for(int c= 0;c<characterActions[b].Length;c++)
 			{
-				CurrentActionSet[c] = null;
+				if(characterActions[b][c]!=null)
+				{
+					characterActions[b][c] = null;
+				}
 			}
 		}
 		board.TurnOffHiglightedAdjacent ();
-		actionCount = 0;
+		actionCount[0] = 0;
+		actionCount[1] = 0;
 //		foreach(UnitController c in CurrentTeam.mates)
 //		{
 //			c.ClearActions();
@@ -175,6 +179,7 @@ public class MainGame : MonoBehaviour
 	void CreateTeams()
 	{
 		Teams = new Team[2];
+		int d=0;
 		for(int t = 0; t<2 ; t++)
 			{
 				//bool teamOne = t == 0;
@@ -188,6 +193,11 @@ public class MainGame : MonoBehaviour
 					Teams [t].mates [c].team = t;
 					Teams [t].mates [c].charData = positionData [c];
 					newGuy.SetActive (false);
+					if(bDev)
+					{
+						SetCharacterPosition(t,c,devPositions[d]);
+						d++;
+					}
 				}
 			}
 	}
@@ -256,9 +266,13 @@ public class MainGame : MonoBehaviour
 
 	public void NewGame()
 	{
-		CreateTeams();
 		board.Generate();
-		gui.UIState.ToSetPiece();
+		CreateTeams();
+
+		if(bDev)
+			gui.UIState.ToGameHUD();
+		else gui.UIState.ToSetPiece();
+
 	}
 
 	public void SubmitTeam()
@@ -270,7 +284,7 @@ public class MainGame : MonoBehaviour
 
 			if(bDev&&!(TeamActive(Teams[0])&&TeamActive(Teams[1])))
 			{
-				currentTeam = (currentTeam+1)%2;
+				CurrentTeamNum = (CurrentTeamNum+1)%2;
 				gui.UIState.ToGameHUD();
 				gui.UIState.ToSetPiece();
 			}else{
@@ -303,21 +317,24 @@ public class MainGame : MonoBehaviour
 	void CalcMoves()
 	{
 	//The idea is to sort each Player's actions to figure out what will actually happen vs plans. 
-	//Compiled list od acts is then acted upon by both Players
+	//Compiled list of acts is then acted upon by both Players
 		Hashtable MoveSet = new Hashtable();
 		//List<Cell> targetedCells = new List<Cell> ();
 		Debug.Log ("Calculating");
+		int count = 0;
 		for(int j = 0;j<characterActions.Length; j++)
 		{
 			for (int i = 0; i<characterActions[j].Length; i++) 
 			{
 				if(characterActions[j][i]!=null)
 				{
-					//targetedCells.Add (oppActions[i]);
-					MoveSet[(i).ToString()] = characterActions[j][i].GetActionProp();
+					
+					MoveSet[count.ToString()] = characterActions[j][i].GetActionProp();
+					count++;
 				}
 			}
 		}
+
 //		for (int i = 0; i<characterActions[1].Length; i++) 
 //		{
 //			if(characterActions[1][i]!=null)

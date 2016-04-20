@@ -71,29 +71,7 @@ public class Grid_Setup : MonoBehaviour
 		}
 		Destroy (Ball);
 	}
-//	public UnitController GetCharacter(int Team, int index)
-//	{
-//		return Teams [Team].mates [index];
-//	}
-//
-//	public void SetCharacter(int team,int index, Vector3 location)
-//	{
-//		if(team<Teams.Length && index<teamSize)
-//		{
-//			Teams[team].mates[index].gameObject.SetActive(true);
-//			Teams[team].mates[index].MoveTransform(GetCellByLocation(location).Location);
-//		}
-//	}
-//	public void LoadCharactersFromProps(Hashtable ht)
-//	{
-//		for(int i = 0;i<ht.Count;i++)
-//		{
-//			Hashtable hash = ht[i.ToString()]as Hashtable;
-//			int team = (int)hash["Team"];
-//			Vector3 loc = (Vector3)hash["Location"];
-//			this.SetCharacter(team, i, loc);
-//		}
-//	}
+
 	public void ResetBoard ()
 	{
 		Ball.GetComponent<BallScript>().StopMe();
@@ -113,22 +91,6 @@ public class Grid_Setup : MonoBehaviour
 	{
 		if(!isCreated)
 		{
-//			Teams = new Team[2];
-//			for(int t = 0; t<2 ; t++)
-//			{
-//				//bool teamOne = t == 0;
-//				Vector3 goal = t == 0 ? TeamOneGoal : TeamTwoGoal;
-//				Teams [t] = new Team (t, TeamColors[t], teamSize, goal, GoalSize);
-//				//Quaternion face = teamOne ? Quaternion.LookRotation(Vector3.right):Quaternion.LookRotation(-Vector3.right) ;
-//				for(int c = 0; c <teamSize; c++)
-//				{
-//					GameObject newGuy = Instantiate(charFab,Vector3.zero + new Vector3((float)t,0.2f,(float)c),Quaternion.identity) as GameObject;
-//					Teams [t].AddMate(newGuy.GetComponent<UnitController>());
-//					Teams [t].mates [c].charData = positionData [c];
-//					newGuy.SetActive (false);
-//				}
-//			}
-
 			isCreated = true;
 			cellCount = length*width;
 			cells2D = new Cell[width,length];

@@ -90,8 +90,12 @@ public class GUIController: MonoBehaviour
 					{
 					case "Player":
 						{
-							int id = hit.transform.gameObject.GetComponent<UnitController> ().id;
-							UIState.ClickOnPlayer (id);
+							UnitController u =  hit.transform.gameObject.GetComponent<UnitController> ();
+							if(u.team == mainGame.CurrentTeamNum)
+							{
+								int id =u.id;
+								UIState.ClickOnPlayer (id);
+							}
 							break;
 
 						}
@@ -113,9 +117,10 @@ public class GUIController: MonoBehaviour
 	public IEnumerator UpdateInfo ()
 	{
 		bUpdatingInfo = true;
-		while (CustomGameClient.ClientInstance.CurrentRoom!=null) 
+		string side =  (int)CustomGameClient.ClientInstance.team>0 ? "Right":"Left" ;
+		while (true) 
 		{
-			string side =  (int)CustomGameClient.ClientInstance.team>0 ? "Right":"Left" ;
+			//string side =  (int)CustomGameClient.ClientInstance.team>0 ? "Right":"Left" ;
 			infoText.text = string.Format(" Turn: {2}\n team: {0}. \n You're on the: {1} side. \n", mainGame.CurrentTeamNum , side, mainGame.TurnNumber);
 			infoText.text += string.Format (" You have {0} moves left \n", mainGame.ActionsLeft);
 			infoText.text += string.Format(" Opponenent ready: {0}\n", CustomGameClient.ClientInstance.HasOppSubmitted());

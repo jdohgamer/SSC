@@ -30,6 +30,7 @@ public class UIGameHUD : IUIState
 	{
 		UnityEventManager.StartListening("ShotFired", ShotOnGoal);
 		gui.EnableHUD (true);
+		gui.EnableCharacterSelection(false);
 	}
 
 	public void Update ()
