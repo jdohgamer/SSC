@@ -85,7 +85,7 @@ public class CustomGameClient : LoadBalancingClient
 		}
 		
 	}
-	public void SubmitTeamEvent()
+	public void SubmitTeamEvent(Team t)
 	{	
 		if (IsPlayerOne()) 
 		{
@@ -94,7 +94,7 @@ public class CustomGameClient : LoadBalancingClient
 			P2Submitted=true;
 		}
 		//SetTeams(oppHT);
-		Hashtable TeamHT = myTeam.GetTeamAsProps();
+		Hashtable TeamHT = t.GetTeamAsProps();
 	
 		this.loadBalancingPeer.OpRaiseEvent(SubmitTeam, TeamHT, true, null);
 			
@@ -346,6 +346,7 @@ public class CustomGameClient : LoadBalancingClient
 			// we are in a fresh room with no saved board.
 			//board.Generate();
 			//gui.UIState = gui.UISP;
+			mainGame.NewGame();
 			this.SaveBoardToProperties();
 			Debug.Log(string.Format("Board Properties: {0}", SupportClass.DictionaryToString(roomProps)));
 		}
@@ -356,7 +357,7 @@ public class CustomGameClient : LoadBalancingClient
 		{
 			Debug.LogError("Not loaded board from props?");
 		}
-		this.myTeam = Grid_Setup.Instance.Teams [(int)team];
+		//this.myTeam = MainGame.Instance.Teams [team];
 
 		// we set properties "pt" (player turn) and "t#" (turn number). those props might have changed
 		// it's easier to use a variable in gui, so read the latter property now

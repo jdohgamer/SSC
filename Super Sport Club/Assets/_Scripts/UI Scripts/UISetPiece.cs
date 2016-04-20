@@ -5,17 +5,15 @@ using System.Collections;
 
 public class UISetPiece : IUIState 
 {
-	MainGame MainGameInstance;
 	GUIController gui;
 	Drag[] dragPortraits;
 	int activeCards = 0;
 	bool bSetup;
 
-	public UISetPiece(GUIController GUI, MainGame GameClient)
+	public UISetPiece(GUIController GUI)
 	{
 		this.gui = GUI;
-		MainGameInstance = GameClient;
-		dragPortraits = new Drag[Grid_Setup.Instance.TeamSize];
+		dragPortraits = new Drag[MainGame.Instance.TeamSize];
 
 	}
 	public void EnterState ()
@@ -72,7 +70,7 @@ public class UISetPiece : IUIState
 	{
 		if (OutOfCards ()) 
 		{
-			this.MainGameInstance.SubmitTeam ();
+			MainGame.Instance.SubmitTeam ();
 			ToGameHUD ();
 		} else {
 			Debug.Log ("You still have players to place");
@@ -104,7 +102,7 @@ public class UISetPiece : IUIState
 	public bool CanPlaceCharacter(Vector3 potential)
 	{
 		Cell potent = Grid_Setup.Instance.GetCellByLocation (potential);
-		if (potent.team == MainGameInstance.team && !potent.bOccupied) 
+		if (potent.team == MainGame.Instance.teamNum && !potent.bOccupied) 
 		{
 			activeCards--;
 			return true;
@@ -123,9 +121,8 @@ public class UISetPiece : IUIState
 			Image charObject = GameObject.Instantiate (gui.characterCardFab, Vector3.zero, Quaternion.identity) as Image;
 			charObject.transform.SetParent (gui.CharacterPanel);
 			dragPortraits [c] = charObject.GetComponent<Drag> ();
-			dragPortraits [c].PlayerPosition = MainGame.Instance.GetCharacter ((int)MainGameInstance.team, c).charData.Name;
+			dragPortraits [c].PlayerPosition = MainGame.Instance.GetCharacter (MainGame.Instance.teamNum, c).charData.Name;
 			dragPortraits [c].index = c;
-			dragPortraits [c].mainGame = MainGameInstance;
 			dragPortraits [c].gui = this;
 			activeCards++;
 		}

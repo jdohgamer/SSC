@@ -9,6 +9,7 @@ public class Cell
 	public bool bHighlighted;
 	public int id;
 	public CellType type;
+	public UnitController UnitOccupier;
 	public Vector3 Location{get{return location;}}
 	//public bool HasBall{get{return IsVectorInCell(Grid_Setup.Instance.BallLocation);}}
 	public bool bOccupied{get{return Physics.CheckSphere(Location, 0.5f, characterLayer);}}

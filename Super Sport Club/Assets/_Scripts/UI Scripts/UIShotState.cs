@@ -3,20 +3,18 @@ using System.Collections;
 
 public class UIShotState : IUIState 
 {
-	MainGame GameClientInstance;
 	GUIController gui;
 	Animator camAnim;
 
-	public UIShotState(GUIController GUI, MainGame GameClient)
+	public UIShotState(GUIController GUI)
 	{
 		this.gui = GUI;
-		GameClientInstance = GameClient;
 		camAnim = Camera.main.GetComponent<Animator> ();
 	}
 	public void EnterState ()
 	{
 		//animate to goal
-		int pan = (int)GameClientInstance.team>0 ? 1:-1 ;
+		int pan = MainGame.Instance.teamNum>0 ? 1:-1 ;
 		camAnim.SetInteger("SwirlDir", pan);
 
 		gui.EnableHUD (true);

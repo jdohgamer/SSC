@@ -10,6 +10,7 @@ public class UnitController : MonoBehaviour
 	public int team;
 	public CharacterData charData; // contains Name, Id, and stats
 	public bool hasTarget, hasBall;
+	public bool BActive{get{return this.gameObject.activeSelf;}set{this.gameObject.SetActive(value);}}
 	public int MoveDistance{get{return  charData.MoveDist;}}
 	public bool CanSprint{get{return (turnsSinceSprint>=2);}}
 	public Cell OccupiedCell
@@ -125,12 +126,12 @@ public class UnitController : MonoBehaviour
 			actionCount += 1;
 		}
 	}
-	public void SetMoveTarget(Cell target)
+	public void SetMoveTarget(Cell targetCell)
 	{
 		targetPins [targetCount].SetActive(true);
-		targetPins [targetCount].transform.position = target.Location;
+		targetPins [targetCount].transform.position = targetCell.Location;
 		targetCount++;
-		lastTargetedCell = target;
+		lastTargetedCell = targetCell;
 	}
 	public void SetPassTarget(Cell target)
 	{

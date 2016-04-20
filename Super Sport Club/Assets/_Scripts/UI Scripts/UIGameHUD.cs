@@ -8,7 +8,7 @@ public class UIGameHUD : IUIState
 	static GameObject panel, meter;
 	public UnitController CurrentSelectedChar
 	{
-		get{return MainGameInstance.GetCharacter((int)MainGameInstance.team,currentID);}
+		get{return MainGameInstance.GetCharacter((int)MainGameInstance.teamNum,currentID);}
 	}
 	MainGame MainGameInstance;
 	GUIController gui;
@@ -61,7 +61,7 @@ public class UIGameHUD : IUIState
 	void ShotOnGoal()
 	{
 		iTween.Pause ();
-		if(Grid_Setup.Instance.IsShotOnGoal(MainGameInstance.team, BallScript.TargetLocation))
+		if(MainGame.Instance.IsShotOnGoal(MainGameInstance.teamNum, BallScript.TargetLocation))
 		{
 			ToShotState();
 		}

@@ -5,15 +5,13 @@ using UnityEngine.EventSystems;
 
 public class UIMainMenu : IUIState 
 {
-	MainGame MainGameInstance;
 	GUIController gui;
 
 	bool connectInProcess;
 
-	public UIMainMenu(GUIController GUI, MainGame mg)
+	public UIMainMenu(GUIController GUI)
 	{
 		this.gui = GUI;
-		MainGameInstance = mg;
 	}
 	public void EnterState ()
 	{

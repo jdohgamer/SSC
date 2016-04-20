@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 public class GUIController: MonoBehaviour
 {
-	public float timeSinceService;
+
 	public IUIState UIState 
 	{
 		get{ return uiState; }
@@ -31,32 +31,21 @@ public class GUIController: MonoBehaviour
 	public Button buttFab;
 	public Canvas UIcan;
 	public RectTransform CharacterPanel;
-	[SerializeField] RectTransform MainMenu, InGameHUD = null;
-	[SerializeField] string AppId;// set in inspector. this is called when the client loaded and is ready to start
-	[SerializeField] float serviceInterval = 1;
+	[SerializeField] RectTransform MainMenu, Turn_Button, Submit_Button, InGameHUD = null;
 	[SerializeField] LayerMask mask;
 	[SerializeField] Text infoText;
 	private IUIState uiState;
-	//private CustomGameClient CustomGameClient.ClientInstance;
 	private MainGame mainGame;
 	private Grid_Setup board;
 	private bool bUpdatingInfo;
 
 	void Awake()
 	{
-		//this.board = GetComponent<Grid_Setup>();
-		//Grid_Setup.Instance = this.board;
-		//this.GameClientInstance  = new CustomGameClient();
-		//this.GameClientInstance.AppId = AppId;  // edit this!
-		//this.GameClientInstance.board = board;
-		//this.GameClientInstance.gui = this;
-		mainGame = MainGame.Instance;
-		Application.runInBackground = true;
-		CustomTypes.Register();
-		UIMM = new UIMainMenu(this, mainGame);
-		UISP = new UISetPiece (this, mainGame);
+		mainGame = MainGame.Instance; //this starts the MainGame script
+		UIMM = new UIMainMenu(this);
+		UISP = new UISetPiece (this);
 		UIHUD = new UIGameHUD(this, mainGame);
-		UISOG = new UIShotState(this, mainGame);
+		UISOG = new UIShotState(this);
 		UIState = UIMM;
 	}
 	void OnEnable()
@@ -84,7 +73,7 @@ public class GUIController: MonoBehaviour
 //		}
 		UIState.Update ();
 
-		if(CustomGameClient.ClientInstance.CurrentRoom!=null)
+		//if(CustomGameClient.ClientInstance.CurrentRoom!=null)
 		{
 			if (!bUpdatingInfo) 
 			{
@@ -147,22 +136,23 @@ public class GUIController: MonoBehaviour
 	public void EnableCharacterSelection(bool set)
 	{
 		CharacterPanel.gameObject.SetActive (set);
+		Turn_Button.gameObject.SetActive(!set);
+		Submit_Button.gameObject.SetActive(set);
 	}
 	void OnApplicationQuit()
 	{
 		CustomGameClient.ClientInstance.Disconnect();
 	}
-	public void NewGameButton()
+	public void NewOnlineGameButton()
 	{
 		mainGame.Connect();
-		mainGame.NewOnlineGame();
-		UIState.ToSetPiece();
+		//UIState.ToSetPiece();
 	}
 
 	public void NewDevGameButton()
 	{
-		mainGame.NewLocalGame();
-		UIState.ToSetPiece();
+		mainGame.NewGame();
+		//UIState.ToSetPiece();
 		//board.Generate();
 	}
 
@@ -186,5 +176,7 @@ public class GUIController: MonoBehaviour
 	}
 	public void SubmitTeam()
 	{	
+		mainGame.SubmitTeam();
+		//UIState.EndTurnButton();
 	}
 }

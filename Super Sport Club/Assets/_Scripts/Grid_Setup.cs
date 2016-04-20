@@ -39,15 +39,15 @@ public class Grid_Setup : MonoBehaviour
 {
 	public static GameObject Ball;
 	public static Grid_Setup Instance;//not technically a singleton
-	public Team[] Teams;
+	//public Team[] Teams;
 	public bool isHighlighted, isCreated;
 	public Vector3 BallLocation{get{return Ball.transform.position;}}
-	public int TeamSize{ get{return teamSize;}}
+	//public int TeamSize{ get{return teamSize;}}
 	[SerializeField] public Vector3 TeamOneGoal = Vector3.zero, TeamTwoGoal = Vector3.one, GoalSize = Vector3.one;
-	[SerializeField] private GameObject highlightFab, ballFab = null, charFab = null;
-	[SerializeField] private CharacterData[] positionData;
-	[SerializeField] private Color[] TeamColors =  {Color.black, Color.white};
-	[SerializeField] private int teamSize = 5, length = 13 , width = 23;
+	[SerializeField] private GameObject highlightFab, ballFab = null;//, charFab = null;
+	//[SerializeField] private CharacterData[] positionData;
+	//[SerializeField] private Color[] TeamColors =  {Color.black, Color.white};
+	[SerializeField] private int  length = 13 , width = 23;
 	private static Cell highlightSingle;
 	private Cell[,] cells2D;
 	private Transform fieldTran;
@@ -190,11 +190,6 @@ public class Grid_Setup : MonoBehaviour
 		}
 		return null; 
 	}
-	public bool IsShotOnGoal(int tNum, Vector3 spot)
-	{
-		return Teams[tNum].IsVectorInGoal (spot);
-		
-	}
 
 	public void HighlightAdjacent(bool set, Vector3 index, int distance)
 	{
@@ -268,7 +263,7 @@ public class Grid_Setup : MonoBehaviour
 				width = (int)customProps["tx#"];
 				length = (int)customProps["tz#"];
 			}
-			this.Generate();
+			//this.Generate();
 		}
 
 		int readTiles = 0;

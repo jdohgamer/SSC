@@ -7,7 +7,6 @@ using System.Collections;
 public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
 	public static bool bDragging;
-	public MainGame mainGame;
 	public bool dragOnSurfaces = true;	
 	public int index;
 	//[SerializeField] GUIController GUI;
@@ -113,7 +112,7 @@ public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 			{
 				if (gui.CanPlaceCharacter (hit.point)) 
 				{
-					mainGame.SetCharacter (mainGame.team, index, hit.point);
+					MainGame.Instance.SetCharacterPosition (MainGame.Instance.teamNum, index, hit.point);
 					DisableMe ();
 				} else {
 					EnableMe ();
