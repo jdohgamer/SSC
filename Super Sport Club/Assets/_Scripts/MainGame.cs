@@ -46,8 +46,10 @@ public class MainGame : MonoBehaviour
 		set
 		{
 			if(bDev)
-			currentTeam = value;
-			else teamNum = value;
+			{
+				currentTeam = value;
+				teamNum = value;
+			}else teamNum = value;
 		}
 	}
 	public PlayerAction[] CurrentActionSet{get{return characterActions[CurrentTeamNum];}}
@@ -83,7 +85,7 @@ public class MainGame : MonoBehaviour
 		characterActions = new PlayerAction[][]{new PlayerAction[MaxActions], new PlayerAction[MaxActions]};
 		//oppCharacers = new FSM_Character[teamSize];
 		score = new int[2];
-
+		connectInProgress = GameClientInstance.ConnectToRegionMaster("us"); 
 	}
 
 	void Update()
@@ -245,16 +247,11 @@ public class MainGame : MonoBehaviour
 
 	public void Connect()
 	{
-		connectInProgress = GameClientInstance.ConnectToRegionMaster("us");  // can return false for errors
+		//connectInProgress = GameClientInstance.ConnectToRegionMaster("us");  // can return false for errors
 		//StartCoroutine("NewOnlineGame");
-	}
-
-	public IEnumerator NewOnlineGame()
-	{
-		yield return new WaitForSeconds(4);
-
-			if (connectInProgress) 
+		if (connectInProgress) 
 			{
+				//GameClientInstance.CreateTurnbasedRoom();
 				GameClientInstance.OpJoinRandomRoom (null, 0);
 				bOnline = true;
 
@@ -263,6 +260,21 @@ public class MainGame : MonoBehaviour
 				Debug.Log ("I Can't Even");
 			}
 	}
+
+//	public IEnumerator NewOnlineGame()
+//	{
+//		yield return new WaitForSeconds(4);
+//
+//			if (connectInProgress) 
+//			{
+//				GameClientInstance.OpJoinRandomRoom (null, 0);
+//				bOnline = true;
+//
+//			} else {
+//				connectInProgress = GameClientInstance.ConnectToRegionMaster("us"); 
+//				Debug.Log ("I Can't Even");
+//			}
+//	}
 
 	public void NewGame()
 	{
@@ -314,7 +326,7 @@ public class MainGame : MonoBehaviour
 		else {CalcMoves();}
 	}
 
-	void CalcMoves()
+	public void CalcMoves()
 	{
 	//The idea is to sort each Player's actions to figure out what will actually happen vs plans. 
 	//Compiled list of acts is then acted upon by both Players
@@ -376,42 +388,16 @@ public class MainGame : MonoBehaviour
 			{
 				if(characterActions[j][i]!=null)
 				{
-//					Cell targetcell =  characterActions[j][i].cTo;
-//					if(!targetedCells.Contains(targetcell))
-//					{
-//						targetedCells.Add(targetcell);
-//					}else{
-//						if(characterActions[j][i].action == PlayerAction.Actions.Move)
-//						{
-//						}
-//					}
 					MoveSet[count.ToString()] = characterActions[j][i].GetActionProp();
 					count++;
 				}
 			}
 		}
-
-//		for (int i = 0; i<characterActions[1].Length; i++) 
-//		{
-//			if(characterActions[1][i]!=null)
-//			{
-//				//targetedCells.Add (oppActions[i]);
-//				MoveSet[(i).ToString()] = CurrentActionSet[i].GetActionProp();
-//			}
-//		}
-//		for (int i = 0; i<characterActions[0].Length; i++) 
-//		{
-//			if(characterActions[0][i]!=null)
-//			{
-//				//int conflict = targetedCells.BinarySearch(myActions[i].cTo);
-//				MoveSet[(i+CurrentActionSet.Length).ToString()] = CurrentActionSet[i].GetActionProp();
-//			}
-//		}
+		GameClientInstance.OpRaiseEvent((byte)2, MoveSet, true, null);
 		ExecuteMoves(MoveSet);
-
 	}
 
-	void ExecuteMoves(Hashtable moves)
+	public void ExecuteMoves(Hashtable moves)
 	{
 		PlayerAction[] acts = LoadActionsFromProps (moves);
 		List<UnitController> affectedChars = new List<UnitController>();

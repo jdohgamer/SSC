@@ -134,7 +134,7 @@ public class UIGameHUD : IUIState
 	}
 	void MovementClick(Cell tCell)
 	{
-		MainGameInstance.SetPlayerAction(new PlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, tCell, CurrentSelectedChar.OccupiedCell));
+		MainGameInstance.SetPlayerAction(new PlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, tCell, CurrentSelectedChar.LastTargetCell));
 		if ((CurrentSelectedChar.targetCount == 1 && CurrentSelectedChar.IsSprinting))  
 		{
 			board.HighlightAdjacent (true, tCell.Location, CurrentSelectedChar.MoveDistance);
@@ -150,7 +150,7 @@ public class UIGameHUD : IUIState
 	{
 		if (CurrentSelectedChar.maxActions -CurrentSelectedChar.actionCount > 0) 
 		{
-			MainGameInstance.SetPlayerAction(new PlayerAction (act, CurrentSelectedChar,tCell));
+			MainGameInstance.SetPlayerAction(new PlayerAction (act, CurrentSelectedChar,tCell, CurrentSelectedChar.LastTargetCell));
 			board.TurnOffHiglightedAdjacent();
 			isPassing = false;
 		}

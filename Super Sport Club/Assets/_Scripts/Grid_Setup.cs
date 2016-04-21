@@ -220,12 +220,7 @@ public class Grid_Setup : MonoBehaviour
 	{ 
 		if (!calledByEvent)
 		{
-			if (customProps.ContainsKey("tx#"))
-			{
-				width = (int)customProps["tx#"];
-				length = (int)customProps["tz#"];
-			}
-			//this.Generate();
+			MainGame.Instance.NewGame();
 		}
 
 		int readTiles = 0;

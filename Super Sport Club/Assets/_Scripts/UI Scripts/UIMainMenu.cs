@@ -17,7 +17,7 @@ public class UIMainMenu : IUIState
 	{
 		gui.EnableMainMenu (true);
 		//if(GameClientInstance.CurrentRoom==null)
-		//connectInProcess = CustomGameClient.ConnectToRegionMaster("us");  // can return false for errors
+		//connectInProcess = CustomGameClient.ClientInstance.ConnectToRegionMaster("us");  // can return false for errors
 	}
 	public void Update ()
 	{

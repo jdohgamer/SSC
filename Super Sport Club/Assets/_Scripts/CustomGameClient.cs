@@ -65,7 +65,9 @@ public class CustomGameClient : LoadBalancingClient
 			this.loadBalancingPeer.OpRaiseEvent(EndTurn, null, true, null);
 			if(BothPlayersHaveSubmitted())
 			{
-				//CalcMoves(); //
+				mainGame.CalcMoves(); //
+				P1Submitted = false;
+				P2Submitted = false;
 				Debug.Log("Go and get yourself a good fucking");
 			}
 			//ExecuteMoves(content);
@@ -83,10 +85,15 @@ public class CustomGameClient : LoadBalancingClient
 		}else{
 			P2Submitted=true;
 		}
-		//SetTeams(oppHT);
 		Hashtable TeamHT = t.GetTeamAsProps();
 	
 		this.loadBalancingPeer.OpRaiseEvent(SubmitTeam, TeamHT, true, null);
+		if(BothPlayersHaveSubmitted())
+		{
+			mainGame.LoadCharactersFromProps(oppHT);
+			P1Submitted = false;
+			P2Submitted = false;
+		}
 			
 	}
 
@@ -148,7 +155,7 @@ public class CustomGameClient : LoadBalancingClient
 				}
 				break;
 			case (byte)OperationCode.Authenticate:
-			mainGame.StartCoroutine("NewOnlineGame");
+			//mainGame.StartCoroutine("NewOnlineGame");
 			break;
 			case (byte)OperationCode.JoinGame:
 			case (byte)OperationCode.CreateGame:
@@ -162,10 +169,10 @@ public class CustomGameClient : LoadBalancingClient
 				{
 					if(IsPlayerOne())
 					{
-						team = 0;
-						mainGame.NewGame();
-					}else team = 1;
-					//this.LoadBoardFromProperties(false);
+						mainGame.CurrentTeamNum = 0;
+						//mainGame.NewGame();
+					}else mainGame.CurrentTeamNum  = 1;
+					this.LoadBoardFromProperties(false);
 				}
 			}
 			break;
@@ -198,7 +205,9 @@ public class CustomGameClient : LoadBalancingClient
 					mainGame.SetOtherTeamActions(turnClick);
 					if(BothPlayersHaveSubmitted())
 					{
-						//CalcMoves();
+						mainGame.CalcMoves();
+						P1Submitted = false;
+					P2Submitted = false;
 						Debug.Log("Go and get yourself a good fucking");
 					}
 				}else{P1Submitted=true;}	
@@ -213,8 +222,15 @@ public class CustomGameClient : LoadBalancingClient
 				
 				object content = photonEvent.Parameters[ParameterCode.CustomEventContent];
 				oppHT = content as Hashtable;
+
+				if(BothPlayersHaveSubmitted())
+				{
+					mainGame.LoadCharactersFromProps(oppHT);
+					P1Submitted = false;
+					P2Submitted = false;
+				}
 				//oppCharacers = LoadCharactersFromProps(turnClick);
-				SetTeams(oppHT);
+				//SetTeams(oppHT);
 				
 				break;
 			}
@@ -226,7 +242,7 @@ public class CustomGameClient : LoadBalancingClient
 			{
 				object content = photonEvent.Parameters[ParameterCode.CustomEventContent];
 				Hashtable turnClick = content as Hashtable;
-				//ExecuteMoves(turnClick);
+				mainGame.ExecuteMoves(turnClick);
 				break;
 			}
 			case EventCode.Join:
@@ -266,9 +282,10 @@ public class CustomGameClient : LoadBalancingClient
 	
 	void SetTeams(Hashtable HT)
 	{
+		mainGame.LoadCharactersFromProps(HT);
 		if(BothPlayersHaveSubmitted())
 		{
-			mainGame.LoadCharactersFromProps(HT);
+			
 		}
 	}
 	
@@ -291,8 +308,6 @@ public class CustomGameClient : LoadBalancingClient
 		if (roomProps.Count == 0)
 		{
 			// we are in a fresh room with no saved board.
-			//board.Generate();
-			//gui.UIState = gui.UISP;
 			mainGame.NewGame();
 			this.SaveBoardToProperties();
 			Debug.Log(string.Format("Board Properties: {0}", SupportClass.DictionaryToString(roomProps)));
