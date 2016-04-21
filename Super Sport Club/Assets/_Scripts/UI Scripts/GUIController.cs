@@ -31,7 +31,7 @@ public class GUIController: MonoBehaviour
 	public Button buttFab;
 	public Canvas UIcan;
 	public RectTransform CharacterPanel;
-	[SerializeField] RectTransform MainMenu, Turn_Button, Submit_Button, InGameHUD = null;
+	[SerializeField] RectTransform MainMenu, Turn_Button, Submit_Button, Switch_Button, InGameHUD = null;
 	[SerializeField] LayerMask mask;
 	[SerializeField] Text infoText;
 	private IUIState uiState;
@@ -117,10 +117,9 @@ public class GUIController: MonoBehaviour
 	public IEnumerator UpdateInfo ()
 	{
 		bUpdatingInfo = true;
-		string side =  (int)CustomGameClient.ClientInstance.team>0 ? "Right":"Left" ;
 		while (true) 
 		{
-			//string side =  (int)CustomGameClient.ClientInstance.team>0 ? "Right":"Left" ;
+			string side =  mainGame.CurrentTeamNum>0 ? "Right":"Left" ;
 			infoText.text = string.Format(" Turn: {2}\n team: {0}. \n You're on the: {1} side. \n", mainGame.CurrentTeamNum , side, mainGame.TurnNumber);
 			infoText.text += string.Format (" You have {0} moves left \n", mainGame.ActionsLeft);
 			infoText.text += string.Format(" Opponenent ready: {0}\n", CustomGameClient.ClientInstance.HasOppSubmitted());
@@ -157,6 +156,7 @@ public class GUIController: MonoBehaviour
 	public void NewDevGameButton()
 	{
 		mainGame.NewGame();
+		Switch_Button.gameObject.SetActive(true);
 		//UIState.ToSetPiece();
 		//board.Generate();
 	}
@@ -173,6 +173,11 @@ public class GUIController: MonoBehaviour
 //		{
 //			c.ClearActions();
 //		}
+	}
+	public void SwitchTeams()
+	{
+		UIState.DeselectCharacter ();
+		mainGame.CurrentTeamNum = (mainGame.CurrentTeamNum+1)%2;
 	}
 	public void EndTurnButton()
 	{
