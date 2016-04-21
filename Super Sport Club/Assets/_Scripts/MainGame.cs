@@ -319,16 +319,72 @@ public class MainGame : MonoBehaviour
 	//The idea is to sort each Player's actions to figure out what will actually happen vs plans. 
 	//Compiled list of acts is then acted upon by both Players
 		Hashtable MoveSet = new Hashtable();
-		//List<Cell> targetedCells = new List<Cell> ();
+		List<Cell> targetedCells = new List<Cell> ();
 		Debug.Log ("Calculating");
 		int count = 0;
+		for(int k = 0; k<MaxActions; k++)
+		{
+			if(characterActions[0][k]!=null)
+			{
+				for(int j = 0;j<characterActions[1].Length; j++)
+				{
+					if(characterActions[1][j]!=null)
+					{
+						if(characterActions[0][k].cTo == characterActions[1][j].cTo)
+						{
+							if(characterActions[0][k].action == PlayerAction.Actions.Move)
+							{
+								if(characterActions[1][j].action == PlayerAction.Actions.Move)//both moving
+								{
+									float dist1, dist2;
+									dist1 = Vector3.Distance(characterActions[0][k].cFrom.Location, characterActions[0][k].cTo.Location);
+									dist2 = Vector3.Distance(characterActions[1][j].cFrom.Location, characterActions[1][j].cTo.Location);
+									if(dist1>= dist2)
+									{
+										Vector3 diff = characterActions[0][k].cTo.Location - characterActions[0][k].cFrom.Location;
+										if(diff.x!=0)
+										{diff.x = diff.x/Mathf.Abs(diff.x);}
+										if(diff.z!=0)
+										{diff.z = diff.z/Mathf.Abs(diff.z);}
+										Cell newCTo = board.GetCellByLocation(characterActions[0][k].cTo.Location - diff);
+										characterActions[0][k].cTo = newCTo;
+									}
+									else if(dist1<dist2)
+									{
+										Vector3 diff = characterActions[1][j].cTo.Location - characterActions[1][j].cFrom.Location;
+										if(diff.x!=0)
+										{diff.x = diff.x/Mathf.Abs(diff.x);}
+										if(diff.z!=0)
+										{diff.z = diff.z/Mathf.Abs(diff.z);}
+										Cell newCTo = board.GetCellByLocation(characterActions[1][j].cTo.Location - diff);
+										characterActions[1][j].cTo = newCTo;
+									}else {
+										
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+
 		for(int j = 0;j<characterActions.Length; j++)
 		{
 			for (int i = 0; i<characterActions[j].Length; i++) 
 			{
 				if(characterActions[j][i]!=null)
 				{
-					
+//					Cell targetcell =  characterActions[j][i].cTo;
+//					if(!targetedCells.Contains(targetcell))
+//					{
+//						targetedCells.Add(targetcell);
+//					}else{
+//						if(characterActions[j][i].action == PlayerAction.Actions.Move)
+//						{
+//						}
+//					}
 					MoveSet[count.ToString()] = characterActions[j][i].GetActionProp();
 					count++;
 				}

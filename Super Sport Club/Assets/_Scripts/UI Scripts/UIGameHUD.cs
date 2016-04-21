@@ -134,7 +134,7 @@ public class UIGameHUD : IUIState
 	}
 	void MovementClick(Cell tCell)
 	{
-		MainGameInstance.SetPlayerAction(new PlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, tCell));
+		MainGameInstance.SetPlayerAction(new PlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, tCell, CurrentSelectedChar.OccupiedCell));
 		if ((CurrentSelectedChar.targetCount == 1 && CurrentSelectedChar.IsSprinting))  
 		{
 			board.HighlightAdjacent (true, tCell.Location, CurrentSelectedChar.MoveDistance);

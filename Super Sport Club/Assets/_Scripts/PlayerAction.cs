@@ -51,7 +51,8 @@ public class PlayerAction
 		Actions act = (Actions)ht["Act"];
 		int iChId = (int)ht["iCharacter"];
 		int iChTeam = (int)ht["iCharacterTeam"];
-		Cell cell =	Grid_Setup.Instance.GetCellByID((int)ht["tCell"]);
-		return new PlayerAction(act,MainGame.Instance.GetCharacter(iChTeam,iChId),cell);
+		Cell tcell = Grid_Setup.Instance.GetCellByID((int)ht["tCell"]);
+		Cell fcell = Grid_Setup.Instance.GetCellByID((int)ht["fCell"]);
+		return new PlayerAction(act,MainGame.Instance.GetCharacter(iChTeam,iChId),tcell, fcell);
 	}
 }
