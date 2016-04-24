@@ -17,7 +17,7 @@ public class UIGameHUD : IUIState
 	private Vector3 idealPassDir, simpleDir, offsetDir;
 	private Grid_Setup board;
 	private int currentID = -1;
-	private bool isPassing, isMoving, isShooting, shotFired;
+	private bool isPassing, isMoving, isShooting, isTackling, shotFired;
 	//LayerMask mask = (1<<LayerMask.NameToLayer("Ground") | 1<<LayerMask.NameToLayer("Characters"));
 
 	public UIGameHUD(GUIController GUI, MainGame mg)
@@ -110,6 +110,10 @@ public class UIGameHUD : IUIState
 				{
 					CreatePlayerMeter (cell.Location, PlayerAction.Actions.Shoot);
 				}
+				else if (isTackling) 
+				{
+					ActionClick (cell, PlayerAction.Actions.Tackle);
+				}
 			}
 		}
 	}
@@ -145,6 +149,15 @@ public class UIGameHUD : IUIState
 			isMoving = false;
 		}
 	}	
+	void ActionClick(Cell tCell, PlayerAction.Actions act)
+	{
+		if (CurrentSelectedChar.maxActions -CurrentSelectedChar.actionCount > 0) 
+		{
+			MainGameInstance.SetPlayerAction(new PlayerAction (act, CurrentSelectedChar,tCell, CurrentSelectedChar.LastTargetCell));
+			board.TurnOffHiglightedAdjacent();
+			isTackling = false;
+		}
+	}
 
 	void KickClick(Cell tCell, PlayerAction.Actions act)
 	{
@@ -243,6 +256,10 @@ public class UIGameHUD : IUIState
 				{
 					pc.AddButton ("Sprint", false).onClick.AddListener (() => 
 						{ 
+							isMoving = true;
+							isShooting = false;
+							isPassing = false;
+							board.HighlightAdjacent (true, CharacterPosition, CurrentSelectedChar.MoveDistance);
 							CurrentSelectedChar.StartSprinting();
 							GameObject.Destroy (panel.gameObject);
 						});
@@ -252,6 +269,19 @@ public class UIGameHUD : IUIState
 					pc.AddButton ("Move", false).onClick.AddListener (() => 
 					{ 
 						isMoving = true;
+						isTackling = false;
+						isShooting = false;
+						isPassing = false;
+						board.HighlightAdjacent (true, CharacterPosition, CurrentSelectedChar.MoveDistance);
+						GameObject.Destroy (panel.gameObject);
+					});
+				}
+				if (CurrentSelectedChar.targetCount == 0  && !CurrentSelectedChar.IsSprinting) 
+				{
+					pc.AddButton ("Tackle", false).onClick.AddListener (() => 
+					{ 
+						isTackling = true;
+						isMoving = false;
 						isShooting = false;
 						isPassing = false;
 						board.HighlightAdjacent (true, CharacterPosition, CurrentSelectedChar.MoveDistance);
@@ -264,6 +294,7 @@ public class UIGameHUD : IUIState
 					pc.AddButton("Pass", false).onClick.AddListener (() => 
 					{ 
 						isPassing = true;
+						isTackling = false;
 						isShooting = false;
 						isMoving = false;
 						board.HighlightAdjacent (true,  CharacterPosition, (int)CurrentSelectedChar.charData.Strength);
@@ -272,6 +303,7 @@ public class UIGameHUD : IUIState
 					pc.AddButton("Shoot", false).onClick.AddListener (() => 
 					{ 
 						isShooting = true;
+						isTackling = false;
 						isPassing = false;
 						isMoving = false;
 						board.HighlightAdjacent (true,  CharacterPosition, (int)CurrentSelectedChar.charData.Strength);

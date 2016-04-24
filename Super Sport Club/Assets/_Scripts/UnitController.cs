@@ -65,18 +65,6 @@ public class UnitController : MonoBehaviour
 	UnitController opp;
 	//NavMeshAgent navAgent;
 
-//	public void ReturnCharacter(Hashtable ht)
-//	{
-//		CharacterData cd = ScriptableObject.CreateInstance<CharacterData>();
-//		this.id = (int)ht["ID"];
-//		cd.name = (string)ht["Name"];
-//		cd.Strength = (float)ht["Strength"];
-//		cd.Speed = (float)ht["Speed"];
-//		cd.Defense = (float)ht["Defense"];
-//		this.charData = cd;
-//		this.team = (Team.TeamNumber)ht["Team"];
-//	}
-
 	void Awake()
 	{
 		//navAgent = GetComponent<NavMeshAgent> ();
@@ -226,6 +214,16 @@ public class UnitController : MonoBehaviour
 						}
 						break;
 					}
+					case PlayerAction.Actions.Fumble:
+					{
+						if(hasBall)
+						{
+							ball.BallisticVelocity(act.cTo.Location, 20);
+							LetGoOfBall();
+						}
+						
+						break;
+					}
 					case PlayerAction.Actions.Juke:
 					{
 						break;
@@ -252,19 +250,24 @@ public class UnitController : MonoBehaviour
 		{
 			dir = target - (OccupiedCell.Location + offset);
 			nextCell = (OccupiedCell.Location + offset) + dir.normalized;
+			OccupiedCell.UnitOccupier = null;
 			//if(CanMove(target))
 			{
 				iTween.MoveTo(gameObject, iTween.Hash("position", nextCell, "easeType", easeType, "loopType", "none", "speed", charData.Speed));
 				yield return new WaitForSeconds(0.2f);
 			}//else break;
 		}
+		OccupiedCell.UnitOccupier = this;
 		//StopCoroutine("MoveTo");
 	}
 	void RotateTowards(Vector3 target)// this is really a SetRotation function
 	{
 		Vector3 dir = target - tran.position;
-		Quaternion rotation = Quaternion.LookRotation(dir);
-		tran.rotation= rotation;
+		if(dir!=Vector3.zero)
+		{
+			Quaternion rotation = Quaternion.LookRotation(dir);
+			tran.rotation= rotation;
+		}
 		//float f = Vector3.Angle(tran.forward,dir);
 		//tran.Rotate(Vector3.up,f);
 	}
@@ -328,6 +331,7 @@ public class UnitController : MonoBehaviour
 	}
 	void ShowTargets(bool set)
 	{
+	passTargetPin.GetComponent<Renderer>().enabled = set;
 		foreach (GameObject t in targetPins) 
 		{
 			if(t!=null)
@@ -341,24 +345,28 @@ public class UnitController : MonoBehaviour
 	{
 		refactory = 0f;
 		Debug.Log ("ball has left");
-		hasBall = false;
+		ball.BPosessed = false;
+		ball.unitOwner = null;
 		ball.transform.SetParent(null);
 		ball = null;
+		hasBall = false;
 	}
+
 	void OnTriggerEnter(Collider other)
 	{
 		switch(other.tag)
 		{
 			case "Ball":
 			{
-				if (refactory > 1f) 
+				if (refactory>1f) 
 				{
+					ball = other.GetComponent<BallScript> ();
+					ball.BPosessed = true;
+					ball.unitOwner = this;
 					Debug.Log ("I gots da ball");
 					hasBall = true;
-					other.transform.SetParent (transform);
-					other.transform.position = transform.TransformPoint (0, 0, 1);
-					ball = other.GetComponent<BallScript> ();
-
+					other.transform.SetParent (tran);
+					other.transform.position = tran.TransformPoint (0, 0, 1);
 					ball.StopMe ();
 				}
 				break;
@@ -372,7 +380,7 @@ public class UnitController : MonoBehaviour
 			case "Ball":
 			{
 				if(hasBall)
-				other.transform.position = transform.TransformPoint (0, 0, 1);
+				other.transform.position = tran.TransformPoint (0, 0, 1);
 			}
 			break;
 		}

@@ -207,7 +207,7 @@ public class CustomGameClient : LoadBalancingClient
 					{
 						mainGame.CalcMoves();
 						P1Submitted = false;
-					P2Submitted = false;
+						P2Submitted = false;
 						Debug.Log("Go and get yourself a good fucking");
 					}
 				}else{P1Submitted=true;}	

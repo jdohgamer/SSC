@@ -58,19 +58,13 @@ public class GUIController: MonoBehaviour
 	}
 	void GoalScored(int p)
 	{
-		//board.ResetBoard ();
 		mainGame.ScorePoint (p);
 		UIState = UISP;
 	}
 
 	void Update()
 	{
-//		timeSinceService += Time.deltaTime;
-//		if (timeSinceService > serviceInterval)
-//		{
-//			this.GameClientInstance.Service();
-//			timeSinceService = 0;
-//		}
+
 		UIState.Update ();
 
 		//if(CustomGameClient.ClientInstance.CurrentRoom!=null)
@@ -117,7 +111,7 @@ public class GUIController: MonoBehaviour
 	public IEnumerator UpdateInfo ()
 	{
 		bUpdatingInfo = true;
-		while (true) 
+		while (true) //make this event based
 		{
 			string side =  mainGame.CurrentTeamNum>0 ? "Right":"Left" ;
 			infoText.text = string.Format(" Turn: {2}\n team: {0}. \n You're on the: {1} side. \n", mainGame.CurrentTeamNum , side, mainGame.TurnNumber);
@@ -126,7 +120,7 @@ public class GUIController: MonoBehaviour
 			infoText.text += string.Format(" Score: {0} : {1}\n", mainGame.TeamScore(0), mainGame.TeamScore(1));
 			yield return new WaitForSeconds (1f);
 		}
-		yield return null;
+	
 	}
 
 	public void EnableHUD(bool set)

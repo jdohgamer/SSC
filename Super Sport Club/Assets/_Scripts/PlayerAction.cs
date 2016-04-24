@@ -7,24 +7,24 @@ public class PlayerAction
 {
 	public UnitController iCh,tCh;
 	public Cell cFrom, cTo;
-	public enum Actions{Move, Block, Tackle, Juke, Pass, Shoot, Cross}
+	public enum Actions{Move, Block, Tackle, Juke, Pass, Shoot, Cross, Fumble}
 	public Actions action; 
 
 	public PlayerAction()
 	{
 	}
-	public PlayerAction(Actions act, UnitController iCharacter)//Actions done to a character that don't affect anything else
-	{
-		this.action=act; iCh = iCharacter;
-	}
-	public PlayerAction(Actions act, UnitController iCharacter, UnitController tCharacter)// Actions one character does to another
-	{
-		this.action=act; iCh = iCharacter; tCh = tCharacter;
-	}
-	public PlayerAction(Actions act, UnitController iCharacter, Cell tCell)// Actions done by a character on the field, 
-	{
-		this.action=act; iCh = iCharacter; cTo = tCell;
-	}
+//	public PlayerAction(Actions act, UnitController iCharacter)//Actions done to a character that don't affect anything else
+//	{
+//		this.action=act; iCh = iCharacter;
+//	}
+//	public PlayerAction(Actions act, UnitController iCharacter, UnitController tCharacter)// Actions one character does to another
+//	{
+//		this.action=act; iCh = iCharacter; tCh = tCharacter;
+//	}
+//	public PlayerAction(Actions act, UnitController iCharacter, Cell tCell)// Actions done by a character on the field, 
+//	{
+//		this.action=act; iCh = iCharacter; cTo = tCell;
+//	}
 	public PlayerAction(Actions act, UnitController iCharacter, Cell tCell, Cell fCell)// Actions done by a character from one part of the field to another
 	{
 		this.action=act; iCh = iCharacter; cTo = tCell; cFrom = fCell;

@@ -5,6 +5,8 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 public class BallScript : MonoBehaviour 
 {
 	public static Vector3 TargetLocation;
+	public bool BPosessed=false;
+	public UnitController unitOwner;
 	[SerializeField] Vector3 offset =  new Vector3(0,0.1f,0);
 	private Vector3 moveDirection;
 	Rigidbody rigid;

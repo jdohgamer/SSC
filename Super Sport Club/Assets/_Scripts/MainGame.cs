@@ -82,7 +82,7 @@ public class MainGame : MonoBehaviour
 		this.GameClientInstance.mainGame = this;
 		Application.runInBackground = true;
 		CustomTypes.Register();
-		characterActions = new PlayerAction[][]{new PlayerAction[MaxActions], new PlayerAction[MaxActions]};
+		characterActions = new PlayerAction[][]{new PlayerAction[MaxActions], new PlayerAction[MaxActions], new PlayerAction[10]};
 		//oppCharacers = new FSM_Character[teamSize];
 		score = new int[2];
 		connectInProgress = GameClientInstance.ConnectToRegionMaster("us"); 
@@ -261,26 +261,12 @@ public class MainGame : MonoBehaviour
 			}
 	}
 
-//	public IEnumerator NewOnlineGame()
-//	{
-//		yield return new WaitForSeconds(4);
-//
-//			if (connectInProgress) 
-//			{
-//				GameClientInstance.OpJoinRandomRoom (null, 0);
-//				bOnline = true;
-//
-//			} else {
-//				connectInProgress = GameClientInstance.ConnectToRegionMaster("us"); 
-//				Debug.Log ("I Can't Even");
-//			}
-//	}
 
 	public void NewGame()
 	{
 		board.Generate();
 		CreateTeams();
-
+		serviceInterval = 1f;
 		if(bDev)
 			gui.UIState.ToGameHUD();
 		else gui.UIState.ToSetPiece();
@@ -315,23 +301,40 @@ public class MainGame : MonoBehaviour
 		ClearActions();
 		UnityEventManager.TriggerEvent ("NextTurn");
 		turnNumber++;
-//		P1Submitted = false;
-//		P2Submitted = false;
+		if(!bOnline)
+		{
+			P1Submitted = false;
+			P2Submitted = false;
+		}
+	}
+
+	bool BothPlayersHaveSubmitted()
+	{
+		return P1Submitted && P2Submitted;
 	}
 
 	public void EndTurn()
 	{
 		if(bOnline)
 		this.GameClientInstance.EndTurnEvent(CurrentActionSet);
-		else {CalcMoves();}
+		else {
+			if(CurrentTeamNum==0)
+			P1Submitted=true;
+			else P2Submitted=true;
+
+			if(BothPlayersHaveSubmitted())
+				CalcMoves();
+			else{ CurrentTeamNum = (CurrentTeamNum+1)%2; gui.UIState.DeselectCharacter();}
+		}
 	}
+
 
 	public void CalcMoves()
 	{
 	//The idea is to sort each Player's actions to figure out what will actually happen vs plans. 
 	//Compiled list of acts is then acted upon by both Players
 		Hashtable MoveSet = new Hashtable();
-		List<Cell> targetedCells = new List<Cell> ();
+		//List<Cell> targetedCells = new List<Cell> ();
 		Debug.Log ("Calculating");
 		int count = 0;
 		for(int k = 0; k<MaxActions; k++)
@@ -375,13 +378,33 @@ public class MainGame : MonoBehaviour
 									}
 								}
 							}
+
+						}
+
+					}
+				}
+				if(characterActions[0][k].action == PlayerAction.Actions.Tackle)
+				{
+					Cell targetCell = characterActions[0][k].cTo;
+					if(targetCell.bOccupied && targetCell.UnitOccupier.team!= characterActions[0][k].iCh.team)//This will also not be allowed against team mates in the first place
+					{
+						UnitController unitTarget = targetCell.UnitOccupier;
+						if(targetCell.UnitOccupier.LastTargetCell == targetCell)//if the person I'm targeting is "landed" on my target tile
+						{
+							bool tackleSuccess = (unitTarget.charData.Defense+Random.Range(1,5)>= characterActions[0][k].iCh.charData.Strength+Random.Range(1,3));
+							Debug.Log(tackleSuccess.ToString());
+							if(tackleSuccess)
+							{
+								characterActions[2][count] = (new PlayerAction(PlayerAction.Actions.Fumble,unitTarget,characterActions[0][k].iCh.OccupiedCell,unitTarget.OccupiedCell));
+								count++;
+							}
 						}
 					}
 				}
 			}
 		}
 
-
+		count = 0;
 		for(int j = 0;j<characterActions.Length; j++)
 		{
 			for (int i = 0; i<characterActions[j].Length; i++) 
