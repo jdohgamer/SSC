@@ -230,6 +230,14 @@ public class UnitController : MonoBehaviour
 					}
 					case PlayerAction.Actions.Tackle:
 					{
+						Vector3 target = act.cTo.Location;
+						if(Vector3.Distance(Location,target)>2)
+						{
+							Cell newCTo = Grid_Setup.Instance.GetNearestCellToDestination(OccupiedCell.Location, target);
+							RotateTowards(newCTo.Location+offset);
+							yield return StartCoroutine (MoveTo (newCTo.Location+offset));
+						}
+						//MainGameInstance.SetPlayerAction(new PlayerAction (PlayerAction.Actions.Move, CurrentSelectedChar,tCell, newCTo));
 						break;
 					}
 					case PlayerAction.Actions.Block:

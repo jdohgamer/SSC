@@ -152,6 +152,16 @@ public class Grid_Setup : MonoBehaviour
 		}
 		return null; 
 	}
+	public Cell GetNearestCellToDestination(Vector3 locFrom, Vector3 locTo)
+	{
+		Vector3 diff = locTo -locFrom;
+		if(diff.x!=0)
+		{diff.x = diff.x/Mathf.Abs(diff.x);}
+		if(diff.z!=0)
+		{diff.z = diff.z/Mathf.Abs(diff.z);}
+		Cell newCTo = GetCellByLocation(locTo - diff);
+		return newCTo;
+	}
 
 	public void HighlightAdjacent(bool set, Vector3 index, int distance)
 	{

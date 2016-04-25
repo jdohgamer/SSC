@@ -279,16 +279,7 @@ public class CustomGameClient : LoadBalancingClient
 		};
 		this.OpCreateRoom(newRoomName, roomOptions, TypedLobby.Default);
 	}
-	
-	void SetTeams(Hashtable HT)
-	{
-		mainGame.LoadCharactersFromProps(HT);
-		if(BothPlayersHaveSubmitted())
-		{
-			
-		}
-	}
-	
+
 	public void SaveBoardToProperties()
 	{
 		Hashtable boardProps = Grid_Setup.Instance.GetBoardAsCustomProperties();

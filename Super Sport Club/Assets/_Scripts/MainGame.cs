@@ -356,22 +356,12 @@ public class MainGame : MonoBehaviour
 									dist2 = Vector3.Distance(characterActions[1][j].cFrom.Location, characterActions[1][j].cTo.Location);
 									if(dist1>= dist2)
 									{
-										Vector3 diff = characterActions[0][k].cTo.Location - characterActions[0][k].cFrom.Location;
-										if(diff.x!=0)
-										{diff.x = diff.x/Mathf.Abs(diff.x);}
-										if(diff.z!=0)
-										{diff.z = diff.z/Mathf.Abs(diff.z);}
-										Cell newCTo = board.GetCellByLocation(characterActions[0][k].cTo.Location - diff);
+										Cell newCTo = board.GetNearestCellToDestination(characterActions[0][k].cFrom.Location, characterActions[0][k].cTo.Location);
 										characterActions[0][k].cTo = newCTo;
 									}
 									else if(dist1<dist2)
 									{
-										Vector3 diff = characterActions[1][j].cTo.Location - characterActions[1][j].cFrom.Location;
-										if(diff.x!=0)
-										{diff.x = diff.x/Mathf.Abs(diff.x);}
-										if(diff.z!=0)
-										{diff.z = diff.z/Mathf.Abs(diff.z);}
-										Cell newCTo = board.GetCellByLocation(characterActions[1][j].cTo.Location - diff);
+										Cell newCTo = board.GetNearestCellToDestination(characterActions[1][j].cFrom.Location, characterActions[1][j].cTo.Location);
 										characterActions[1][j].cTo = newCTo;
 									}else {
 										
