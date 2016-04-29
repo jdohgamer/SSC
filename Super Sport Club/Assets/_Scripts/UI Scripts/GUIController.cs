@@ -48,19 +48,6 @@ public class GUIController: MonoBehaviour
 		UISOG = new UIShotState(this);
 		UIState = UIMM;
 	}
-	void OnEnable()
-	{
-		UnityEventManager.StartListeningInt("ScoreGoal", GoalScored);
-	}
-	void OnDisable()
-	{
-		UnityEventManager.StopListeningInt("ScoreGoal", GoalScored);
-	}
-	void GoalScored(int p)
-	{
-		mainGame.ScorePoint (p);
-		UIState = UISP;
-	}
 
 	void Update()
 	{

@@ -5,36 +5,36 @@ using System.Collections.Generic;
 using ExitGames.Client.Photon.LoadBalancing;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-struct AdjacentIndexes 
-{
-	public List<Cell> neighbors;
-	
-	public AdjacentIndexes(Vector3 index, int distance,  int boardLength, int boardWidth)
-	{
-		neighbors = new List<Cell>();
-		int dist = distance*2+1; //total width of square we look in
-		int negDist = -distance; //we want to itereate between the positive and negative value
-		int negDistColumn; //relative "z" value going "up", think of as typical "y"
-		int negDistRow; //relative "x" value going "right"
-		float row, col; //these will be the actual positions in our return Vector
-		for(int x = 0; x<dist; x++)
-		{
-			negDistRow = negDist; // our "x" value will change in this outer loop from -dist to dist (equaling width)
-			negDistColumn = -distance; //our "y" value change in the inner loop from -distance to disance (equaling height)
-			for(int z = 0; z<dist; z++)
-			{
-				row = negDistRow+index.x;
-				col = negDistColumn+index.z;
-				if(row<boardWidth && row >=0 && col<boardLength && col>=0)
-				{
-					neighbors.Add(Grid_Setup.Instance.GetCellByLocation( new Vector3(row,0,col))); //only adding valid board locations
-				}
-				negDistColumn++;//increment until we reach height
-			}
-			negDist++; //increment until we reach width
-		}
-	}
-} 
+//struct AdjacentIndexes 
+//{
+//	public List<Cell> neighbors;
+//	
+//	public AdjacentIndexes(Vector3 index, int distance,  int boardLength, int boardWidth)
+//	{
+//		neighbors = new List<Cell>();
+//		int dist = distance*2+1; //total width of square we look in
+//		int negDist = -distance; //we want to itereate between the positive and negative value
+//		int negDistColumn; //relative "z" value going "up", think of as typical "y"
+//		int negDistRow; //relative "x" value going "right"
+//		float row, col; //these will be the actual positions in our return Vector
+//		for(int x = 0; x<dist; x++)
+//		{
+//			negDistRow = negDist; // our "x" value will change in this outer loop from -dist to dist (equaling width)
+//			negDistColumn = -distance; //our "y" value change in the inner loop from -distance to disance (equaling height)
+//			for(int z = 0; z<dist; z++)
+//			{
+//				row = negDistRow+index.x;
+//				col = negDistColumn+index.z;
+//				if(row<boardWidth && row >=0 && col<boardLength && col>=0)
+//				{
+//					neighbors.Add(Grid_Setup.Instance.GetCellByLocation( new Vector3(row,0,col))); //only adding valid board locations
+//				}
+//				negDistColumn++;//increment until we reach height
+//			}
+//			negDist++; //increment until we reach width
+//		}
+//	}
+//} 
 
 public class Grid_Setup : MonoBehaviour 
 {
@@ -48,8 +48,9 @@ public class Grid_Setup : MonoBehaviour
 	private static Cell highlightSingle;
 	private Cell[,] cells2D;
 	private Transform fieldTran;
-	private AdjacentIndexes adjacent;
+	//private AdjacentIndexes adjacent;
 	private int cellCount, fieldSide;
+	private List<Cell> neighbors;
 
 	void Awake()
 	{
@@ -80,7 +81,7 @@ public class Grid_Setup : MonoBehaviour
 	public bool IsInsideHighlighted(Cell spot)
 	{
 		if (isHighlighted)
-			return adjacent.neighbors.Contains (spot);
+			return neighbors.Contains (spot);
 		else
 			return false;
 	}
@@ -185,23 +186,43 @@ public class Grid_Setup : MonoBehaviour
 		{
 			TurnOffHiglightedAdjacent ();
 		}
-	
-		adjacent = new AdjacentIndexes (index, distance, this.length, this.width);
-		foreach(Cell c in adjacent.neighbors)
+
+		neighbors = new List<Cell>();
+		int dist = distance*2+1; //total width of square we look in
+		int negDist = -distance; //we want to itereate between the positive and negative value
+		int negDistColumn; //relative "z" value going "up", think of as typical "y"
+		int negDistRow; //relative "x" value going "right"
+		float row, col; //these will be the actual positions in our return Vector
+		for(int x = 0; x<dist; x++)
 		{
-			//Cell c = GetCellByLocation(v);
-			if(predicate.Invoke(c))
+			negDistRow = negDist; // our "x" value will change in this outer loop from -dist to dist (equaling width)
+			negDistColumn = -distance; //our "y" value change in the inner loop from -distance to disance (equaling height)
+			for(int z = 0; z<dist; z++)
 			{
-				c.Highlight(true);
-			}//else Debug.Log(v);
+				row = negDistRow+index.x;
+				col = negDistColumn+index.z;
+				if(row<width && row >=0 && col<length && col>=0)
+				{
+					Cell c = GetCellByLocation(new Vector3(row,0,col));
+					if(predicate.Invoke(c))
+					{
+						c.Highlight(true);
+						neighbors.Add(c);
+					}
+					//neighbors.Add(Grid_Setup.Instance.GetCellByLocation( new Vector3(row,0,col))); //only adding valid board locations
+				}
+				negDistColumn++;//increment until we reach height
+			}
+			negDist++; //increment until we reach width
 		}
+//		adjacent = new AdjacentIndexes (index, distance, this.length, this.width);
 		isHighlighted = true;
 	}
 	public void TurnOffHiglightedAdjacent()
 	{
 		if (isHighlighted) 
 		{
-			foreach(Cell v in adjacent.neighbors)
+			foreach(Cell v in neighbors)
 			{
 				v.Highlight(false);
 			}

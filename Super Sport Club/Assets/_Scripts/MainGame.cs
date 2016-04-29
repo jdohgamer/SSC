@@ -88,6 +88,15 @@ public class MainGame : MonoBehaviour
 		connectInProgress = GameClientInstance.ConnectToRegionMaster("us"); 
 	}
 
+	void OnEnable()
+	{
+		UnityEventManager.StartListeningInt("ScoreGoal", GoalScored);
+	}
+	void OnDisable()
+	{
+		UnityEventManager.StopListeningInt("ScoreGoal", GoalScored);
+	}
+
 	void Update()
 	{
 		timeSinceService += Time.deltaTime;
@@ -182,21 +191,25 @@ public class MainGame : MonoBehaviour
 		
 	}
 
-		public int TeamScore(int team)
-	{
-		if (team > 1 || team<0) 
-		{
-			return -1;
-		}
-		return score [team];
-	}
-	public void ScorePoint(int team)
+	void GoalScored(int team)
 	{
 		if (team > 1 || team<0) 
 		{
 			return;
 		}
 		score [team] += 1;
+		gui.UIState = gui.UISP;
+		Teams[0].Sleep();
+		Teams[1].Sleep();
+		board.ResetBoard();
+	}
+	public int TeamScore(int team)
+	{
+		if (team > 1 || team<0) 
+		{
+			return -1;
+		}
+		return score [team];
 	}
 
 	void CreateTeams()
