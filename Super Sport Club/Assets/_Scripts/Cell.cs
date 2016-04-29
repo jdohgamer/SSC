@@ -29,7 +29,7 @@ public class Cell
 	public int team;
 	bool occupied;
 	UnitController unit;
-	LayerMask characterLayer = 1<<LayerMask.NameToLayer("Characters");
+	//LayerMask characterLayer = 1<<LayerMask.NameToLayer("Characters");
 	Vector3 location;
 	Bounds bounds;
 	GameObject highlighter= null;

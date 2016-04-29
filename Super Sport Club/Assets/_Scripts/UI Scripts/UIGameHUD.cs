@@ -99,12 +99,13 @@ public class UIGameHUD : IUIState
 		}
 		CreateButtonPanel (CurrentSelectedChar.Location);
 	}
+
 	public void ClickOnField(Vector3 hit)
 	{
 		if(isCharacterSelected)
 		{
 			Cell cell = board.GetCellByLocation (hit);
-			if (board.IsInsideHighlighted (cell.Location)) 
+			if (board.IsInsideHighlighted (cell)) 
 			{
 				if (isPassing) 
 				{
@@ -140,12 +141,16 @@ public class UIGameHUD : IUIState
 			currentID = -1;
 		}
 	}
+	bool MovementParams(Cell x)
+	{
+		return !x.bOccupied && x !=null && x.type!=Cell.CellType.OutOfBounds;
+	}
 	void MovementClick(Cell tCell)
 	{
 		MainGameInstance.SetPlayerAction(new PlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, tCell, CurrentSelectedChar.LastTargetCell));
 		if ((CurrentSelectedChar.targetCount == 1 && CurrentSelectedChar.IsSprinting))  
 		{
-			board.HighlightAdjacent (true, tCell.Location, CurrentSelectedChar.MoveDistance);
+			board.HighlightAdjacent (x=> !x.bOccupied && x !=null && x.type!=Cell.CellType.OutOfBounds,tCell.Location, CurrentSelectedChar.MoveDistance);
 
 		}
 		else {
@@ -249,7 +254,7 @@ public class UIGameHUD : IUIState
 							isMoving = true;
 							isShooting = false;
 							isPassing = false;
-							board.HighlightAdjacent (true, CharacterPosition, CurrentSelectedChar.MoveDistance);
+							board.HighlightAdjacent (x=> x !=null  && !x.bOccupied && x.type!=Cell.CellType.OutOfBounds,CharacterPosition, CurrentSelectedChar.MoveDistance);
 							CurrentSelectedChar.StartSprinting();
 							pc.HidePanel();
 						});
@@ -262,7 +267,7 @@ public class UIGameHUD : IUIState
 						isTackling = false;
 						isShooting = false;
 						isPassing = false;
-						board.HighlightAdjacent (true, CharacterPosition, CurrentSelectedChar.MoveDistance);
+						board.HighlightAdjacent (x=> x !=null  && !x.bOccupied && x.type!=Cell.CellType.OutOfBounds,CharacterPosition, CurrentSelectedChar.MoveDistance);
 						pc.HidePanel();//GameObject.Destroy (panel.gameObject);
 					});
 				}
@@ -274,7 +279,7 @@ public class UIGameHUD : IUIState
 						isMoving = false;
 						isShooting = false;
 						isPassing = false;
-						board.HighlightAdjacent (true, CharacterPosition, CurrentSelectedChar.MoveDistance);
+						board.HighlightAdjacent (x=> x !=null  && x.bOccupied && x.UnitOccupier.team!=CurrentSelectedChar.team && x.type!=Cell.CellType.OutOfBounds,CharacterPosition, CurrentSelectedChar.MoveDistance);
 						pc.HidePanel();
 					});
 				}
@@ -287,7 +292,7 @@ public class UIGameHUD : IUIState
 						isTackling = false;
 						isShooting = false;
 						isMoving = false;
-						board.HighlightAdjacent (true,  CharacterPosition, (int)CurrentSelectedChar.charData.Strength);
+						board.HighlightAdjacent (x=> x !=null && x.type!=Cell.CellType.OutOfBounds,CharacterPosition, (int)CurrentSelectedChar.charData.Strength);
 						pc.HidePanel();
 					});	
 					pc.AddButton("Shoot", false).onClick.AddListener (() => 
@@ -296,7 +301,7 @@ public class UIGameHUD : IUIState
 						isTackling = false;
 						isPassing = false;
 						isMoving = false;
-						board.HighlightAdjacent (true,  CharacterPosition, (int)CurrentSelectedChar.charData.Strength);
+						board.HighlightAdjacent (x=> x !=null && x.type!=Cell.CellType.OutOfBounds,CharacterPosition, (int)CurrentSelectedChar.charData.Strength);
 						pc.HidePanel();
 					});	
 				}
