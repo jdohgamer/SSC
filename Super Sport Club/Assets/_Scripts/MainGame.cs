@@ -166,23 +166,19 @@ public class MainGame : MonoBehaviour
 
 	public void ClearActions()
 	{
-		for(int b=0; b<characterActions.Length; b++)
+		for(int b=0; b<CurrentActionSet.Length; b++)
 		{
-			for(int c= 0;c<characterActions[b].Length;c++)
+			if(CurrentActionSet[b]!=null)
 			{
-				if(characterActions[b][c]!=null)
-				{
-					characterActions[b][c] = null;
-				}
+				CurrentActionSet[b] = null;
 			}
 		}
 		board.TurnOffHiglightedAdjacent ();
-		actionCount[0] = 0;
-		actionCount[1] = 0;
-//		foreach(UnitController c in CurrentTeam.mates)
-//		{
-//			c.ClearActions();
-//		}
+		actionCount[CurrentTeamNum] = 0;
+		foreach(UnitController c in CurrentTeam.mates)
+		{
+			c.ClearActions();
+		}
 	}
 
 	public bool IsShotOnGoal(int tNum, Vector3 spot)

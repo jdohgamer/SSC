@@ -72,6 +72,7 @@ public class Grid_Setup : MonoBehaviour
 
 	public void ResetBoard ()
 	{
+		TurnOffHiglightedAdjacent();
 		Ball.GetComponent<BallScript>().StopMe();
 		Ball.transform.SetParent (null);
 		Ball.transform.position = new Vector3 (11,0.1f,6);
@@ -161,25 +162,6 @@ public class Grid_Setup : MonoBehaviour
 		return newCTo;
 	}
 
-//	public void HighlightAdjacent(bool set, Vector3 index, int distance)//get rid of bool set, I never use it
-//	{
-//		if (isHighlighted||set==false)
-//		{
-//			TurnOffHiglightedAdjacent ();
-//		}
-//	
-//		adjacent = new AdjacentIndexes (index, distance, this.length, this.width);
-//		foreach(Vector3 v in adjacent.neighbors)
-//		{
-//			Cell c = GetCellByLocation(v);
-//			if(c !=null && c.type!=Cell.CellType.OutOfBounds)
-//			{
-//				c.Highlight(true);
-//			}//else Debug.Log(v);
-//		}
-//		isHighlighted = true;
-//	}
-
 	public void HighlightAdjacent( Predicate<Cell> predicate, Vector3 index, int distance)
 	{
 		if (isHighlighted)
@@ -188,7 +170,7 @@ public class Grid_Setup : MonoBehaviour
 		}
 
 		neighbors = new List<Cell>();
-		int dist = distance*2+1; //total width of square we look in
+		int dist = (distance*2)+1; //total width of square we look in
 		int negDist = -distance; //we want to itereate between the positive and negative value
 		int negDistColumn; //relative "z" value going "up", think of as typical "y"
 		int negDistRow; //relative "x" value going "right"
@@ -201,7 +183,7 @@ public class Grid_Setup : MonoBehaviour
 			{
 				row = negDistRow+index.x;
 				col = negDistColumn+index.z;
-				if(row<width && row >=0 && col<length && col>=0)
+				if(row<width && row >=0 && col<length && col>=0)//only adding valid board locations
 				{
 					Cell c = GetCellByLocation(new Vector3(row,0,col));
 					if(predicate.Invoke(c))
@@ -209,13 +191,12 @@ public class Grid_Setup : MonoBehaviour
 						c.Highlight(true);
 						neighbors.Add(c);
 					}
-					//neighbors.Add(Grid_Setup.Instance.GetCellByLocation( new Vector3(row,0,col))); //only adding valid board locations
+					//neighbors.Add(Grid_Setup.Instance.GetCellByLocation( new Vector3(row,0,col))); 
 				}
 				negDistColumn++;//increment until we reach height
 			}
 			negDist++; //increment until we reach width
 		}
-//		adjacent = new AdjacentIndexes (index, distance, this.length, this.width);
 		isHighlighted = true;
 	}
 	public void TurnOffHiglightedAdjacent()
