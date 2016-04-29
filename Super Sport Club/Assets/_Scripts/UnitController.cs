@@ -12,7 +12,7 @@ public class UnitController : MonoBehaviour
 	public bool hasTarget, hasBall;
 	public bool BActive{get{return this.gameObject.activeSelf;}set{this.gameObject.SetActive(value);}}
 	public int MoveDistance{get{return  charData.MoveDist;}}
-	public bool CanSprint{get{return (turnsSinceSprint>=2);}}
+	public bool CanSprint{get{return (turnsSinceSprint>=2)&&(targetCount<2);}}
 	public Cell OccupiedCell
 	{
 		get
@@ -158,7 +158,7 @@ public class UnitController : MonoBehaviour
 		}
 		targetCount = 0;
 		bSprinting = false;
-		//passTargetPin.SetActive(false);//if we make this apart of targetPins[], then the loop above will take care of it.
+		passTargetPin.SetActive(false);//if we make this apart of targetPins[], then the loop above will take care of it.
 		lastTargetedCell = null;
 		ActionQueue.Clear ();//This "should" be unnecessary as it's not set until Execution starts, and it empties during execution
 	}
@@ -237,7 +237,6 @@ public class UnitController : MonoBehaviour
 							RotateTowards(newCTo.Location+offset);
 							yield return StartCoroutine (MoveTo (newCTo.Location+offset));
 						}
-						//MainGameInstance.SetPlayerAction(new PlayerAction (PlayerAction.Actions.Move, CurrentSelectedChar,tCell, newCTo));
 						break;
 					}
 					case PlayerAction.Actions.Block:
@@ -252,16 +251,16 @@ public class UnitController : MonoBehaviour
 	}
 	IEnumerator MoveTo(Vector3 target)
 	{
-		Vector3 dir, nextCell;
+		//Vector3 dir, nextCell;
 		easeType = ease.ToString();
 		while(Vector3.Distance(tran.position,target)>0.1f) 
 		{
-			dir = target - (OccupiedCell.Location + offset);
-			nextCell = (OccupiedCell.Location + offset) + dir.normalized;
+			//dir = target - (OccupiedCell.Location + offset);
+			//nextCell = (OccupiedCell.Location + offset) + dir.normalized;
 			OccupiedCell.UnitOccupier = null;
 			//if(CanMove(target))
 			{
-				iTween.MoveTo(gameObject, iTween.Hash("position", nextCell, "easeType", easeType, "loopType", "none", "speed", charData.Speed));
+				iTween.MoveTo(gameObject, iTween.Hash("position", target, "easeType", easeType, "loopType", "none", "speed", charData.Speed/2));
 				yield return new WaitForSeconds(0.2f);
 			}//else break;
 		}

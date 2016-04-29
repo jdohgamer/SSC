@@ -163,7 +163,7 @@ public class Grid_Setup : MonoBehaviour
 		return newCTo;
 	}
 
-	public void HighlightAdjacent(bool set, Vector3 index, int distance)
+	public void HighlightAdjacent(bool set, Vector3 index, int distance)//get rid of bool set, I never use it
 	{
 		if (isHighlighted||set==false)
 		{

@@ -52,7 +52,7 @@ public class MainGame : MonoBehaviour
 			}else teamNum = value;
 		}
 	}
-	public PlayerAction[] CurrentActionSet{get{return characterActions[CurrentTeamNum];}}
+	public PlayerAction[] CurrentActionSet{get{return characterActions[CurrentTeamNum];}set{characterActions[CurrentTeamNum]=value;}}
 	[SerializeField] private int teamSize = 5, currentTeam;
 	[SerializeField] string AppId;// set in inspector. this is called when the client loaded and is ready to start
 	[SerializeField] float serviceInterval = 1;
@@ -113,6 +113,27 @@ public class MainGame : MonoBehaviour
 				act.iCh.SetPassTarget(act.cTo);
 			}
 		}
+	}
+	public void RemovePlayerActions(UnitController unit)
+	{
+		//PlayerAction[] acts = new PlayerAction[MaxActions];
+		PlayerAction temp;
+		byte count=0;
+		for(int i = 0; i<CurrentActionSet.Length;i++)
+		{
+			if(CurrentActionSet[i]!= null && CurrentActionSet[i].iCh==unit)
+			{	
+				count++;
+				temp = CurrentActionSet[MaxActions-1];
+				//CurrentActionSet[MaxActions-1] = CurrentActionSet[i];
+				CurrentActionSet[i] = temp;
+			}
+		}
+//		for(int c = count; c>0;c--)
+//		{
+//			CurrentActionSet[CurrentActionSet.Length-c] = null;
+//		}
+		actionCount[CurrentTeamNum] -= count;
 	}
 
 	public void SetOtherTeamActions(Hashtable ht)

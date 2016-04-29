@@ -8,12 +8,13 @@ public class UIGameHUD : IUIState
 	static GameObject panel, meter;
 	public UnitController CurrentSelectedChar
 	{
-		get{return MainGameInstance.GetCharacter((int)MainGameInstance.CurrentTeamNum,currentID);}
+		get{return MainGameInstance.GetCharacter(MainGameInstance.CurrentTeamNum,currentID);}
 	}
 	MainGame MainGameInstance;
 	GUIController gui;
 	float offsetX = -50,offsetY =0;
 	bool isCharacterSelected;
+	PanelController pc;
 	private Vector3 idealPassDir, simpleDir, offsetDir;
 	private Grid_Setup board;
 	private int currentID = -1;
@@ -25,6 +26,11 @@ public class UIGameHUD : IUIState
 		this.gui = GUI;
 		MainGameInstance = mg;
 		board = Grid_Setup.Instance;
+		panel = GameObject.Instantiate(gui.panelFab.gameObject, Vector3.zero, Quaternion.identity)as GameObject;
+		panel.transform.SetParent(gui.UIcan.transform,false);
+		panel.transform.SetAsLastSibling(); 
+		pc = panel.GetComponent<PanelController> ();
+		pc.HidePanel();
 	}
 	public void EnterState ()
 	{
@@ -123,10 +129,8 @@ public class UIGameHUD : IUIState
 		{
 			isMoving = false;
 			isPassing = false;
-			if (panel!=null) 
-			{
-				GameObject.Destroy(panel.gameObject);
-			}
+			pc.HidePanel();//GameObject.Destroy(panel.gameObject);
+
 			if (meter!=null) 
 			{
 				GameObject.Destroy(meter.gameObject);
@@ -204,16 +208,8 @@ public class UIGameHUD : IUIState
 		meter = GameObject.Instantiate(gui.meterFab.gameObject, loc, Quaternion.LookRotation(simpleDir))as GameObject;
 		meter.GetComponent<Gauge>().SetIdeal(idealPassDir);
 
-		if (panel!=null) 
-		{
-			GameObject.Destroy(panel.gameObject);
-		}
-
 		loc= Camera.main.WorldToScreenPoint(CharacterPosition) + offsetDir*50; //re-using a variable
-		panel = GameObject.Instantiate(gui.panelFab.gameObject, loc, Quaternion.identity)as GameObject;
-		panel.transform.SetParent(gui.UIcan.transform,false);
-		panel.transform.SetAsLastSibling(); 
-		PanelController pc = panel.GetComponent<PanelController> ();
+		pc.ShowPanel(loc);
 
 		pc.AddButton("Kick", false).onClick.AddListener (() => 
 		{ 
@@ -221,38 +217,32 @@ public class UIGameHUD : IUIState
 			Vector3 cellPos = CharacterPosition + kick.normalized * idealPassDir.magnitude;
 			KickClick(board.GetCellByLocation(cellPos),act);			
 			GameObject.Destroy(meter.gameObject);
-			GameObject.Destroy(panel.gameObject);
+			pc.HidePanel();//GameObject.Destroy(panel.gameObject);
 		});
 	}
 
 	void CreateButtonPanel(Vector3 cellLocation)
 	{
-		if (panel!=null)
-		{
-			GameObject.Destroy(panel.gameObject);
-		}
 		Vector3 loc = Camera.main.WorldToScreenPoint(cellLocation);
 		loc += new Vector3(offsetX,offsetY,0f);
-		panel = GameObject.Instantiate(gui.panelFab.gameObject, loc, Quaternion.identity)as GameObject;//prefab with PanelController script attached
-		panel.transform.SetParent(gui.UIcan.transform,false);
-		panel.transform.SetAsLastSibling();
-		PanelController pc = panel.GetComponent<PanelController> ();
+		pc.ShowPanel(loc);
 		Vector3 CharacterPosition = CurrentSelectedChar.LastTargetCell.Location;
 
-		if(CurrentSelectedChar.actionCount > 0|| CurrentSelectedChar.targetCount > 0) 
+		if(CurrentSelectedChar.actionCount > 0|| CurrentSelectedChar.targetCount > 0 || CurrentSelectedChar.IsSprinting) 
 		{
 			pc.AddButton("Clear", false).onClick.AddListener (() => 
 			{ 
 				CurrentSelectedChar.ClearActions();
+				MainGameInstance.RemovePlayerActions(CurrentSelectedChar);
 				board.TurnOffHiglightedAdjacent();
-				GameObject.Destroy (panel.gameObject);
+				pc.HidePanel();
 			});
 		}
 		if (MainGameInstance.ActionsLeft > 0) 
 		{
 			if ((CurrentSelectedChar.maxActions - CurrentSelectedChar.actionCount > 0))
 			{
-				if(CurrentSelectedChar.targetCount <2 && CurrentSelectedChar.CanSprint  && !CurrentSelectedChar.IsSprinting)
+				if(CurrentSelectedChar.CanSprint  && !CurrentSelectedChar.IsSprinting)
 				{
 					pc.AddButton ("Sprint", false).onClick.AddListener (() => 
 						{ 
@@ -261,7 +251,7 @@ public class UIGameHUD : IUIState
 							isPassing = false;
 							board.HighlightAdjacent (true, CharacterPosition, CurrentSelectedChar.MoveDistance);
 							CurrentSelectedChar.StartSprinting();
-							GameObject.Destroy (panel.gameObject);
+							pc.HidePanel();
 						});
 				}
 				if (CurrentSelectedChar.targetCount == 0 || (CurrentSelectedChar.targetCount == 1 && CurrentSelectedChar.IsSprinting)) 
@@ -273,7 +263,7 @@ public class UIGameHUD : IUIState
 						isShooting = false;
 						isPassing = false;
 						board.HighlightAdjacent (true, CharacterPosition, CurrentSelectedChar.MoveDistance);
-						GameObject.Destroy (panel.gameObject);
+						pc.HidePanel();//GameObject.Destroy (panel.gameObject);
 					});
 				}
 				if (CurrentSelectedChar.targetCount == 0  && !CurrentSelectedChar.IsSprinting) 
@@ -285,7 +275,7 @@ public class UIGameHUD : IUIState
 						isShooting = false;
 						isPassing = false;
 						board.HighlightAdjacent (true, CharacterPosition, CurrentSelectedChar.MoveDistance);
-						GameObject.Destroy (panel.gameObject);
+						pc.HidePanel();
 					});
 				}
 
@@ -298,7 +288,7 @@ public class UIGameHUD : IUIState
 						isShooting = false;
 						isMoving = false;
 						board.HighlightAdjacent (true,  CharacterPosition, (int)CurrentSelectedChar.charData.Strength);
-						GameObject.Destroy (panel.gameObject);
+						pc.HidePanel();
 					});	
 					pc.AddButton("Shoot", false).onClick.AddListener (() => 
 					{ 
@@ -307,10 +297,10 @@ public class UIGameHUD : IUIState
 						isPassing = false;
 						isMoving = false;
 						board.HighlightAdjacent (true,  CharacterPosition, (int)CurrentSelectedChar.charData.Strength);
-						GameObject.Destroy (panel.gameObject);
+						pc.HidePanel();
 					});	
 				}
 			}
-		} 
+		}else pc.HidePanel();
 	}
 }

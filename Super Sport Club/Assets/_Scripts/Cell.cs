@@ -9,11 +9,26 @@ public class Cell
 	public bool bHighlighted;
 	public int id;
 	public CellType type;
-	public UnitController UnitOccupier;
+	public UnitController UnitOccupier{
+		get
+		{
+			return unit;
+		}
+		set
+		{
+			unit = value; 
+
+			if(value==null)
+				occupied = false;
+			else occupied = true;
+		}
+	}
 	public Vector3 Location{get{return location;}}
 	//public bool HasBall{get{return IsVectorInCell(Grid_Setup.Instance.BallLocation);}}
-	public bool bOccupied{get{return Physics.CheckSphere(Location, 0.5f, characterLayer);}}
+	public bool bOccupied{get{return occupied;}}//Physics.CheckSphere(Location, 0.5f, characterLayer);}}
 	public int team;
+	bool occupied;
+	UnitController unit;
 	LayerMask characterLayer = 1<<LayerMask.NameToLayer("Characters");
 	Vector3 location;
 	Bounds bounds;
