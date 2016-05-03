@@ -24,7 +24,7 @@ public class Cell
 		}
 	}
 	public Vector3 Location{get{return location;}}
-	//public bool HasBall{get{return IsVectorInCell(Grid_Setup.Instance.BallLocation);}}
+	public bool HasBall{get{return IsVectorInCell(Grid_Setup.Instance.BallLocation);}}
 	public bool bOccupied{get{return occupied;}}//Physics.CheckSphere(Location, 0.5f, characterLayer);}}
 	public int team;
 	bool occupied;

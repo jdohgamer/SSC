@@ -56,6 +56,7 @@ public class Grid_Setup : MonoBehaviour
 	{
 		GameObject field = new GameObject("Field");
 		fieldTran = field.transform;
+		neighbors = new List<Cell>();
 	}
 
 	void DestroyBoard ()
@@ -137,15 +138,15 @@ public class Grid_Setup : MonoBehaviour
 	{
 		int x = (int)Mathf.Round(locaton.x);//we use a unit size of 1, elsewise multiply by size
 		int z = (int)Mathf.Round(locaton.z);
-		if(cells2D!=null&& cells2D[x,z]!=null)
+		if(cells2D!=null && cells2D[x,z]!=null)
 		return cells2D[x,z];
 		else return null;
 	}
 	public Cell GetCellByID(int id)
 	{
-		int row = (int)Mathf.Floor(id/length);//truncate to "ten's" place
-		int col = (int)(id % length);//get the remainder of length
-		if(cells2D[row,col]!=null)
+		int row = (int)Mathf.Floor(id/length);//truncate to "ten's" place, using length as our base
+		int col = (int)(id % length);//get the remainder for our "one's" place, using length as our base
+		if(cells2D!=null && cells2D[row,col]!=null)
 		{
 			return cells2D[row,col];
 		}
@@ -169,7 +170,7 @@ public class Grid_Setup : MonoBehaviour
 			TurnOffHiglightedAdjacent ();
 		}
 
-		neighbors = new List<Cell>();
+		neighbors.Clear();
 		int dist = (distance*2)+1; //total width of square we look in
 		int negDist = -distance; //we want to itereate between the positive and negative value
 		int negDistColumn; //relative "z" value going "up", think of as typical "y"
@@ -186,12 +187,11 @@ public class Grid_Setup : MonoBehaviour
 				if(row<width && row >=0 && col<length && col>=0)//only adding valid board locations
 				{
 					Cell c = GetCellByLocation(new Vector3(row,0,col));
-					if(predicate.Invoke(c))
+					if(predicate.Invoke(c))//if the cell matches our criteria
 					{
 						c.Highlight(true);
 						neighbors.Add(c);
 					}
-					//neighbors.Add(Grid_Setup.Instance.GetCellByLocation( new Vector3(row,0,col))); 
 				}
 				negDistColumn++;//increment until we reach height
 			}
@@ -234,13 +234,7 @@ public class Grid_Setup : MonoBehaviour
 		for (int i = 0; i < cellCount; i++)
 		{
 			customProps[i.ToString()] = (int)GetCellByID(i).type;
-		}
-//		foreach(FSM_Character c in characters2D)
-//		{
-//			if(c!=null)
-//			customProps.Add("character#"+c.id,c.GetCharacterAsProp());
-//		}	
-		
+		}	
 		return customProps;
 	}
 	
@@ -256,6 +250,7 @@ public class Grid_Setup : MonoBehaviour
 		{
 			if (customProps.ContainsKey(i.ToString()))
 			{
+				//This needs to set the local player's board with the network board
 				readTiles++;
 			}
 		}

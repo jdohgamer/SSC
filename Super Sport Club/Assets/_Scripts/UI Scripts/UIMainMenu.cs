@@ -7,7 +7,6 @@ public class UIMainMenu : IUIState
 {
 	GUIController gui;
 
-	bool connectInProcess;
 
 	public UIMainMenu(GUIController GUI)
 	{

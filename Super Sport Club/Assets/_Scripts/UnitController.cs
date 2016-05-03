@@ -108,7 +108,7 @@ public class UnitController : MonoBehaviour
 	}
 	public void SetPlayerAction(PlayerAction act)
 	{
-		if(actionCount<maxActions)
+		//if(actionCount<maxActions)
 		{
 			ActionQueue.Enqueue (act);
 			actionCount += 1;

@@ -18,7 +18,9 @@ public class UIGameHUD : IUIState
 	private Vector3 idealPassDir, simpleDir, offsetDir;
 	private Grid_Setup board;
 	private int currentID = -1;
-	private bool isPassing, isMoving, isShooting, isTackling, shotFired;
+	private bool isPassing, isMoving, isShooting, isTackling;
+	private enum CharacterSelectionState{None, Passing, Shooting, Moving, Tackling}
+	private CharacterSelectionState selectionState;
 	//LayerMask mask = (1<<LayerMask.NameToLayer("Ground") | 1<<LayerMask.NameToLayer("Characters"));
 
 	public UIGameHUD(GUIController GUI, MainGame mg)
@@ -45,9 +47,12 @@ public class UIGameHUD : IUIState
 		{
 			ToMainMenu ();
 		}
-		if (Input.GetKeyDown (KeyCode.Space)) 
+		if(MainGameInstance.bDev)
 		{
-			ToShotState ();
+			if (Input.GetKeyDown (KeyCode.Space)) 
+			{
+				ToShotState ();
+			}
 		}
 	}
 	public void ExitState()
@@ -107,20 +112,46 @@ public class UIGameHUD : IUIState
 			Cell cell = board.GetCellByLocation (hit);
 			if (board.IsInsideHighlighted (cell)) 
 			{
-				if (isPassing) 
+				switch(selectionState)
 				{
+				case CharacterSelectionState.None:
+				break;
+				case CharacterSelectionState.Moving:
+					MainGameInstance.SetPlayerAction(new PlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, cell, CurrentSelectedChar.LastTargetCell));
+					if ((CurrentSelectedChar.targetCount == 1 && CurrentSelectedChar.IsSprinting))  
+					{
+						board.HighlightAdjacent (x=> !x.bOccupied && x !=null && x.type!=Cell.CellType.OutOfBounds, cell.Location, CurrentSelectedChar.MoveDistance);
+
+					}
+					else {
+						board.TurnOffHiglightedAdjacent();
+						selectionState = CharacterSelectionState.None;
+					}
+				break;
+				case CharacterSelectionState.Passing:
 					CreatePlayerMeter (cell.Location, PlayerAction.Actions.Pass);
-				} else if (isMoving) 
-				{
-					MovementClick (cell);
-				} else if (isShooting) 
-				{
+				break;
+				case CharacterSelectionState.Shooting:
 					CreatePlayerMeter (cell.Location, PlayerAction.Actions.Shoot);
+				break;
+				case CharacterSelectionState.Tackling:
+					ActionClick(cell, PlayerAction.Actions.Tackle);
+				break;
 				}
-				else if (isTackling) 
-				{
-					ActionClick (cell, PlayerAction.Actions.Tackle);
-				}
+//				if (isPassing) 
+//				{
+//					CreatePlayerMeter (cell.Location, PlayerAction.Actions.Pass);
+//				} else if (isMoving) 
+//				{
+//					MovementClick (cell);
+//				} else if (isShooting) 
+//				{
+//					CreatePlayerMeter (cell.Location, PlayerAction.Actions.Shoot);
+//				}
+//				else if (isTackling) 
+//				{
+//					ActionClick (cell, PlayerAction.Actions.Tackle);
+//				}
 			}
 		}
 	}
@@ -128,8 +159,7 @@ public class UIGameHUD : IUIState
 	{
 		if(currentID!=-1)
 		{
-			isMoving = false;
-			isPassing = false;
+			selectionState = CharacterSelectionState.None;
 			pc.HidePanel();//GameObject.Destroy(panel.gameObject);
 
 			if (meter!=null) 
@@ -145,38 +175,38 @@ public class UIGameHUD : IUIState
 	{
 		return !x.bOccupied && x !=null && x.type!=Cell.CellType.OutOfBounds;
 	}
-	void MovementClick(Cell tCell)
-	{
-		MainGameInstance.SetPlayerAction(new PlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, tCell, CurrentSelectedChar.LastTargetCell));
-		if ((CurrentSelectedChar.targetCount == 1 && CurrentSelectedChar.IsSprinting))  
-		{
-			board.HighlightAdjacent (x=> !x.bOccupied && x !=null && x.type!=Cell.CellType.OutOfBounds,tCell.Location, CurrentSelectedChar.MoveDistance);
-
-		}
-		else {
-			board.TurnOffHiglightedAdjacent();
-			isMoving = false;
-		}
-	}	
+//	void MovementClick(Cell tCell)
+//	{
+//		MainGameInstance.SetPlayerAction(new PlayerAction(PlayerAction.Actions.Move, CurrentSelectedChar, tCell, CurrentSelectedChar.LastTargetCell));
+//		if ((CurrentSelectedChar.targetCount == 1 && CurrentSelectedChar.IsSprinting))  
+//		{
+//			board.HighlightAdjacent (x=> !x.bOccupied && x !=null && x.type!=Cell.CellType.OutOfBounds,tCell.Location, CurrentSelectedChar.MoveDistance);
+//
+//		}
+//		else {
+//			board.TurnOffHiglightedAdjacent();
+//			selectionState = CharacterSelectionState.None;
+//		}
+//	}	
 	void ActionClick(Cell tCell, PlayerAction.Actions act)
 	{
-		if (CurrentSelectedChar.maxActions -CurrentSelectedChar.actionCount > 0) 
+		//if (CurrentSelectedChar.maxActions -CurrentSelectedChar.actionCount > 0) 
 		{
 			MainGameInstance.SetPlayerAction(new PlayerAction (act, CurrentSelectedChar,tCell, CurrentSelectedChar.LastTargetCell));
 			board.TurnOffHiglightedAdjacent();
-			isTackling = false;
+			selectionState = CharacterSelectionState.None;
 		}
 	}
-
-	void KickClick(Cell tCell, PlayerAction.Actions act)
-	{
-		if (CurrentSelectedChar.maxActions -CurrentSelectedChar.actionCount > 0) 
-		{
-			MainGameInstance.SetPlayerAction(new PlayerAction (act, CurrentSelectedChar,tCell, CurrentSelectedChar.LastTargetCell));
-			board.TurnOffHiglightedAdjacent();
-			isPassing = false;
-		}
-	}
+//
+//	void KickClick(Cell tCell, PlayerAction.Actions act)
+//	{
+//		if (CurrentSelectedChar.maxActions -CurrentSelectedChar.actionCount > 0) 
+//		{
+//			MainGameInstance.SetPlayerAction(new PlayerAction (act, CurrentSelectedChar,tCell, CurrentSelectedChar.LastTargetCell));
+//			board.TurnOffHiglightedAdjacent();
+//			selectionState = CharacterSelectionState.None;
+//		}
+//	}
 
 	void CreatePlayerMeter(Vector3 location, PlayerAction.Actions act)
 	{
@@ -208,6 +238,7 @@ public class UIGameHUD : IUIState
 		if (meter!=null)
 		{
 			GameObject.Destroy(meter.gameObject);
+			pc.HidePanel();
 		}
 		Vector3 loc = CharacterPosition+Vector3.up*0.2f;
 		meter = GameObject.Instantiate(gui.meterFab.gameObject, loc, Quaternion.LookRotation(simpleDir))as GameObject;
@@ -220,7 +251,7 @@ public class UIGameHUD : IUIState
 		{ 
 			Vector3 kick = meter.GetComponent<Gauge>().StopBounce();
 			Vector3 cellPos = CharacterPosition + kick.normalized * idealPassDir.magnitude;
-			KickClick(board.GetCellByLocation(cellPos),act);			
+			ActionClick(board.GetCellByLocation(cellPos),act);			
 			GameObject.Destroy(meter.gameObject);
 			pc.HidePanel();//GameObject.Destroy(panel.gameObject);
 		});
@@ -251,9 +282,7 @@ public class UIGameHUD : IUIState
 				{
 					pc.AddButton ("Sprint", false).onClick.AddListener (() => 
 						{ 
-							isMoving = true;
-							isShooting = false;
-							isPassing = false;
+							selectionState = CharacterSelectionState.Moving;
 							board.HighlightAdjacent (x=> x !=null  && !x.bOccupied && x.type!=Cell.CellType.OutOfBounds,CharacterPosition, CurrentSelectedChar.MoveDistance);
 							CurrentSelectedChar.StartSprinting();
 							pc.HidePanel();
@@ -263,10 +292,7 @@ public class UIGameHUD : IUIState
 				{
 					pc.AddButton ("Move", false).onClick.AddListener (() => 
 					{ 
-						isMoving = true;
-						isTackling = false;
-						isShooting = false;
-						isPassing = false;
+						selectionState = CharacterSelectionState.Moving;
 						board.HighlightAdjacent (x=> x !=null  && !x.bOccupied && x.type!=Cell.CellType.OutOfBounds,CharacterPosition, CurrentSelectedChar.MoveDistance);
 						pc.HidePanel();//GameObject.Destroy (panel.gameObject);
 					});
@@ -275,33 +301,26 @@ public class UIGameHUD : IUIState
 				{
 					pc.AddButton ("Tackle", false).onClick.AddListener (() => 
 					{ 
-						isTackling = true;
-						isMoving = false;
-						isShooting = false;
-						isPassing = false;
+						selectionState = CharacterSelectionState.Tackling;
 						board.HighlightAdjacent (x=> x !=null  && x.bOccupied && x.UnitOccupier.team!=CurrentSelectedChar.team && x.type!=Cell.CellType.OutOfBounds,CharacterPosition, CurrentSelectedChar.MoveDistance);
 						pc.HidePanel();
 					});
 				}
 
-				if (CurrentSelectedChar.hasBall || CurrentSelectedChar.LastTargetCell.IsVectorInCell(board.BallLocation)) 
+				if (CurrentSelectedChar.hasBall || CurrentSelectedChar.LastTargetCell.HasBall) 
 				{
 					pc.AddButton("Pass", false).onClick.AddListener (() => 
 					{ 
-						isPassing = true;
-						isTackling = false;
-						isShooting = false;
-						isMoving = false;
-						board.HighlightAdjacent (x=> x !=null && x.type!=Cell.CellType.OutOfBounds,CharacterPosition, (int)CurrentSelectedChar.charData.Strength);
+						selectionState = CharacterSelectionState.Passing;
+						int shotDistanceSqrd = (int)CurrentSelectedChar.charData.Strength*(int)CurrentSelectedChar.charData.Strength;
+						board.HighlightAdjacent (x=> x !=null && x.type!=Cell.CellType.OutOfBounds&& (x.Location-CharacterPosition).sqrMagnitude<shotDistanceSqrd, CharacterPosition, (int)CurrentSelectedChar.charData.Strength);
 						pc.HidePanel();
 					});	
 					pc.AddButton("Shoot", false).onClick.AddListener (() => 
 					{ 
-						isShooting = true;
-						isTackling = false;
-						isPassing = false;
-						isMoving = false;
-						board.HighlightAdjacent (x=> x !=null && x.type!=Cell.CellType.OutOfBounds,CharacterPosition, (int)CurrentSelectedChar.charData.Strength);
+						selectionState = CharacterSelectionState.Shooting;
+						int shotDistanceSqrd = (int)CurrentSelectedChar.charData.Strength*(int)CurrentSelectedChar.charData.Strength;
+						board.HighlightAdjacent (x=> x !=null && x.type!=Cell.CellType.OutOfBounds && (x.Location-CharacterPosition).sqrMagnitude<shotDistanceSqrd, CharacterPosition, (int)CurrentSelectedChar.charData.Strength);
 						pc.HidePanel();
 					});	
 				}

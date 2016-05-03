@@ -109,7 +109,7 @@ public class MainGame : MonoBehaviour
 
 	public void SetPlayerAction(PlayerAction act)
 	{
-		if(actionCount[CurrentTeamNum]<MaxActions&&act.iCh.actionCount<act.iCh.maxActions)
+		//if(actionCount[CurrentTeamNum]<MaxActions&&act.iCh.actionCount<act.iCh.maxActions)
 		{
 			CurrentActionSet[actionCount[CurrentTeamNum]] = act;
 			actionCount[CurrentTeamNum] += 1;

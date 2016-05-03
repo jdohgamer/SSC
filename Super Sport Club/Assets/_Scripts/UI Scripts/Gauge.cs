@@ -23,7 +23,7 @@ public class Gauge : MonoBehaviour
 		rot.eulerAngles += new Vector3(90,0,45);
 		arrow.rotation = rot;
 		currentAngle = arrow.rotation.eulerAngles.y;
-		StartCoroutine(Bounce());
+		//StartCoroutine(Bounce());
 		run =true;
 	}
 	

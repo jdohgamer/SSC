@@ -107,7 +107,6 @@ public class GUIController: MonoBehaviour
 			infoText.text += string.Format(" Score: {0} : {1}\n", mainGame.TeamScore(0), mainGame.TeamScore(1));
 			yield return new WaitForSeconds (1f);
 		}
-	
 	}
 
 	public void EnableHUD(bool set)
@@ -138,8 +137,6 @@ public class GUIController: MonoBehaviour
 	{
 		mainGame.NewGame();
 		Switch_Button.gameObject.SetActive(true);
-		//UIState.ToSetPiece();
-		//board.Generate();
 	}
 
 	public void QuitGameButton()
@@ -149,11 +146,6 @@ public class GUIController: MonoBehaviour
 	public void ClearButton()
 	{
 		mainGame.ClearActions();
-//		this.GameClientInstance.ClearActions();
-//		foreach(UnitController c in board.Teams[(int)GameClientInstance.team].mates)
-//		{
-//			c.ClearActions();
-//		}
 	}
 	public void SwitchTeams()
 	{
@@ -168,6 +160,5 @@ public class GUIController: MonoBehaviour
 	public void SubmitTeam()
 	{	
 		mainGame.SubmitTeam();
-		//UIState.EndTurnButton();
 	}
 }
